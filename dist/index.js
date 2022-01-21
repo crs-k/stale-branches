@@ -60,7 +60,7 @@ function getBranches() {
         }
         catch (err) {
             if (err instanceof Error)
-                core.setFailed(`Failed to retrieve branches for ${get_context_1.repo}`);
+                core.setFailed(`Failed to retrieve branches for ${get_context_1.repo} with ${err.message}`);
             branchName = '';
             protectEnabled = false;
         }

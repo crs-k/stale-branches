@@ -22,7 +22,8 @@ export async function getBranches(): Promise<[string, boolean]> {
     assert.ok(branchName, 'name cannot be empty')
     assert.ok(protectEnabled, 'protected cannot be empty')
   } catch (err) {
-    if (err instanceof Error) core.setFailed(`Failed to retrieve branches for ${repo} with ${err.message}`)
+    if (err instanceof Error)
+      core.setFailed(`Failed to retrieve branches for ${repo} with ${err.message}`)
     branchName = ''
     protectEnabled = false
   }
