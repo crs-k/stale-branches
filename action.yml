@@ -1,0 +1,25 @@
+name: 'Stale Branches'
+description: 'Finds and deletes stale branches'
+author: 'Chris Kerins'
+inputs:
+  repo-token:
+    description: 'The GITHUB_TOKEN secret'
+  days-before-stale:
+    description: 'Number of days a branch has been inactive before it is considered stale. Default: 120.'
+    required: false
+    default: '120'
+  days-before-delete:
+    description: 'Number of days a branch has been inactive before it is deleted. Default: 180.'
+    required: false
+    default: '180'
+outputs:
+  closed-branches:
+    description: 'List of all closed branches.'
+  stale-branches:
+    description: 'List of all stale branches.'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
+branding:
+  icon: 'save'
+  color: 'blue'
