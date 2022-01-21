@@ -55,6 +55,9 @@ function getBranches() {
             });
             branchName = response.data[0].name;
             protectEnabled = response.data[0].protected;
+            for (const i in response) {
+                core.info(response[i]);
+            }
             assert.ok(branchName, 'name cannot be empty');
             //assert.ok(protectEnabled, 'protected cannot be empty')
         }
