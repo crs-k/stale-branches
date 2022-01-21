@@ -18,8 +18,9 @@ export async function getBranches(): Promise<[string, boolean]> {
     })
     branchName = response.data[0].name
     protectEnabled = response.data[0].protected
+
     for (const i in response.data[0]) {
-      core.info(response[i])
+      core.info(response.data[i].name)
     }
     assert.ok(branchName, 'name cannot be empty')
     //assert.ok(protectEnabled, 'protected cannot be empty')
