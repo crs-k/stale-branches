@@ -56,7 +56,7 @@ function getBranches() {
             branchName = response.data[0].name;
             protectEnabled = response.data[0].protected;
             assert.ok(branchName, 'name cannot be empty');
-            assert.ok(protectEnabled, 'protected cannot be empty');
+            //assert.ok(protectEnabled, 'protected cannot be empty')
         }
         catch (err) {
             if (err instanceof Error)
