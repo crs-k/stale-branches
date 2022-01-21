@@ -1,0 +1,21 @@
+name: Release Draft
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request_target:
+    branches:
+      - main
+  release:
+      types: [published]
+
+jobs:
+  release_draft:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Release Draft
+      uses: crs-k/release-draft@v0.4.0
+      with:
+        repo-token: "${{ secrets.GITHUB_TOKEN }}"
