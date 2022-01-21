@@ -156,7 +156,7 @@ function run() {
             //Collect Branches
             const { 0: branchName, 1: protectEnabled } = yield (0, get_branches_1.getBranches)();
             // Mark branches
-            if (protectEnabled === true) {
+            if (protectEnabled === false) {
                 core.info(`Branch Name: '${branchName}'`);
                 core.info(`Protected: '${protectEnabled}'`);
             }

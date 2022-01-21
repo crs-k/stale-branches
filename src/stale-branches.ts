@@ -7,7 +7,7 @@ export async function run(): Promise<void> {
     const {0: branchName, 1: protectEnabled} = await getBranches()
 
     // Mark branches
-    if (protectEnabled === true) {
+    if (protectEnabled === false) {
       core.info(`Branch Name: '${branchName}'`)
       core.info(`Protected: '${protectEnabled}'`)
     } else {
