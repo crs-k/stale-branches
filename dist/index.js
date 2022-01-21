@@ -57,12 +57,12 @@ function getBranches() {
             branchName = response.data[0].name;
             protectEnabled = response.data[0].protected;
             for (const i of response.data) {
-                const branchResponse = yield get_context_1.github.rest.repos.getBranch({
+                const branchResponse = yield get_context_1.github.rest.repos.getCommit({
                     owner: get_context_1.owner,
                     repo: get_context_1.repo,
-                    branch: i.name
+                    ref: i.commit.sha
                 });
-                core.info(((_a = branchResponse.data.commit.author) === null || _a === void 0 ? void 0 : _a.node_id) || '');
+                core.info(((_a = branchResponse.data.commit.author) === null || _a === void 0 ? void 0 : _a.date) || '');
             }
             assert.ok(branchName, 'name cannot be empty');
             //assert.ok(protectEnabled, 'protected cannot be empty')
