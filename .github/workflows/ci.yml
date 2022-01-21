@@ -1,0 +1,72 @@
+name: 'CI'
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  Lint:
+    name: Format & Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print GitHub event action
+        run: |
+          echo "${{ github.event.action }}"
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+
+      - name: Install Dependencies
+        run: npm ci --no-progress --ignore-scripts=false
+      
+      - name: Format
+        run: 'npm run format'
+      
+      - name: Lint
+        run: 'npm run lint'
+
+  Test-Unit:
+    name: Test - Unit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print GitHub event action
+        run: |
+          echo "${{ github.event.action }}"
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+
+      - name: Install Dependencies
+        run: npm ci --no-progress --ignore-scripts=false
+      
+      - name: Test
+        run: 'npm run test'
+
+  Test-Action: # make sure the action works on a clean machine without building
+    name: Test - Action
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+
+  Build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [Lint, Test-Unit, Test-Action]
+    steps:
+      - name: Print GitHub event action
+        run: |
+          echo "${{ github.event.action }}"
+
+      - name: Checkout Repo
+        uses: actions/checkout@v2
+
+      - name: Install Dependencies
+        run: npm ci --no-progress --ignore-scripts=false
+      
+      - name: Build
+        run: 'npm run build && npm run package'
+
+
