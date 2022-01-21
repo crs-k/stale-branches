@@ -20,7 +20,12 @@ export async function getBranches(): Promise<[string, boolean]> {
     protectEnabled = response.data[0].protected
 
     for (const i of response.data) {
-      core.info(i.name)
+      const branchResponse = await github.rest.repos.getBranch({
+        owner,
+        repo,
+        branch: i.name
+      })
+      core.info(branchResponse.data.commit.author?.node_id || '')
     }
 
     assert.ok(branchName, 'name cannot be empty')

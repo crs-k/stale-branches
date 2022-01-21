@@ -40,6 +40,7 @@ const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
 function getBranches() {
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         core.info('Retrieving branch information...');
         let branchName;
@@ -56,7 +57,12 @@ function getBranches() {
             branchName = response.data[0].name;
             protectEnabled = response.data[0].protected;
             for (const i of response.data) {
-                core.info(i.name);
+                const branchResponse = yield get_context_1.github.rest.repos.getBranch({
+                    owner: get_context_1.owner,
+                    repo: get_context_1.repo,
+                    branch: i.name
+                });
+                core.info(((_a = branchResponse.data.commit.author) === null || _a === void 0 ? void 0 : _a.node_id) || '');
             }
             assert.ok(branchName, 'name cannot be empty');
             //assert.ok(protectEnabled, 'protected cannot be empty')
