@@ -286,23 +286,22 @@ const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
 function getIssue(branch) {
     return __awaiter(this, void 0, void 0, function* () {
-        let issueId;
+        let issues;
         try {
             const issueResponse = yield get_context_1.github.rest.issues.listForRepo({
                 owner: get_context_1.owner,
                 repo: get_context_1.repo,
                 options: { title: `[STALE] Branch: ${branch}` }
             });
-            issueId = issueResponse.data[0].number || 0;
-            assert.ok(issueId, 'Issue ID cannot be empty');
+            issues = issueResponse;
+            assert.ok(issues, 'Issue ID cannot be empty');
         }
         catch (err) {
             if (err instanceof Error)
                 core.setFailed(`Failed to locate issue for ${branch} with ${err.message}`);
-            issueId = 0;
+            issues = {};
         }
-        core.info(`Existing Issue found with ID: ${issueId}`);
-        return issueId;
+        return issues;
     });
 }
 exports.getIssue = getIssue;
@@ -480,16 +479,18 @@ function run() {
                 const commitDate = new Date(commitResponse).getTime();
                 const commitAge = (0, get_time_1.getMinutes)(currentDate, commitDate);
                 const branchName = i.name;
-                const existingIssue = yield (0, get_issue_1.getIssue)(branchName);
                 if (commitAge > get_context_1.daysBeforeStale) {
                     core.info(`Stale Branch: ${branchName}`);
                     core.info(`Commit Age: ${commitAge.toString()}`);
                     core.info(`Allowed Days: ${get_context_1.daysBeforeStale.toString()}`);
-                    if (existingIssue !== 0) {
-                        yield (0, update_issue_1.updateIssue)(existingIssue, branchName, commitAge);
-                    }
-                    else {
-                        yield (0, create_issue_1.createIssue)(branchName, commitAge);
+                    const existingIssue = yield (0, get_issue_1.getIssue)(branchName);
+                    for (const n of existingIssue.data) {
+                        if (n.number !== 0) {
+                            yield (0, update_issue_1.updateIssue)(n.number, branchName, commitAge);
+                        }
+                        else {
+                            yield (0, create_issue_1.createIssue)(branchName, commitAge);
+                        }
                     }
                 }
             }

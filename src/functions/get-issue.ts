@@ -1,9 +1,14 @@
 import * as assert from 'assert'
 import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
+// eslint-disable-next-line import/named
+import {GetResponseTypeFromEndpointMethod} from '@octokit/types'
 
-export async function getIssue(branch: string): Promise<number> {
-  let issueId: number
+type ListIssuesResponseDataType = GetResponseTypeFromEndpointMethod<
+  typeof github.rest.issues.listForRepo
+>
+export async function getIssue(branch: string): Promise<ListIssuesResponseDataType> {
+  let issues: ListIssuesResponseDataType
 
   try {
     const issueResponse = await github.rest.issues.listForRepo({
@@ -11,13 +16,13 @@ export async function getIssue(branch: string): Promise<number> {
       repo,
       options: {title: `[STALE] Branch: ${branch}`}
     })
-    issueId = issueResponse.data[0].number || 0
-    assert.ok(issueId, 'Issue ID cannot be empty')
+    issues = issueResponse
+    assert.ok(issues, 'Issue ID cannot be empty')
   } catch (err) {
     if (err instanceof Error)
       core.setFailed(`Failed to locate issue for ${branch} with ${err.message}`)
-    issueId = 0
+    issues = {} as ListIssuesResponseDataType
   }
-  core.info(`Existing Issue found with ID: ${issueId}`)
-  return issueId
+
+  return issues
 }
