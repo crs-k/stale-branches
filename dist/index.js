@@ -301,6 +301,7 @@ function getIssue(branch) {
                 core.setFailed(`Failed to locate issue for ${branch} with ${err.message}`);
             issueId = 0;
         }
+        core.info(`Existing Issue found with ID: ${issueId}`);
         return issueId;
     });
 }
@@ -407,7 +408,7 @@ function updateIssue(issueNumber, branch, commitAge) {
         }
         catch (err) {
             if (err instanceof Error)
-                core.info(`No existing issue returned for ${branch} with: ${err.message}`);
+                core.info(`No existing issue returned for stale branch: ${branch}. Description: ${err.message}`);
             issueId = 0;
         }
         return issueId;

@@ -12,12 +12,12 @@ export async function getIssue(branch: string): Promise<number> {
       title: `[STALE] Branch: ${branch}`
     })
     issueId = issueResponse.data[0].id || 0
-    assert.ok(issueId, 'Date cannot be empty')
+    assert.ok(issueId, 'Issue ID cannot be empty')
   } catch (err) {
     if (err instanceof Error)
       core.setFailed(`Failed to locate issue for ${branch} with ${err.message}`)
     issueId = 0
   }
-
+  core.info(`Existing Issue found with ID: ${issueId}`)
   return issueId
 }

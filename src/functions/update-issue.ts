@@ -29,7 +29,9 @@ export async function updateIssue(
     assert.ok(issueId, 'Date cannot be empty')
   } catch (err) {
     if (err instanceof Error)
-      core.info(`No existing issue returned for ${branch} with: ${err.message}`)
+      core.info(
+        `No existing issue returned for stale branch: ${branch}. Description: ${err.message}`
+      )
     issueId = 0
   }
 
