@@ -406,7 +406,7 @@ function updateIssue(issueNumber, branch, commitAge) {
                     ]
                 }
             });
-            issueId = issueResponse.data.id || 0;
+            issueId = issueResponse.data.number || 0;
             updatedAt = issueResponse.data.updated_at || '';
             core.info(`${issueId} = issue id`);
             core.info(`${updatedAt} = updated at`);
@@ -490,7 +490,9 @@ function run() {
                     if (existingIssue !== 0) {
                         yield (0, update_issue_1.updateIssue)(existingIssue, i.name, commitAge);
                     }
-                    yield (0, create_issue_1.createIssue)(i.name, commitAge);
+                    else {
+                        yield (0, create_issue_1.createIssue)(i.name, commitAge);
+                    }
                 }
             }
             core.endGroup();

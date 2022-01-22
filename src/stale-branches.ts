@@ -27,8 +27,9 @@ export async function run(): Promise<void> {
         const existingIssue = await getIssue(i.name)
         if (existingIssue !== 0) {
           await updateIssue(existingIssue, i.name, commitAge)
+        } else {
+          await createIssue(i.name, commitAge)
         }
-        await createIssue(i.name, commitAge)
       }
     }
     core.endGroup()

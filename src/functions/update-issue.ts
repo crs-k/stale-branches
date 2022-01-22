@@ -29,7 +29,7 @@ export async function updateIssue(
       }
     })
 
-    issueId = issueResponse.data.id || 0
+    issueId = issueResponse.data.number || 0
     updatedAt = issueResponse.data.updated_at || ''
     core.info(`${issueId} = issue id`)
     core.info(`${updatedAt} = updated at`)
