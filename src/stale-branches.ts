@@ -2,8 +2,11 @@ import * as core from '@actions/core'
 import {createIssue} from './functions/create-issue'
 import {daysBeforeStale} from './functions/get-context'
 import {getBranches} from './functions/get-branches'
+import {getIssue} from './functions/get-issue'
 import {getMinutes} from './functions/get-time'
 import {getRecentCommitDate} from './functions/get-commits'
+
+import {updateIssue} from './functions/update-issue'
 
 export async function run(): Promise<void> {
   try {
@@ -21,6 +24,10 @@ export async function run(): Promise<void> {
         core.info(i.name)
         core.info(`Commit Age: ${commitAge.toString()}`)
         core.info(`Allowed Days: ${daysBeforeStale.toString()}`)
+        const existingIssue = await getIssue(i.name)
+        if (existingIssue !== 0) {
+          await updateIssue(existingIssue, i.name, commitAge)
+        }
         await createIssue(i.name, commitAge)
       }
     }

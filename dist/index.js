@@ -42,7 +42,7 @@ const get_context_1 = __nccwpck_require__(7782);
 const get_time_1 = __nccwpck_require__(1035);
 function createIssue(branch, commitAge) {
     return __awaiter(this, void 0, void 0, function* () {
-        let issueUrl;
+        let issueId;
         const daysUntilDelete = (0, get_time_1.getMinutes)(commitAge, get_context_1.daysBeforeDelete);
         try {
             const issueResponse = yield get_context_1.github.rest.issues.create({
@@ -58,15 +58,15 @@ function createIssue(branch, commitAge) {
                     }
                 ]
             });
-            issueUrl = issueResponse.data.url || '';
-            assert.ok(issueUrl, 'Date cannot be empty');
+            issueId = issueResponse.data.id || 0;
+            assert.ok(issueId, 'Date cannot be empty');
         }
         catch (err) {
             if (err instanceof Error)
                 core.setFailed(`Failed to create issue for ${branch} with ${err.message}`);
-            issueUrl = '';
+            issueId = 0;
         }
-        return issueUrl;
+        return issueId;
     });
 }
 exports.createIssue = createIssue;
@@ -246,6 +246,69 @@ exports.daysBeforeDelete = Number(core.getInput('days-before-delete', { required
 
 /***/ }),
 
+/***/ 6349:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getIssue = void 0;
+const assert = __importStar(__nccwpck_require__(9491));
+const core = __importStar(__nccwpck_require__(2186));
+const get_context_1 = __nccwpck_require__(7782);
+function getIssue(branch) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let issueId;
+        try {
+            const issueResponse = yield get_context_1.github.rest.issues.listForRepo({
+                owner: get_context_1.owner,
+                repo: get_context_1.repo,
+                title: `[STALE] Branch: ${branch}`
+            });
+            issueId = issueResponse.data[0].id || 0;
+            assert.ok(issueId, 'Date cannot be empty');
+        }
+        catch (err) {
+            if (err instanceof Error)
+                core.setFailed(`Failed to locate issue for ${branch} with ${err.message}`);
+            issueId = 0;
+        }
+        return issueId;
+    });
+}
+exports.getIssue = getIssue;
+
+
+/***/ }),
+
 /***/ 1035:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -277,6 +340,80 @@ function getnSeconds(date1, date2) {
     return seconds;
 }
 exports.getnSeconds = getnSeconds;
+
+
+/***/ }),
+
+/***/ 2914:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.updateIssue = void 0;
+const assert = __importStar(__nccwpck_require__(9491));
+const core = __importStar(__nccwpck_require__(2186));
+const get_context_1 = __nccwpck_require__(7782);
+const get_time_1 = __nccwpck_require__(1035);
+function updateIssue(issueNumber, branch, commitAge) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let issueId;
+        const daysUntilDelete = (0, get_time_1.getMinutes)(commitAge, get_context_1.daysBeforeDelete);
+        try {
+            const issueResponse = yield get_context_1.github.rest.issues.update({
+                owner: get_context_1.owner,
+                repo: get_context_1.repo,
+                issue_number: issueNumber,
+                title: `[STALE] Branch: ${branch}`,
+                body: `${branch} has had no activity for ${commitAge.toString()} days. This branch will be automatically deleted in ${daysUntilDelete.toString()} days.`,
+                labels: [
+                    {
+                        name: 'stale 🗑️',
+                        color: 'B60205',
+                        description: 'Used by Stale Branches Action to label issues'
+                    }
+                ]
+            });
+            issueId = issueResponse.data.id || 0;
+            assert.ok(issueId, 'Date cannot be empty');
+        }
+        catch (err) {
+            if (err instanceof Error)
+                core.setFailed(`Failed to create issue for ${branch} with ${err.message}`);
+            issueId = 0;
+        }
+        return issueId;
+    });
+}
+exports.updateIssue = updateIssue;
 
 
 /***/ }),
@@ -320,8 +457,10 @@ const core = __importStar(__nccwpck_require__(2186));
 const create_issue_1 = __nccwpck_require__(9810);
 const get_context_1 = __nccwpck_require__(7782);
 const get_branches_1 = __nccwpck_require__(6204);
+const get_issue_1 = __nccwpck_require__(6349);
 const get_time_1 = __nccwpck_require__(1035);
 const get_commits_1 = __nccwpck_require__(9821);
+const update_issue_1 = __nccwpck_require__(2914);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -338,6 +477,10 @@ function run() {
                     core.info(i.name);
                     core.info(`Commit Age: ${commitAge.toString()}`);
                     core.info(`Allowed Days: ${get_context_1.daysBeforeStale.toString()}`);
+                    const existingIssue = yield (0, get_issue_1.getIssue)(i.name);
+                    if (existingIssue !== 0) {
+                        yield (0, update_issue_1.updateIssue)(existingIssue, i.name, commitAge);
+                    }
                     yield (0, create_issue_1.createIssue)(i.name, commitAge);
                 }
             }
