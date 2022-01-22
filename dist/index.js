@@ -39,13 +39,10 @@ exports.getBranches = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
-const get_time_1 = __nccwpck_require__(1035);
-const get_commits_1 = __nccwpck_require__(9821);
 function getBranches() {
     return __awaiter(this, void 0, void 0, function* () {
         core.info('Retrieving branch information...');
-        let branchName;
-        let protectEnabled;
+        let branches;
         try {
             // Get info from the most recent release
             const response = yield get_context_1.github.rest.repos.listBranches({
@@ -55,32 +52,15 @@ function getBranches() {
                 per_page: 100,
                 page: 1
             });
-            branchName = response.data[0].name;
-            protectEnabled = response.data[0].protected;
-            core.startGroup('Stale Branches');
-            for (const i of response.data) {
-                const commitResponse = yield (0, get_commits_1.getRecentCommitDate)(i.commit.sha);
-                const currentDate = new Date().getTime();
-                const commitDate = new Date(commitResponse).getTime();
-                const commitAge = (0, get_time_1.getMinutes)(currentDate, commitDate);
-                if (commitAge > get_context_1.daysBeforeStale) {
-                    core.info(i.name);
-                    core.info(`Commit Age: ${commitAge.toString()}`);
-                    core.info(`Allowed Days: ${get_context_1.daysBeforeStale.toString()}`);
-                }
-            }
-            core.endGroup();
-            assert.ok(branchName, 'name cannot be empty');
-            //assert.ok(protectEnabled, 'protected cannot be empty')
+            branches = response;
+            assert.ok(response, 'name cannot be empty');
         }
         catch (err) {
             if (err instanceof Error)
                 core.setFailed(`Failed to retrieve branches for ${get_context_1.repo} with ${err.message}`);
-            branchName = '';
-            protectEnabled = false;
+            branches = {};
         }
-        const data = [branchName, protectEnabled];
-        return data;
+        return branches;
     });
 }
 exports.getBranches = getBranches;
@@ -264,20 +244,29 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
 const core = __importStar(__nccwpck_require__(2186));
+const get_context_1 = __nccwpck_require__(7782);
 const get_branches_1 = __nccwpck_require__(6204);
+const get_time_1 = __nccwpck_require__(1035);
+const get_commits_1 = __nccwpck_require__(9821);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             //Collect Branches
-            const { 0: branchName, 1: protectEnabled } = yield (0, get_branches_1.getBranches)();
+            const branches = yield (0, get_branches_1.getBranches)();
             // Mark branches
-            if (protectEnabled === false) {
-                core.info(`Branch Name: '${branchName}'`);
-                core.info(`Protected: '${protectEnabled}'`);
+            core.startGroup('Stale Branches');
+            for (const i of branches.data) {
+                const commitResponse = yield (0, get_commits_1.getRecentCommitDate)(i.commit.sha);
+                const currentDate = new Date().getTime();
+                const commitDate = new Date(commitResponse).getTime();
+                const commitAge = (0, get_time_1.getMinutes)(currentDate, commitDate);
+                if (commitAge > get_context_1.daysBeforeStale) {
+                    core.info(i.name);
+                    core.info(`Commit Age: ${commitAge.toString()}`);
+                    core.info(`Allowed Days: ${get_context_1.daysBeforeStale.toString()}`);
+                }
             }
-            else {
-                core.info(`No qualifying unprotected branches.`);
-            }
+            core.endGroup();
         }
         catch (error) {
             if (error instanceof Error)
@@ -5737,9 +5726,17 @@ AbortError.prototype = Object.create(Error.prototype);
 AbortError.prototype.constructor = AbortError;
 AbortError.prototype.name = 'AbortError';
 
+const URL$1 = Url.URL || whatwgUrl.URL;
+
 // fix an issue where "PassThrough", "resolve" aren't a named export for node <10
 const PassThrough$1 = Stream.PassThrough;
-const resolve_url = Url.resolve;
+
+const isDomainOrSubdomain = function isDomainOrSubdomain(destination, original) {
+	const orig = new URL$1(original).hostname;
+	const dest = new URL$1(destination).hostname;
+
+	return orig === dest || orig[orig.length - dest.length - 1] === '.' && orig.endsWith(dest);
+};
 
 /**
  * Fetch function
@@ -5827,7 +5824,19 @@ function fetch(url, opts) {
 				const location = headers.get('Location');
 
 				// HTTP fetch step 5.3
-				const locationURL = location === null ? null : resolve_url(request.url, location);
+				let locationURL = null;
+				try {
+					locationURL = location === null ? null : new URL$1(location, request.url).toString();
+				} catch (err) {
+					// error here can only be invalid URL in Location: header
+					// do not throw when options.redirect == manual
+					// let the user extract the errorneous redirect URL
+					if (request.redirect !== 'manual') {
+						reject(new FetchError(`uri requested responds with an invalid redirect URL: ${location}`, 'invalid-redirect'));
+						finalize();
+						return;
+					}
+				}
 
 				// HTTP fetch step 5.5
 				switch (request.redirect) {
@@ -5874,6 +5883,12 @@ function fetch(url, opts) {
 							timeout: request.timeout,
 							size: request.size
 						};
+
+						if (!isDomainOrSubdomain(request.url, locationURL)) {
+							for (const name of ['authorization', 'www-authenticate', 'cookie', 'cookie2']) {
+								requestOpts.headers.delete(name);
+							}
+						}
 
 						// HTTP-redirect fetch step 9
 						if (res.statusCode !== 303 && request.body && getTotalBytes(request) === null) {

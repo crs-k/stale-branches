@@ -19,5 +19,6 @@ export async function getRecentCommitDate(sha: string): Promise<string> {
       core.setFailed(`Failed to retrieve commit for ${repo} with ${err.message}`)
     commitDate = ''
   }
+
   return commitDate
 }
