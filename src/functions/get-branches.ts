@@ -1,6 +1,7 @@
 import * as assert from 'assert'
 import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
+import {getMinutes} from './get-time'
 import {getRecentCommitDate} from './get-commits'
 
 export async function getBranches(): Promise<[string, boolean]> {
@@ -23,7 +24,9 @@ export async function getBranches(): Promise<[string, boolean]> {
     for (const i of response.data) {
       core.info(i.name)
       const commitResponse = await getRecentCommitDate(i.commit.sha)
-      const commitAge = new Date().getTime() - new Date(commitResponse).getTime()
+      const currentDate = new Date().getTime()
+      const commitDate = new Date(commitResponse).getTime()
+      const commitAge = getMinutes(currentDate, commitDate)
 
       core.info(`Commit Age: ${commitAge.toString()}`)
     }

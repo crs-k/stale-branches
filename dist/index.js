@@ -39,6 +39,7 @@ exports.getBranches = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
+const get_time_1 = __nccwpck_require__(1035);
 const get_commits_1 = __nccwpck_require__(9821);
 function getBranches() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -59,7 +60,9 @@ function getBranches() {
             for (const i of response.data) {
                 core.info(i.name);
                 const commitResponse = yield (0, get_commits_1.getRecentCommitDate)(i.commit.sha);
-                const commitAge = new Date().getTime() - new Date(commitResponse).getTime();
+                const currentDate = new Date().getTime();
+                const commitDate = new Date(commitResponse).getTime();
+                const commitAge = (0, get_time_1.getMinutes)(currentDate, commitDate);
                 core.info(`Commit Age: ${commitAge.toString()}`);
             }
             assert.ok(branchName, 'name cannot be empty');
@@ -188,6 +191,41 @@ const repoToken = core.getInput('repo-token', { required: true });
 core.setSecret(repoToken);
 exports.github = (0, github_1.getOctokit)(repoToken);
 _a = github_1.context.repo, exports.owner = _a.owner, exports.repo = _a.repo;
+
+
+/***/ }),
+
+/***/ 1035:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getnSeconds = exports.getMinutes = exports.getHours = exports.getDays = void 0;
+function getDays(date1, date2) {
+    const diffMs = Math.abs(date2 - date1);
+    const days = diffMs / (1000 * 60 * 60 * 24);
+    return days.toString();
+}
+exports.getDays = getDays;
+function getHours(date1, date2) {
+    const diffMs = Math.abs(date2 - date1);
+    const hours = diffMs / (1000 * 60 * 60);
+    return hours.toString();
+}
+exports.getHours = getHours;
+function getMinutes(date1, date2) {
+    const diffMs = Math.abs(date2 - date1);
+    const minutes = diffMs / (1000 * 60);
+    return minutes.toString();
+}
+exports.getMinutes = getMinutes;
+function getnSeconds(date1, date2) {
+    const diffMs = Math.abs(date2 - date1);
+    const seconds = diffMs / 1000;
+    return seconds.toString();
+}
+exports.getnSeconds = getnSeconds;
 
 
 /***/ }),
