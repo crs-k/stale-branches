@@ -21,6 +21,7 @@ export async function getBranches(): Promise<[string, boolean]> {
     protectEnabled = response.data[0].protected
 
     for (const i of response.data) {
+      core.info(response.data[0].name)
       const branchResponse = await getRecentCommitDate(i.commit.sha)
       core.info(branchResponse)
     }
