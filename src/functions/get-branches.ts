@@ -1,11 +1,16 @@
 import * as assert from 'assert'
 import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
+// eslint-disable-next-line import/named
+import {GetResponseTypeFromEndpointMethod} from '@octokit/types'
 
-export async function getBranches(): Promise<[string, boolean]> {
+type ListBranchesResponseDataType = GetResponseTypeFromEndpointMethod<
+  typeof github.rest.repos.listBranches
+>
+
+export async function getBranches(): Promise<ListBranchesResponseDataType> {
   core.info('Retrieving branch information...')
-  let branchName: string
-  let protectEnabled: boolean
+  let branches: ListBranchesResponseDataType
 
   try {
     // Get info from the most recent release
@@ -16,20 +21,14 @@ export async function getBranches(): Promise<[string, boolean]> {
       per_page: 100,
       page: 1
     })
-    branchName = response.data[0].name
-    protectEnabled = response.data[0].protected
+    branches = response
 
-    assert.ok(branchName, 'name cannot be empty')
-    assert.ok(protectEnabled, 'protected cannot be empty')
+    assert.ok(response, 'name cannot be empty')
   } catch (err) {
-    if (err instanceof Error) core.setFailed(`Failed to retrieve branches for ${repo}`)
-    branchName = ''
-    protectEnabled = false
+    if (err instanceof Error)
+      core.setFailed(`Failed to retrieve branches for ${repo} with ${err.message}`)
+    branches = {} as ListBranchesResponseDataType
   }
-  const data: [branch: string, protectEnabled: boolean] = [branchName, protectEnabled]
-  // Print the previous release info
-  core.info(`Branch Name: '${branchName}'`)
-  core.info(`Protected: '${protectEnabled}'`)
 
-  return data
+  return branches
 }

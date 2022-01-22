@@ -1,6 +1,79 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 9810:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createIssue = void 0;
+const assert = __importStar(__nccwpck_require__(9491));
+const core = __importStar(__nccwpck_require__(2186));
+const get_context_1 = __nccwpck_require__(7782);
+const get_time_1 = __nccwpck_require__(1035);
+function createIssue(branch, commitAge) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let issueUrl;
+        const daysUntilDelete = (0, get_time_1.getMinutes)(commitAge, get_context_1.daysBeforeDelete);
+        try {
+            const issueResponse = yield get_context_1.github.rest.issues.create({
+                owner: get_context_1.owner,
+                repo: get_context_1.repo,
+                title: `[STALE] Branch: ${branch}`,
+                body: `${branch} has had no activity for ${commitAge.toString()} days. This branch will be automatically deleted in ${daysUntilDelete.toString()} days.`,
+                labels: [
+                    {
+                        name: 'stale 🗑️',
+                        color: 'B60205',
+                        description: 'Used by Stale Branches Action to label issues'
+                    }
+                ]
+            });
+            issueUrl = issueResponse.data.url || '';
+            assert.ok(issueUrl, 'Date cannot be empty');
+        }
+        catch (err) {
+            if (err instanceof Error)
+                core.setFailed(`Failed to create issue for ${branch} with ${err.message}`);
+            issueUrl = '';
+        }
+        return issueUrl;
+    });
+}
+exports.createIssue = createIssue;
+
+
+/***/ }),
+
 /***/ 6204:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -42,8 +115,7 @@ const get_context_1 = __nccwpck_require__(7782);
 function getBranches() {
     return __awaiter(this, void 0, void 0, function* () {
         core.info('Retrieving branch information...');
-        let branchName;
-        let protectEnabled;
+        let branches;
         try {
             // Get info from the most recent release
             const response = yield get_context_1.github.rest.repos.listBranches({
@@ -53,25 +125,84 @@ function getBranches() {
                 per_page: 100,
                 page: 1
             });
-            branchName = response.data[0].name;
-            protectEnabled = response.data[0].protected;
-            assert.ok(branchName, 'name cannot be empty');
-            assert.ok(protectEnabled, 'protected cannot be empty');
+            branches = response;
+            assert.ok(response, 'name cannot be empty');
         }
         catch (err) {
             if (err instanceof Error)
-                core.setFailed(`Failed to retrieve branches for ${get_context_1.repo}`);
-            branchName = '';
-            protectEnabled = false;
+                core.setFailed(`Failed to retrieve branches for ${get_context_1.repo} with ${err.message}`);
+            branches = {};
         }
-        const data = [branchName, protectEnabled];
-        // Print the previous release info
-        core.info(`Branch Name: '${branchName}'`);
-        core.info(`Protected: '${protectEnabled}'`);
-        return data;
+        return branches;
     });
 }
 exports.getBranches = getBranches;
+
+
+/***/ }),
+
+/***/ 9821:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getRecentCommitDate = void 0;
+const assert = __importStar(__nccwpck_require__(9491));
+const core = __importStar(__nccwpck_require__(2186));
+const get_context_1 = __nccwpck_require__(7782);
+function getRecentCommitDate(sha) {
+    var _a;
+    return __awaiter(this, void 0, void 0, function* () {
+        let commitDate;
+        try {
+            const branchResponse = yield get_context_1.github.rest.repos.getCommit({
+                owner: get_context_1.owner,
+                repo: get_context_1.repo,
+                ref: sha,
+                per_page: 1,
+                page: 1
+            });
+            commitDate = ((_a = branchResponse.data.commit.author) === null || _a === void 0 ? void 0 : _a.date) || '';
+            assert.ok(commitDate, 'Date cannot be empty');
+        }
+        catch (err) {
+            if (err instanceof Error)
+                core.setFailed(`Failed to retrieve commit for ${get_context_1.repo} with ${err.message}`);
+            commitDate = '';
+        }
+        return commitDate;
+    });
+}
+exports.getRecentCommitDate = getRecentCommitDate;
 
 
 /***/ }),
@@ -102,13 +233,50 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.repo = exports.owner = exports.github = void 0;
+exports.daysBeforeDelete = exports.daysBeforeStale = exports.repo = exports.owner = exports.github = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github_1 = __nccwpck_require__(5438);
 const repoToken = core.getInput('repo-token', { required: true });
 core.setSecret(repoToken);
 exports.github = (0, github_1.getOctokit)(repoToken);
 _a = github_1.context.repo, exports.owner = _a.owner, exports.repo = _a.repo;
+exports.daysBeforeStale = Number(core.getInput('days-before-stale', { required: false }));
+exports.daysBeforeDelete = Number(core.getInput('days-before-delete', { required: false }));
+
+
+/***/ }),
+
+/***/ 1035:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getnSeconds = exports.getMinutes = exports.getHours = exports.getDays = void 0;
+function getDays(date1, date2) {
+    const diffMs = Math.abs(date2 - date1);
+    const days = Math.round(diffMs / (1000 * 60 * 60 * 24));
+    return days;
+}
+exports.getDays = getDays;
+function getHours(date1, date2) {
+    const diffMs = Math.abs(date2 - date1);
+    const hours = Math.round(diffMs / (1000 * 60 * 60));
+    return hours;
+}
+exports.getHours = getHours;
+function getMinutes(date1, date2) {
+    const diffMs = Math.abs(date2 - date1);
+    const minutes = Math.round(diffMs / (1000 * 60));
+    return minutes;
+}
+exports.getMinutes = getMinutes;
+function getnSeconds(date1, date2) {
+    const diffMs = Math.abs(date2 - date1);
+    const seconds = Math.round(diffMs / 1000);
+    return seconds;
+}
+exports.getnSeconds = getnSeconds;
 
 
 /***/ }),
@@ -149,20 +317,31 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
 const core = __importStar(__nccwpck_require__(2186));
+const create_issue_1 = __nccwpck_require__(9810);
+const get_context_1 = __nccwpck_require__(7782);
 const get_branches_1 = __nccwpck_require__(6204);
+const get_time_1 = __nccwpck_require__(1035);
+const get_commits_1 = __nccwpck_require__(9821);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             //Collect Branches
-            const { 0: branchName, 1: protectEnabled } = yield (0, get_branches_1.getBranches)();
-            // Mark branches
-            if (protectEnabled === true) {
-                core.info(`Branch Name: '${branchName}'`);
-                core.info(`Protected: '${protectEnabled}'`);
+            const branches = yield (0, get_branches_1.getBranches)();
+            // Assess Branches
+            core.startGroup('Stale Branches');
+            for (const i of branches.data) {
+                const commitResponse = yield (0, get_commits_1.getRecentCommitDate)(i.commit.sha);
+                const currentDate = new Date().getTime();
+                const commitDate = new Date(commitResponse).getTime();
+                const commitAge = (0, get_time_1.getMinutes)(currentDate, commitDate);
+                if (commitAge > get_context_1.daysBeforeStale) {
+                    core.info(i.name);
+                    core.info(`Commit Age: ${commitAge.toString()}`);
+                    core.info(`Allowed Days: ${get_context_1.daysBeforeStale.toString()}`);
+                    yield (0, create_issue_1.createIssue)(i.name, commitAge);
+                }
             }
-            else {
-                core.info(`No qualifying unprotected branches.`);
-            }
+            core.endGroup();
         }
         catch (error) {
             if (error instanceof Error)
@@ -5622,9 +5801,17 @@ AbortError.prototype = Object.create(Error.prototype);
 AbortError.prototype.constructor = AbortError;
 AbortError.prototype.name = 'AbortError';
 
+const URL$1 = Url.URL || whatwgUrl.URL;
+
 // fix an issue where "PassThrough", "resolve" aren't a named export for node <10
 const PassThrough$1 = Stream.PassThrough;
-const resolve_url = Url.resolve;
+
+const isDomainOrSubdomain = function isDomainOrSubdomain(destination, original) {
+	const orig = new URL$1(original).hostname;
+	const dest = new URL$1(destination).hostname;
+
+	return orig === dest || orig[orig.length - dest.length - 1] === '.' && orig.endsWith(dest);
+};
 
 /**
  * Fetch function
@@ -5712,7 +5899,19 @@ function fetch(url, opts) {
 				const location = headers.get('Location');
 
 				// HTTP fetch step 5.3
-				const locationURL = location === null ? null : resolve_url(request.url, location);
+				let locationURL = null;
+				try {
+					locationURL = location === null ? null : new URL$1(location, request.url).toString();
+				} catch (err) {
+					// error here can only be invalid URL in Location: header
+					// do not throw when options.redirect == manual
+					// let the user extract the errorneous redirect URL
+					if (request.redirect !== 'manual') {
+						reject(new FetchError(`uri requested responds with an invalid redirect URL: ${location}`, 'invalid-redirect'));
+						finalize();
+						return;
+					}
+				}
 
 				// HTTP fetch step 5.5
 				switch (request.redirect) {
@@ -5759,6 +5958,12 @@ function fetch(url, opts) {
 							timeout: request.timeout,
 							size: request.size
 						};
+
+						if (!isDomainOrSubdomain(request.url, locationURL)) {
+							for (const name of ['authorization', 'www-authenticate', 'cookie', 'cookie2']) {
+								requestOpts.headers.delete(name);
+							}
+						}
 
 						// HTTP-redirect fetch step 9
 						if (res.statusCode !== 303 && request.body && getTotalBytes(request) === null) {
