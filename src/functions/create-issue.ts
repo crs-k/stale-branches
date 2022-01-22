@@ -15,7 +15,7 @@ export async function createIssue(branch: string, commitAge: number): Promise<st
       labels: [
         {
           name: 'stale 🗑️',
-          color: '#B60205',
+          color: 'B60205',
           description: 'Used by Stale Branches Action to label issues'
         }
       ]
