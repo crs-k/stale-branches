@@ -17,7 +17,7 @@ export async function updateIssue(
       repo,
       issue_number: issueNumber,
       options: {
-        body: `${branch} has had no activity for ${commitAge.toString()} days. This branch will be automatically deleted in ${daysUntilDelete.toString()} days.`,
+        body: `${branch} has had no activity for ${commitAge.toString()} days. This branch will be automatically deleted in ${daysUntilDelete.toString()} days. This issue was last updated on ${new Date().toString()}`,
         labels: [
           {
             name: 'stale 🗑️',

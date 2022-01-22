@@ -7,20 +7,19 @@ import {GetResponseTypeFromEndpointMethod} from '@octokit/types'
 type ListIssuesResponseDataType = GetResponseTypeFromEndpointMethod<
   typeof github.rest.issues.listForRepo
 >
-export async function getIssue(branch: string): Promise<ListIssuesResponseDataType> {
+export async function getIssues(): Promise<ListIssuesResponseDataType> {
   let issues: ListIssuesResponseDataType
 
   try {
     const issueResponse = await github.rest.issues.listForRepo({
       owner,
       repo,
-      options: {title: `[STALE] Branch: ${branch}`}
+      state: 'open'
     })
     issues = issueResponse
     assert.ok(issues, 'Issue ID cannot be empty')
   } catch (err) {
-    if (err instanceof Error)
-      core.setFailed(`Failed to locate issue for ${branch} with ${err.message}`)
+    if (err instanceof Error) core.setFailed(`Failed to locate issues with ${err.message}`)
     issues = {} as ListIssuesResponseDataType
   }
 

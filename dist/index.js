@@ -280,31 +280,31 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getIssue = void 0;
+exports.getIssues = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
-function getIssue(branch) {
+function getIssues() {
     return __awaiter(this, void 0, void 0, function* () {
         let issues;
         try {
             const issueResponse = yield get_context_1.github.rest.issues.listForRepo({
                 owner: get_context_1.owner,
                 repo: get_context_1.repo,
-                options: { title: `[STALE] Branch: ${branch}` }
+                state: 'open'
             });
             issues = issueResponse;
             assert.ok(issues, 'Issue ID cannot be empty');
         }
         catch (err) {
             if (err instanceof Error)
-                core.setFailed(`Failed to locate issue for ${branch} with ${err.message}`);
+                core.setFailed(`Failed to locate issues with ${err.message}`);
             issues = {};
         }
         return issues;
     });
 }
-exports.getIssue = getIssue;
+exports.getIssues = getIssues;
 
 
 /***/ }),
@@ -394,7 +394,7 @@ function updateIssue(issueNumber, branch, commitAge) {
                 repo: get_context_1.repo,
                 issue_number: issueNumber,
                 options: {
-                    body: `${branch} has had no activity for ${commitAge.toString()} days. This branch will be automatically deleted in ${daysUntilDelete.toString()} days.`,
+                    body: `${branch} has had no activity for ${commitAge.toString()} days. This branch will be automatically deleted in ${daysUntilDelete.toString()} days. This issue was last updated on ${new Date().toString()}`,
                     labels: [
                         {
                             name: 'stale 🗑️',
@@ -483,7 +483,7 @@ function run() {
                     core.info(`Stale Branch: ${branchName}`);
                     core.info(`Commit Age: ${commitAge.toString()}`);
                     core.info(`Allowed Days: ${get_context_1.daysBeforeStale.toString()}`);
-                    const existingIssue = yield (0, get_issue_1.getIssue)(branchName);
+                    const existingIssue = yield (0, get_issue_1.getIssues)();
                     for (const n of existingIssue.data) {
                         if (n.number !== 0) {
                             yield (0, update_issue_1.updateIssue)(n.number, branchName, commitAge);
