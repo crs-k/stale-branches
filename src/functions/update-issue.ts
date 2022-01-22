@@ -15,15 +15,17 @@ export async function updateIssue(
       owner,
       repo,
       issue_number: issueNumber,
-      title: `[STALE] Branch: ${branch}`,
-      body: `${branch} has had no activity for ${commitAge.toString()} days. This branch will be automatically deleted in ${daysUntilDelete.toString()} days.`,
-      labels: [
-        {
-          name: 'stale 🗑️',
-          color: 'B60205',
-          description: 'Used by Stale Branches Action to label issues'
-        }
-      ]
+      options: {
+        title: `[STALE] Branch: ${branch}`,
+        body: `${branch} has had no activity for ${commitAge.toString()} days. This branch will be automatically deleted in ${daysUntilDelete.toString()} days.`,
+        labels: [
+          {
+            name: 'stale 🗑️',
+            color: 'B60205',
+            description: 'Used by Stale Branches Action to label issues'
+          }
+        ]
+      }
     })
     issueId = issueResponse.data.id || 0
     assert.ok(issueId, 'Date cannot be empty')

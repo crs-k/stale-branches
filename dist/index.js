@@ -294,7 +294,7 @@ function getIssue(branch) {
                 title: `[STALE] Branch: ${branch}`
             });
             issueId = issueResponse.data[0].id || 0;
-            assert.ok(issueId, 'Date cannot be empty');
+            assert.ok(issueId, 'Issue ID cannot be empty');
         }
         catch (err) {
             if (err instanceof Error)
@@ -393,15 +393,17 @@ function updateIssue(issueNumber, branch, commitAge) {
                 owner: get_context_1.owner,
                 repo: get_context_1.repo,
                 issue_number: issueNumber,
-                title: `[STALE] Branch: ${branch}`,
-                body: `${branch} has had no activity for ${commitAge.toString()} days. This branch will be automatically deleted in ${daysUntilDelete.toString()} days.`,
-                labels: [
-                    {
-                        name: 'stale 🗑️',
-                        color: 'B60205',
-                        description: 'Used by Stale Branches Action to label issues'
-                    }
-                ]
+                options: {
+                    title: `[STALE] Branch: ${branch}`,
+                    body: `${branch} has had no activity for ${commitAge.toString()} days. This branch will be automatically deleted in ${daysUntilDelete.toString()} days.`,
+                    labels: [
+                        {
+                            name: 'stale 🗑️',
+                            color: 'B60205',
+                            description: 'Used by Stale Branches Action to label issues'
+                        }
+                    ]
+                }
             });
             issueId = issueResponse.data.id || 0;
             assert.ok(issueId, 'Date cannot be empty');
