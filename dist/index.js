@@ -126,7 +126,7 @@ const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
 function getRecentCommitDate(sha) {
-    var _a, _b;
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         let commitDate;
         try {
@@ -137,19 +137,14 @@ function getRecentCommitDate(sha) {
                 per_page: 1,
                 page: 1
             });
-            core.info(((_a = branchResponse.data.commit.author) === null || _a === void 0 ? void 0 : _a.date) || '');
-            commitDate = ((_b = branchResponse.data.commit.author) === null || _b === void 0 ? void 0 : _b.date) || '';
+            commitDate = ((_a = branchResponse.data.commit.author) === null || _a === void 0 ? void 0 : _a.date) || '';
             assert.ok(commitDate, 'Date cannot be empty');
-            //assert.ok(protectEnabled, 'protected cannot be empty')
         }
         catch (err) {
             if (err instanceof Error)
                 core.setFailed(`Failed to retrieve commit for ${get_context_1.repo} with ${err.message}`);
             commitDate = '';
         }
-        // Print the previous release info
-        /*   core.info(`Commit Date: '${commitDate}'`)
-        core.info(`Commit URL: '${commitUrl}'`) */
         return commitDate;
     });
 }

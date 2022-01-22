@@ -12,20 +12,12 @@ export async function getRecentCommitDate(sha: string): Promise<string> {
       per_page: 1,
       page: 1
     })
-    core.info(branchResponse.data.commit.author?.date || '')
     commitDate = branchResponse.data.commit.author?.date || ''
-
     assert.ok(commitDate, 'Date cannot be empty')
-    //assert.ok(protectEnabled, 'protected cannot be empty')
   } catch (err) {
     if (err instanceof Error)
       core.setFailed(`Failed to retrieve commit for ${repo} with ${err.message}`)
     commitDate = ''
   }
-
-  // Print the previous release info
-  /*   core.info(`Commit Date: '${commitDate}'`)
-  core.info(`Commit URL: '${commitUrl}'`) */
-
   return commitDate
 }
