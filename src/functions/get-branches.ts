@@ -27,8 +27,10 @@ export async function getBranches(): Promise<[string, boolean]> {
       const currentDate = new Date().getTime()
       const commitDate = new Date(commitResponse).getTime()
       const commitAge = getMinutes(currentDate, commitDate)
-      if (commitAge > daysBeforeStale) core.info(i.name)
-      core.info(`Commit Age: ${commitAge.toString()}`)
+      if (commitAge > daysBeforeStale) {
+        core.info(i.name)
+        core.info(`Commit Age: ${commitAge.toString()}`)
+      }
     }
     core.endGroup()
 

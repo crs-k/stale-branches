@@ -63,9 +63,10 @@ function getBranches() {
                 const currentDate = new Date().getTime();
                 const commitDate = new Date(commitResponse).getTime();
                 const commitAge = (0, get_time_1.getMinutes)(currentDate, commitDate);
-                if (commitAge > get_context_1.daysBeforeStale)
+                if (commitAge > get_context_1.daysBeforeStale) {
                     core.info(i.name);
-                core.info(`Commit Age: ${commitAge.toString()}`);
+                    core.info(`Commit Age: ${commitAge.toString()}`);
+                }
             }
             core.endGroup();
             assert.ok(branchName, 'name cannot be empty');
