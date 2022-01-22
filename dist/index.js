@@ -57,7 +57,7 @@ function getBranches() {
             branchName = response.data[0].name;
             protectEnabled = response.data[0].protected;
             for (const i of response.data) {
-                core.info(response.data[0].name);
+                core.info(i.name);
                 const branchResponse = yield (0, get_commits_1.getRecentCommitDate)(i.commit.sha);
                 core.info(branchResponse);
             }
