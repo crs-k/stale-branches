@@ -293,7 +293,7 @@ function getIssue(branch) {
                 repo: get_context_1.repo,
                 title: `[STALE] Branch: ${branch}`
             });
-            issueId = issueResponse.data[0].id || 0;
+            issueId = issueResponse.data[0].number || 0;
             assert.ok(issueId, 'Issue ID cannot be empty');
         }
         catch (err) {
