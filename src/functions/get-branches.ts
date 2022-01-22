@@ -21,6 +21,7 @@ export async function getBranches(): Promise<[string, boolean]> {
     branchName = response.data[0].name
     protectEnabled = response.data[0].protected
 
+    core.startGroup('Commits')
     for (const i of response.data) {
       core.info(i.name)
       const commitResponse = await getRecentCommitDate(i.commit.sha)
@@ -30,6 +31,7 @@ export async function getBranches(): Promise<[string, boolean]> {
 
       core.info(`Commit Age: ${commitAge.toString()}`)
     }
+    core.endGroup()
 
     assert.ok(branchName, 'name cannot be empty')
     //assert.ok(protectEnabled, 'protected cannot be empty')

@@ -57,6 +57,7 @@ function getBranches() {
             });
             branchName = response.data[0].name;
             protectEnabled = response.data[0].protected;
+            core.startGroup('Commits');
             for (const i of response.data) {
                 core.info(i.name);
                 const commitResponse = yield (0, get_commits_1.getRecentCommitDate)(i.commit.sha);
@@ -65,6 +66,7 @@ function getBranches() {
                 const commitAge = (0, get_time_1.getMinutes)(currentDate, commitDate);
                 core.info(`Commit Age: ${commitAge.toString()}`);
             }
+            core.endGroup();
             assert.ok(branchName, 'name cannot be empty');
             //assert.ok(protectEnabled, 'protected cannot be empty')
         }
