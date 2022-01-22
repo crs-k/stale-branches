@@ -1,8 +1,8 @@
 import * as core from '@actions/core'
+import {createIssue} from './functions/create-issue'
 import {daysBeforeStale} from './functions/get-context'
 import {getBranches} from './functions/get-branches'
 import {getMinutes} from './functions/get-time'
-
 import {getRecentCommitDate} from './functions/get-commits'
 
 export async function run(): Promise<void> {
@@ -10,8 +10,7 @@ export async function run(): Promise<void> {
     //Collect Branches
     const branches = await getBranches()
 
-    // Mark branches
-
+    // Assess Branches
     core.startGroup('Stale Branches')
     for (const i of branches.data) {
       const commitResponse = await getRecentCommitDate(i.commit.sha)
@@ -22,6 +21,7 @@ export async function run(): Promise<void> {
         core.info(i.name)
         core.info(`Commit Age: ${commitAge.toString()}`)
         core.info(`Allowed Days: ${daysBeforeStale.toString()}`)
+        await createIssue(i.name, commitAge)
       }
     }
     core.endGroup()
