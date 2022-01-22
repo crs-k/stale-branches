@@ -291,7 +291,8 @@ function getIssue(branch) {
             const issueResponse = yield get_context_1.github.rest.issues.listForRepo({
                 owner: get_context_1.owner,
                 repo: get_context_1.repo,
-                title: `[STALE] Branch: ${branch}`
+                title: `[STALE] Branch: ${branch}`,
+                options: { title: `[STALE] Branch: ${branch}` }
             });
             issueId = issueResponse.data[0].number || 0;
             assert.ok(issueId, 'Issue ID cannot be empty');

@@ -9,7 +9,8 @@ export async function getIssue(branch: string): Promise<number> {
     const issueResponse = await github.rest.issues.listForRepo({
       owner,
       repo,
-      title: `[STALE] Branch: ${branch}`
+      title: `[STALE] Branch: ${branch}`,
+      options: {title: `[STALE] Branch: ${branch}`}
     })
     issueId = issueResponse.data[0].number || 0
     assert.ok(issueId, 'Issue ID cannot be empty')
