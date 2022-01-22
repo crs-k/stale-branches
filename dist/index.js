@@ -58,8 +58,9 @@ function getBranches() {
             protectEnabled = response.data[0].protected;
             for (const i of response.data) {
                 core.info(i.name);
-                const branchResponse = yield (0, get_commits_1.getRecentCommitDate)(i.commit.sha);
-                core.info(branchResponse);
+                const commitResponse = yield (0, get_commits_1.getRecentCommitDate)(i.commit.sha);
+                const commitAge = new Date(commitResponse).getTime() - new Date().getTime();
+                core.info(`Commit Age: ${commitAge.toString()}`);
             }
             assert.ok(branchName, 'name cannot be empty');
             //assert.ok(protectEnabled, 'protected cannot be empty')
@@ -71,9 +72,6 @@ function getBranches() {
             protectEnabled = false;
         }
         const data = [branchName, protectEnabled];
-        // Print the previous release info
-        core.info(`Branch Name: '${branchName}'`);
-        core.info(`Protected: '${protectEnabled}'`);
         return data;
     });
 }

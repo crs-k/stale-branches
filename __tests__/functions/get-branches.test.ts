@@ -29,7 +29,5 @@ describe('Get Branches Function', () => {
     await getBranches()
 
     expect(core.info).toHaveBeenNthCalledWith(1, 'Retrieving branch information...')
-    expect(core.info).toHaveBeenNthCalledWith(2, `Branch Name: ''`)
-    expect(core.info).toHaveBeenNthCalledWith(3, `Protected: 'false'`)
   })
 })

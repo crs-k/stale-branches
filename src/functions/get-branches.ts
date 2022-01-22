@@ -22,8 +22,10 @@ export async function getBranches(): Promise<[string, boolean]> {
 
     for (const i of response.data) {
       core.info(i.name)
-      const branchResponse = await getRecentCommitDate(i.commit.sha)
-      core.info(branchResponse)
+      const commitResponse = await getRecentCommitDate(i.commit.sha)
+      const commitAge = new Date(commitResponse).getTime() - new Date().getTime()
+
+      core.info(`Commit Age: ${commitAge.toString()}`)
     }
 
     assert.ok(branchName, 'name cannot be empty')
@@ -35,9 +37,6 @@ export async function getBranches(): Promise<[string, boolean]> {
     protectEnabled = false
   }
   const data: [branch: string, protectEnabled: boolean] = [branchName, protectEnabled]
-  // Print the previous release info
-  core.info(`Branch Name: '${branchName}'`)
-  core.info(`Protected: '${protectEnabled}'`)
 
   return data
 }
