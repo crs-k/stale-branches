@@ -417,6 +417,19 @@ function run() {
                         }
                     }
                 }
+                if (commitAge > get_context_1.daysBeforeDelete) {
+                    core.info(`Dead Branch: ${branchName}`);
+                    core.info(`Commit Age: ${commitAge.toString()}`);
+                    core.info(`Allowed Days: ${get_context_1.daysBeforeStale.toString()}`);
+                    const existingIssue = yield (0, get_issue_1.getIssues)();
+                    const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[STALE] Branch: ${branchName}`);
+                    for (const n of filteredIssue) {
+                        if (n.title === `[STALE] Branch: ${branchName}`) {
+                            //await updateIssue(n.number, branchName, commitAge)
+                            core.notice(`Branch: ${branchName} has been deleted.`);
+                        }
+                    }
+                }
             }
             core.endGroup();
         }
