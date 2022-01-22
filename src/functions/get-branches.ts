@@ -1,6 +1,6 @@
 import * as assert from 'assert'
 import * as core from '@actions/core'
-import {github, owner, repo} from './get-context'
+import {daysBeforeStale, github, owner, repo} from './get-context'
 import {getMinutes} from './get-time'
 import {getRecentCommitDate} from './get-commits'
 
@@ -21,14 +21,13 @@ export async function getBranches(): Promise<[string, boolean]> {
     branchName = response.data[0].name
     protectEnabled = response.data[0].protected
 
-    core.startGroup('Commits')
+    core.startGroup('Stale Commits')
     for (const i of response.data) {
-      core.info(i.name)
       const commitResponse = await getRecentCommitDate(i.commit.sha)
       const currentDate = new Date().getTime()
       const commitDate = new Date(commitResponse).getTime()
       const commitAge = getMinutes(currentDate, commitDate)
-
+      if (commitAge > daysBeforeStale) core.info(i.name)
       core.info(`Commit Age: ${commitAge.toString()}`)
     }
     core.endGroup()

@@ -57,13 +57,14 @@ function getBranches() {
             });
             branchName = response.data[0].name;
             protectEnabled = response.data[0].protected;
-            core.startGroup('Commits');
+            core.startGroup('Stale Commits');
             for (const i of response.data) {
-                core.info(i.name);
                 const commitResponse = yield (0, get_commits_1.getRecentCommitDate)(i.commit.sha);
                 const currentDate = new Date().getTime();
                 const commitDate = new Date(commitResponse).getTime();
                 const commitAge = (0, get_time_1.getMinutes)(currentDate, commitDate);
+                if (commitAge > get_context_1.daysBeforeStale)
+                    core.info(i.name);
                 core.info(`Commit Age: ${commitAge.toString()}`);
             }
             core.endGroup();
@@ -186,13 +187,15 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.repo = exports.owner = exports.github = void 0;
+exports.daysBeforeDelete = exports.daysBeforeStale = exports.repo = exports.owner = exports.github = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github_1 = __nccwpck_require__(5438);
 const repoToken = core.getInput('repo-token', { required: true });
 core.setSecret(repoToken);
 exports.github = (0, github_1.getOctokit)(repoToken);
 _a = github_1.context.repo, exports.owner = _a.owner, exports.repo = _a.repo;
+exports.daysBeforeStale = Number(core.getInput('days-before-stale', { required: false }));
+exports.daysBeforeDelete = Number(core.getInput('days-before-delete', { required: false }));
 
 
 /***/ }),
@@ -207,25 +210,25 @@ exports.getnSeconds = exports.getMinutes = exports.getHours = exports.getDays = 
 function getDays(date1, date2) {
     const diffMs = Math.abs(date2 - date1);
     const days = Math.round(diffMs / (1000 * 60 * 60 * 24));
-    return days.toString();
+    return days;
 }
 exports.getDays = getDays;
 function getHours(date1, date2) {
     const diffMs = Math.abs(date2 - date1);
     const hours = Math.round(diffMs / (1000 * 60 * 60));
-    return hours.toString();
+    return hours;
 }
 exports.getHours = getHours;
 function getMinutes(date1, date2) {
     const diffMs = Math.abs(date2 - date1);
     const minutes = Math.round(diffMs / (1000 * 60));
-    return minutes.toString();
+    return minutes;
 }
 exports.getMinutes = getMinutes;
 function getnSeconds(date1, date2) {
     const diffMs = Math.abs(date2 - date1);
     const seconds = Math.round(diffMs / 1000);
-    return seconds.toString();
+    return seconds;
 }
 exports.getnSeconds = getnSeconds;
 

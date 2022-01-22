@@ -5,3 +5,5 @@ const repoToken = core.getInput('repo-token', {required: true})
 core.setSecret(repoToken)
 export const github = getOctokit(repoToken)
 export const {owner: owner, repo: repo} = context.repo
+export const daysBeforeStale = Number(core.getInput('days-before-stale', {required: false}))
+export const daysBeforeDelete = Number(core.getInput('days-before-delete', {required: false}))
