@@ -9,7 +9,6 @@ export async function updateIssue(
   commitAge: number
 ): Promise<string> {
   let createdAt: string
-  let updatedAt: string
   const daysUntilDelete = getMinutes(commitAge, daysBeforeDelete)
   try {
     const issueResponse = await github.rest.issues.createComment({
@@ -17,7 +16,7 @@ export async function updateIssue(
       repo,
       issue_number: issueNumber,
 
-      body: `${branch} has had no activity for ${commitAge.toString()} days. This branch will be automatically deleted in ${daysUntilDelete.toString()} days. This issue was last updated on ${new Date().toString()}`,
+      body: `${branch} has had no activity for ${commitAge.toString()} days. This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \\ This issue was last updated on ${new Date().toString()}`,
       labels: [
         {
           name: 'stale 🗑️',
@@ -28,7 +27,6 @@ export async function updateIssue(
     })
 
     createdAt = issueResponse.data.created_at || ''
-    updatedAt = issueResponse.data.updated_at || ''
     assert.ok(createdAt, 'Created At cannot be empty')
   } catch (err) {
     if (err instanceof Error)
@@ -36,8 +34,7 @@ export async function updateIssue(
         `No existing issue returned for issue number: ${issueNumber}. Description: ${err.message}`
       )
     createdAt = ''
-    updatedAt = 'Never'
   }
-  core.info(`Comment was created at ${createdAt} was updated at ${updatedAt}`)
+  core.info(`Comment was created at ${createdAt}.`)
   return createdAt
 }

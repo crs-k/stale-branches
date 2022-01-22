@@ -313,14 +313,13 @@ const get_time_1 = __nccwpck_require__(1035);
 function updateIssue(issueNumber, branch, commitAge) {
     return __awaiter(this, void 0, void 0, function* () {
         let createdAt;
-        let updatedAt;
         const daysUntilDelete = (0, get_time_1.getMinutes)(commitAge, get_context_1.daysBeforeDelete);
         try {
             const issueResponse = yield get_context_1.github.rest.issues.createComment({
                 owner: get_context_1.owner,
                 repo: get_context_1.repo,
                 issue_number: issueNumber,
-                body: `${branch} has had no activity for ${commitAge.toString()} days. This branch will be automatically deleted in ${daysUntilDelete.toString()} days. This issue was last updated on ${new Date().toString()}`,
+                body: `${branch} has had no activity for ${commitAge.toString()} days. This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \\ This issue was last updated on ${new Date().toString()}`,
                 labels: [
                     {
                         name: 'stale 🗑️',
@@ -330,16 +329,14 @@ function updateIssue(issueNumber, branch, commitAge) {
                 ]
             });
             createdAt = issueResponse.data.created_at || '';
-            updatedAt = issueResponse.data.updated_at || '';
             assert.ok(createdAt, 'Created At cannot be empty');
         }
         catch (err) {
             if (err instanceof Error)
                 core.info(`No existing issue returned for issue number: ${issueNumber}. Description: ${err.message}`);
             createdAt = '';
-            updatedAt = 'Never';
         }
-        core.info(`Comment was created at ${createdAt} was updated at ${updatedAt}`);
+        core.info(`Comment was created at ${createdAt}.`);
         return createdAt;
     });
 }
@@ -413,7 +410,6 @@ function run() {
                     for (const n of filteredIssue) {
                         if (n.title === `[STALE] Branch: ${branchName}`) {
                             yield (0, update_issue_1.updateIssue)(n.number, branchName, commitAge);
-                            core.info(`[STALE] Branch: ${branchName}`);
                         }
                         else {
                             //await createIssue(branchName, commitAge)

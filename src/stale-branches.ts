@@ -32,7 +32,6 @@ export async function run(): Promise<void> {
         for (const n of filteredIssue) {
           if (n.title === `[STALE] Branch: ${branchName}`) {
             await updateIssue(n.number, branchName, commitAge)
-            core.info(`[STALE] Branch: ${branchName}`)
           } else {
             //await createIssue(branchName, commitAge)
             core.info('else path')
