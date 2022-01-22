@@ -59,7 +59,7 @@ function getBranches() {
             for (const i of response.data) {
                 core.info(i.name);
                 const commitResponse = yield (0, get_commits_1.getRecentCommitDate)(i.commit.sha);
-                const commitAge = new Date(commitResponse).getTime() - new Date().getTime();
+                const commitAge = new Date().getTime() - new Date(commitResponse).getTime();
                 core.info(`Commit Age: ${commitAge.toString()}`);
             }
             assert.ok(branchName, 'name cannot be empty');
