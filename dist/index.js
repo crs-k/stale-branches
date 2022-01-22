@@ -50,7 +50,7 @@ function createIssue(branch, commitAge) {
                 repo: get_context_1.repo,
                 title: `[STALE] Branch: ${branch}`,
                 body: `${branch} has had no activity for ${commitAge.toString()} days. This branch will be automatically deleted in ${daysUntilDelete.toString()} days.`,
-                labels: [{ name: 'STALE' }]
+                labels: [{ name: 'STALE 🗑️' }]
             });
             issueUrl = issueResponse.data.url || '';
             assert.ok(issueUrl, 'Date cannot be empty');
