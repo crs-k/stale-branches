@@ -5,7 +5,7 @@ import {getBranches} from './functions/get-branches'
 import {getIssues} from './functions/get-issue'
 import {getMinutes} from './functions/get-time'
 import {getRecentCommitDate} from './functions/get-commits'
-//import {updateIssue} from './functions/update-issue'
+import {updateIssue} from './functions/update-issue'
 
 export async function run(): Promise<void> {
   try {
@@ -28,7 +28,7 @@ export async function run(): Promise<void> {
         const existingIssue = await getIssues()
         for (const n of existingIssue.data) {
           if (n.title === `[STALE] Branch: ${branchName}`) {
-            //await updateIssue(n.number, branchName, commitAge)
+            await updateIssue(n.number, branchName, commitAge)
             core.info(`[STALE] Branch: ${branchName}`)
           } else {
             //await createIssue(branchName, commitAge)
