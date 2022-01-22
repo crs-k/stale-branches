@@ -20,13 +20,13 @@ export async function run(): Promise<void> {
       const currentDate = new Date().getTime()
       const commitDate = new Date(commitResponse).getTime()
       const commitAge = getMinutes(currentDate, commitDate)
-
+      const branchName = i.name
+      const existingIssue = await getIssue(branchName)
       if (commitAge > daysBeforeStale) {
-        const branchName = i.name
         core.info(`Stale Branch: ${branchName}`)
         core.info(`Commit Age: ${commitAge.toString()}`)
         core.info(`Allowed Days: ${daysBeforeStale.toString()}`)
-        const existingIssue = await getIssue(branchName)
+
         if (existingIssue !== 0) {
           await updateIssue(existingIssue, branchName, commitAge)
         } else {

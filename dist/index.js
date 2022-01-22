@@ -479,12 +479,12 @@ function run() {
                 const currentDate = new Date().getTime();
                 const commitDate = new Date(commitResponse).getTime();
                 const commitAge = (0, get_time_1.getMinutes)(currentDate, commitDate);
+                const branchName = i.name;
+                const existingIssue = yield (0, get_issue_1.getIssue)(branchName);
                 if (commitAge > get_context_1.daysBeforeStale) {
-                    const branchName = i.name;
                     core.info(`Stale Branch: ${branchName}`);
                     core.info(`Commit Age: ${commitAge.toString()}`);
                     core.info(`Allowed Days: ${get_context_1.daysBeforeStale.toString()}`);
-                    const existingIssue = yield (0, get_issue_1.getIssue)(branchName);
                     if (existingIssue !== 0) {
                         yield (0, update_issue_1.updateIssue)(existingIssue, branchName, commitAge);
                     }
