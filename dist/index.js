@@ -417,7 +417,7 @@ function run() {
                         }
                         else {
                             //await createIssue(branchName, commitAge)
-                            core.info(n.title);
+                            core.info('else path');
                         }
                     }
                 }

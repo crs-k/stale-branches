@@ -35,7 +35,7 @@ export async function run(): Promise<void> {
             core.info(`[STALE] Branch: ${branchName}`)
           } else {
             //await createIssue(branchName, commitAge)
-            core.info(n.title)
+            core.info('else path')
           }
         }
       }
