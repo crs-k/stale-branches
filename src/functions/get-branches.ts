@@ -1,6 +1,7 @@
 import * as assert from 'assert'
 import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
+import {getRecentCommitDate} from './get-commits'
 
 export async function getBranches(): Promise<[string, boolean]> {
   core.info('Retrieving branch information...')
@@ -20,12 +21,8 @@ export async function getBranches(): Promise<[string, boolean]> {
     protectEnabled = response.data[0].protected
 
     for (const i of response.data) {
-      const branchResponse = await github.rest.repos.getCommit({
-        owner,
-        repo,
-        ref: i.commit.sha
-      })
-      core.info(branchResponse.data.commit.author?.date || '')
+      const branchResponse = await getRecentCommitDate(i.commit.sha)
+      core.info(branchResponse)
     }
 
     assert.ok(branchName, 'name cannot be empty')
