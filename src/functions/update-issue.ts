@@ -17,7 +17,6 @@ export async function updateIssue(
       repo,
       issue_number: issueNumber,
       options: {
-        title: `[STALE] Branch: ${branch}`,
         body: `${branch} has had no activity for ${commitAge.toString()} days. This branch will be automatically deleted in ${daysUntilDelete.toString()} days.`,
         labels: [
           {
@@ -31,8 +30,6 @@ export async function updateIssue(
 
     issueId = issueResponse.data.number || 0
     updatedAt = issueResponse.data.updated_at || ''
-    core.info(`${issueId} = issue id`)
-    core.info(`${updatedAt} = updated at`)
     assert.ok(issueId, 'Date cannot be empty')
   } catch (err) {
     if (err instanceof Error)

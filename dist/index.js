@@ -395,7 +395,6 @@ function updateIssue(issueNumber, branch, commitAge) {
                 repo: get_context_1.repo,
                 issue_number: issueNumber,
                 options: {
-                    title: `[STALE] Branch: ${branch}`,
                     body: `${branch} has had no activity for ${commitAge.toString()} days. This branch will be automatically deleted in ${daysUntilDelete.toString()} days.`,
                     labels: [
                         {
@@ -408,8 +407,6 @@ function updateIssue(issueNumber, branch, commitAge) {
             });
             issueId = issueResponse.data.number || 0;
             updatedAt = issueResponse.data.updated_at || '';
-            core.info(`${issueId} = issue id`);
-            core.info(`${updatedAt} = updated at`);
             assert.ok(issueId, 'Date cannot be empty');
         }
         catch (err) {
@@ -483,15 +480,16 @@ function run() {
                 const commitDate = new Date(commitResponse).getTime();
                 const commitAge = (0, get_time_1.getMinutes)(currentDate, commitDate);
                 if (commitAge > get_context_1.daysBeforeStale) {
-                    core.info(i.name);
+                    const branchName = i.name;
+                    core.info(`Stale Branch: ${branchName}`);
                     core.info(`Commit Age: ${commitAge.toString()}`);
                     core.info(`Allowed Days: ${get_context_1.daysBeforeStale.toString()}`);
-                    const existingIssue = yield (0, get_issue_1.getIssue)(i.name);
+                    const existingIssue = yield (0, get_issue_1.getIssue)(branchName);
                     if (existingIssue !== 0) {
-                        yield (0, update_issue_1.updateIssue)(existingIssue, i.name, commitAge);
+                        yield (0, update_issue_1.updateIssue)(existingIssue, branchName, commitAge);
                     }
                     else {
-                        yield (0, create_issue_1.createIssue)(i.name, commitAge);
+                        yield (0, create_issue_1.createIssue)(branchName, commitAge);
                     }
                 }
             }
