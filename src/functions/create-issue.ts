@@ -11,7 +11,7 @@ export async function createIssue(branch: string, commitAge: number): Promise<nu
       owner,
       repo,
       title: `[STALE] Branch: ${branch}`,
-      body: `${branch} has had no activity for ${commitAge.toString()} days. This branch will be automatically deleted in ${daysUntilDelete.toString()} days.`,
+      body: `${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days.`,
       labels: [
         {
           name: 'stale 🗑️',
