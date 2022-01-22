@@ -12,7 +12,13 @@ export async function createIssue(branch: string, commitAge: number): Promise<st
       repo,
       title: `[STALE] Branch: ${branch}`,
       body: `${branch} has had no activity for ${commitAge.toString()} days. This branch will be automatically deleted in ${daysUntilDelete.toString()} days.`,
-      labels: [{name: 'STALE 🗑️'}]
+      labels: [
+        {
+          name: 'stale 🗑️',
+          color: '#B60205',
+          description: 'Used by Stale Branches Action to label issues'
+        }
+      ]
     })
     issueUrl = issueResponse.data.url || ''
     assert.ok(issueUrl, 'Date cannot be empty')
