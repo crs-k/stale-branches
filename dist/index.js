@@ -319,7 +319,7 @@ function updateIssue(issueNumber, branch, commitAge) {
                 owner: get_context_1.owner,
                 repo: get_context_1.repo,
                 issue_number: issueNumber,
-                body: `${branch} has had no activity for ${commitAge.toString()} days. This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \\ This issue was last updated on ${new Date().toString()}`,
+                body: `${branch} has had no activity for ${commitAge.toString()} days. This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \r This issue was last updated on ${new Date().toString()}`,
                 labels: [
                     {
                         name: 'stale 🗑️',
