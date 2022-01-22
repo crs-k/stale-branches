@@ -122,8 +122,8 @@ const get_context_1 = __nccwpck_require__(7782);
 function getRecentCommitDate(sha) {
     var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
-        core.info('Retrieving branch information...');
-        let branchUrl;
+        //core.info('Retrieving branch information...')
+        let commitUrl;
         let commitDate;
         try {
             const branchResponse = yield get_context_1.github.rest.repos.getCommit({
@@ -134,7 +134,7 @@ function getRecentCommitDate(sha) {
                 page: 1
             });
             core.info(((_a = branchResponse.data.commit.author) === null || _a === void 0 ? void 0 : _a.date) || '');
-            branchUrl = branchResponse.data.url || '';
+            commitUrl = branchResponse.data.html_url || '';
             commitDate = ((_b = branchResponse.data.commit.author) === null || _b === void 0 ? void 0 : _b.date) || '';
             assert.ok(commitDate, 'Date cannot be empty');
             //assert.ok(protectEnabled, 'protected cannot be empty')
@@ -143,12 +143,11 @@ function getRecentCommitDate(sha) {
             if (err instanceof Error)
                 core.setFailed(`Failed to retrieve commit for ${get_context_1.repo} with ${err.message}`);
             commitDate = '';
-            branchUrl = '';
+            commitUrl = '';
         }
         // Print the previous release info
-        core.info(`Branch Name: '${sha}'`);
-        core.info(`Protected: '${commitDate}'`);
-        core.info(`Branch URL: '${branchUrl}'`);
+        core.info(`Commit Date: '${commitDate}'`);
+        core.info(`Commit URL: '${commitUrl}'`);
         return commitDate;
     });
 }
