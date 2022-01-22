@@ -5,7 +5,6 @@ import {getBranches} from './functions/get-branches'
 import {getIssues} from './functions/get-issue'
 import {getMinutes} from './functions/get-time'
 import {getRecentCommitDate} from './functions/get-commits'
-
 import {updateIssue} from './functions/update-issue'
 
 export async function run(): Promise<void> {
@@ -28,7 +27,7 @@ export async function run(): Promise<void> {
         core.info(`Allowed Days: ${daysBeforeStale.toString()}`)
         const existingIssue = await getIssues()
         for (const n of existingIssue.data) {
-          if (n.number !== 0) {
+          if (n.title === `[STALE] Branch: ${branchName}`) {
             await updateIssue(n.number, branchName, commitAge)
           } else {
             await createIssue(branchName, commitAge)

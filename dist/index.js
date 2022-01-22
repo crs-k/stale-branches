@@ -483,7 +483,7 @@ function run() {
                     core.info(`Allowed Days: ${get_context_1.daysBeforeStale.toString()}`);
                     const existingIssue = yield (0, get_issue_1.getIssues)();
                     for (const n of existingIssue.data) {
-                        if (n.number !== 0) {
+                        if (n.title === `[STALE] Branch: ${branchName}`) {
                             yield (0, update_issue_1.updateIssue)(n.number, branchName, commitAge);
                         }
                         else {
