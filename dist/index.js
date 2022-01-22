@@ -57,7 +57,7 @@ function getBranches() {
             });
             branchName = response.data[0].name;
             protectEnabled = response.data[0].protected;
-            core.startGroup('Stale Commits');
+            core.startGroup('Stale Branches');
             for (const i of response.data) {
                 const commitResponse = yield (0, get_commits_1.getRecentCommitDate)(i.commit.sha);
                 const currentDate = new Date().getTime();
@@ -66,6 +66,7 @@ function getBranches() {
                 if (commitAge > get_context_1.daysBeforeStale) {
                     core.info(i.name);
                     core.info(`Commit Age: ${commitAge.toString()}`);
+                    core.info(`Allowed Days: ${get_context_1.daysBeforeStale.toString()}`);
                 }
             }
             core.endGroup();

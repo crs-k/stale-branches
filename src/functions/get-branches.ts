@@ -21,7 +21,7 @@ export async function getBranches(): Promise<[string, boolean]> {
     branchName = response.data[0].name
     protectEnabled = response.data[0].protected
 
-    core.startGroup('Stale Commits')
+    core.startGroup('Stale Branches')
     for (const i of response.data) {
       const commitResponse = await getRecentCommitDate(i.commit.sha)
       const currentDate = new Date().getTime()
@@ -30,6 +30,7 @@ export async function getBranches(): Promise<[string, boolean]> {
       if (commitAge > daysBeforeStale) {
         core.info(i.name)
         core.info(`Commit Age: ${commitAge.toString()}`)
+        core.info(`Allowed Days: ${daysBeforeStale.toString()}`)
       }
     }
     core.endGroup()
