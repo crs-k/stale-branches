@@ -3,15 +3,15 @@ import * as core from '@actions/core'
 import {daysBeforeDelete, github, owner, repo} from './get-context'
 import {getMinutes} from './get-time'
 
-export async function createIssue(branch: string, commitAge: number): Promise<string> {
-  let issueUrl: string
+export async function createIssue(branch: string, commitAge: number): Promise<number> {
+  let issueId: number
   const daysUntilDelete = getMinutes(commitAge, daysBeforeDelete)
   try {
     const issueResponse = await github.rest.issues.create({
       owner,
       repo,
       title: `[STALE] Branch: ${branch}`,
-      body: `${branch} has had no activity for ${commitAge.toString()} days. This branch will be automatically deleted in ${daysUntilDelete.toString()} days.`,
+      body: `${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days.`,
       labels: [
         {
           name: 'stale 🗑️',
@@ -20,13 +20,13 @@ export async function createIssue(branch: string, commitAge: number): Promise<st
         }
       ]
     })
-    issueUrl = issueResponse.data.url || ''
-    assert.ok(issueUrl, 'Date cannot be empty')
+    issueId = issueResponse.data.id || 0
+    assert.ok(issueId, 'Date cannot be empty')
   } catch (err) {
     if (err instanceof Error)
       core.setFailed(`Failed to create issue for ${branch} with ${err.message}`)
-    issueUrl = ''
+    issueId = 0
   }
 
-  return issueUrl
+  return issueId
 }

@@ -1,9 +1,11 @@
 import * as core from '@actions/core'
-import {createIssue} from './functions/create-issue'
-import {daysBeforeStale} from './functions/get-context'
+//import {createIssue} from './functions/create-issue'
+import {daysBeforeDelete, daysBeforeStale} from './functions/get-context'
 import {getBranches} from './functions/get-branches'
+import {getIssues} from './functions/get-issue'
 import {getMinutes} from './functions/get-time'
 import {getRecentCommitDate} from './functions/get-commits'
+import {updateIssue} from './functions/update-issue'
 
 export async function run(): Promise<void> {
   try {
@@ -17,11 +19,40 @@ export async function run(): Promise<void> {
       const currentDate = new Date().getTime()
       const commitDate = new Date(commitResponse).getTime()
       const commitAge = getMinutes(currentDate, commitDate)
+      const branchName = i.name
+
       if (commitAge > daysBeforeStale) {
-        core.info(i.name)
+        core.info(`Stale Branch: ${branchName}`)
         core.info(`Commit Age: ${commitAge.toString()}`)
         core.info(`Allowed Days: ${daysBeforeStale.toString()}`)
-        await createIssue(i.name, commitAge)
+        const existingIssue = await getIssues()
+        const filteredIssue = existingIssue.data.filter(
+          branchIssue => branchIssue.title === `[STALE] Branch: ${branchName}`
+        )
+        for (const n of filteredIssue) {
+          if (n.title === `[STALE] Branch: ${branchName}`) {
+            await updateIssue(n.number, branchName, commitAge)
+          } else {
+            //await createIssue(branchName, commitAge)
+            core.info('else path')
+          }
+        }
+      }
+
+      if (commitAge > daysBeforeDelete) {
+        core.info(`Dead Branch: ${branchName}`)
+        core.info(`Commit Age: ${commitAge.toString()}`)
+        core.info(`Allowed Days: ${daysBeforeStale.toString()}`)
+        const existingIssue = await getIssues()
+        const filteredIssue = existingIssue.data.filter(
+          branchIssue => branchIssue.title === `[STALE] Branch: ${branchName}`
+        )
+        for (const n of filteredIssue) {
+          if (n.title === `[STALE] Branch: ${branchName}`) {
+            //await updateIssue(n.number, branchName, commitAge)
+            core.notice(`Branch: ${branchName} has been deleted.`)
+          }
+        }
       }
     }
     core.endGroup()
