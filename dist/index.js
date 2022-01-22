@@ -39,15 +39,17 @@ exports.createIssue = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
+const get_time_1 = __nccwpck_require__(1035);
 function createIssue(branch, commitAge) {
     return __awaiter(this, void 0, void 0, function* () {
         let issueUrl;
+        const daysUntilDelete = (0, get_time_1.getMinutes)(commitAge, get_context_1.daysBeforeDelete);
         try {
             const issueResponse = yield get_context_1.github.rest.issues.create({
                 owner: get_context_1.owner,
                 repo: get_context_1.repo,
                 title: `[STALE] Branch: ${branch}`,
-                body: `${branch} has had no activity in ${commitAge.toString()} days.`
+                body: `${branch} has had no activity in ${commitAge.toString()} days. This branch will be automatically deleted in ${daysUntilDelete.toString()} days.`
             });
             issueUrl = issueResponse.data.url || '';
             assert.ok(issueUrl, 'Date cannot be empty');
