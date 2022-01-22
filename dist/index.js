@@ -387,6 +387,7 @@ const get_time_1 = __nccwpck_require__(1035);
 function updateIssue(issueNumber, branch, commitAge) {
     return __awaiter(this, void 0, void 0, function* () {
         let issueId;
+        let updatedAt;
         const daysUntilDelete = (0, get_time_1.getMinutes)(commitAge, get_context_1.daysBeforeDelete);
         try {
             const issueResponse = yield get_context_1.github.rest.issues.update({
@@ -406,13 +407,18 @@ function updateIssue(issueNumber, branch, commitAge) {
                 }
             });
             issueId = issueResponse.data.id || 0;
+            updatedAt = issueResponse.data.updated_at || '';
+            core.info(`${issueId} = issue id`);
+            core.info(`${updatedAt} = updated at`);
             assert.ok(issueId, 'Date cannot be empty');
         }
         catch (err) {
             if (err instanceof Error)
-                core.info(`No existing issue returned for stale branch: ${branch}. Description: ${err.message}`);
+                core.info(`No existing issue returned for issue number: ${issueNumber}. Description: ${err.message}`);
             issueId = 0;
+            updatedAt = 'Never';
         }
+        core.info(`Issue ${issueId} was updated at ${updatedAt}`);
         return issueId;
     });
 }

@@ -9,6 +9,7 @@ export async function updateIssue(
   commitAge: number
 ): Promise<number> {
   let issueId: number
+  let updatedAt: string
   const daysUntilDelete = getMinutes(commitAge, daysBeforeDelete)
   try {
     const issueResponse = await github.rest.issues.update({
@@ -27,15 +28,20 @@ export async function updateIssue(
         ]
       }
     })
+
     issueId = issueResponse.data.id || 0
+    updatedAt = issueResponse.data.updated_at || ''
+    core.info(`${issueId} = issue id`)
+    core.info(`${updatedAt} = updated at`)
     assert.ok(issueId, 'Date cannot be empty')
   } catch (err) {
     if (err instanceof Error)
       core.info(
-        `No existing issue returned for stale branch: ${branch}. Description: ${err.message}`
+        `No existing issue returned for issue number: ${issueNumber}. Description: ${err.message}`
       )
     issueId = 0
+    updatedAt = 'Never'
   }
-
+  core.info(`Issue ${issueId} was updated at ${updatedAt}`)
   return issueId
 }
