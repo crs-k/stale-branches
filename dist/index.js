@@ -409,7 +409,8 @@ function run() {
                     core.info(`Commit Age: ${commitAge.toString()}`);
                     core.info(`Allowed Days: ${get_context_1.daysBeforeStale.toString()}`);
                     const existingIssue = yield (0, get_issue_1.getIssues)();
-                    for (const n of existingIssue.data) {
+                    const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[STALE] Branch: ${branchName}`);
+                    for (const n of filteredIssue) {
                         if (n.title === `[STALE] Branch: ${branchName}`) {
                             yield (0, update_issue_1.updateIssue)(n.number, branchName, commitAge);
                             core.info(`[STALE] Branch: ${branchName}`);

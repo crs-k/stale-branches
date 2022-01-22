@@ -26,7 +26,10 @@ export async function run(): Promise<void> {
         core.info(`Commit Age: ${commitAge.toString()}`)
         core.info(`Allowed Days: ${daysBeforeStale.toString()}`)
         const existingIssue = await getIssues()
-        for (const n of existingIssue.data) {
+        const filteredIssue = existingIssue.data.filter(
+          branchIssue => branchIssue.title === `[STALE] Branch: ${branchName}`
+        )
+        for (const n of filteredIssue) {
           if (n.title === `[STALE] Branch: ${branchName}`) {
             await updateIssue(n.number, branchName, commitAge)
             core.info(`[STALE] Branch: ${branchName}`)

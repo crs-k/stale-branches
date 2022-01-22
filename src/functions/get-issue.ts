@@ -17,6 +17,7 @@ export async function getIssues(): Promise<ListIssuesResponseDataType> {
       state: 'open'
     })
     issues = issueResponse
+
     assert.ok(issues, 'Issue ID cannot be empty')
   } catch (err) {
     if (err instanceof Error) core.setFailed(`Failed to locate issues with ${err.message}`)
