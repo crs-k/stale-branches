@@ -10,6 +10,8 @@ import {getRecentCommitDate} from './functions/get-commits'
 import {updateIssue} from './functions/update-issue'
 
 export async function run(): Promise<void> {
+  const outputDeletes: string[] = []
+  const outputStales: string[] = []
   try {
     //Collect Branches
     const branches = await getBranches()
@@ -36,6 +38,7 @@ export async function run(): Promise<void> {
           if (n.title === `[${branchName}] is STALE`) {
             await closeIssue(n.number, branchName, commitAge)
             await deleteBranch(branchName)
+            outputDeletes.push(branchName)
           }
         }
       }
@@ -50,6 +53,7 @@ export async function run(): Promise<void> {
         if (!existingIssue.data.find(findIssue => findIssue.title === `[${branchName}] is STALE`)) {
           await createIssue(branchName, commitAge)
           core.info(`New issue created: [${branchName}] is STALE`)
+          outputStales.push(branchName)
         }
 
         const filteredIssue = existingIssue.data.filter(
@@ -58,6 +62,7 @@ export async function run(): Promise<void> {
         for (const n of filteredIssue) {
           if (n.title === `[${branchName}] is STALE`) {
             await updateIssue(n.number, branchName, commitAge)
+            outputStales.push(branchName)
           }
         }
       }
@@ -66,4 +71,6 @@ export async function run(): Promise<void> {
   } catch (error) {
     if (error instanceof Error) core.setFailed(`Action failed with ${error.message}`)
   }
+  core.setOutput('closed-branches', outputDeletes)
+  core.setOutput('stale-branches', outputStales)
 }

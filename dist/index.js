@@ -604,6 +604,8 @@ const get_commits_1 = __nccwpck_require__(9821);
 const update_issue_1 = __nccwpck_require__(2914);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
+        const outputDeletes = [];
+        const outputStales = [];
         try {
             //Collect Branches
             const branches = yield (0, get_branches_1.getBranches)();
@@ -626,6 +628,7 @@ function run() {
                         if (n.title === `[${branchName}] is STALE`) {
                             yield (0, close_issue_1.closeIssue)(n.number, branchName, commitAge);
                             yield (0, delete_branch_1.deleteBranch)(branchName);
+                            outputDeletes.push(branchName);
                         }
                     }
                 }
@@ -638,11 +641,13 @@ function run() {
                     if (!existingIssue.data.find(findIssue => findIssue.title === `[${branchName}] is STALE`)) {
                         yield (0, create_issue_1.createIssue)(branchName, commitAge);
                         core.info(`New issue created: [${branchName}] is STALE`);
+                        outputStales.push(branchName);
                     }
                     const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
                     for (const n of filteredIssue) {
                         if (n.title === `[${branchName}] is STALE`) {
                             yield (0, update_issue_1.updateIssue)(n.number, branchName, commitAge);
+                            outputStales.push(branchName);
                         }
                     }
                 }
@@ -653,6 +658,8 @@ function run() {
             if (error instanceof Error)
                 core.setFailed(`Action failed with ${error.message}`);
         }
+        core.setOutput('closed-branches', outputDeletes);
+        core.setOutput('stale-branches', outputStales);
     });
 }
 exports.run = run;
