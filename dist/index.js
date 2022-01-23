@@ -621,13 +621,13 @@ function run() {
                 const branchName = i.name;
                 //Close issues if a branch becomes active again
                 if (commitAge < get_context_1.daysBeforeStale) {
-                    core.info(`Active Branch: ${branchName}`);
-                    core.info(`Last Commit: ${commitAge.toString()} days ago.`);
-                    core.info(`Stale Branch Threshold: ${get_context_1.daysBeforeStale.toString()}`);
                     const existingIssue = yield (0, get_issue_1.getIssues)();
                     const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
                     for (const n of filteredIssue) {
                         if (n.title === `[${branchName}] is STALE`) {
+                            core.info(`Active Branch: ${branchName}`);
+                            core.info(`Last Commit: ${commitAge.toString()} days ago.`);
+                            core.info(`Stale Branch Threshold: ${get_context_1.daysBeforeStale.toString()}`);
                             yield (0, close_issue_1.closeIssue)(n.number, branchName, commitAge);
                         }
                     }

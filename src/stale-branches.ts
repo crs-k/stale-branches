@@ -27,15 +27,15 @@ export async function run(): Promise<void> {
 
       //Close issues if a branch becomes active again
       if (commitAge < daysBeforeStale) {
-        core.info(`Active Branch: ${branchName}`)
-        core.info(`Last Commit: ${commitAge.toString()} days ago.`)
-        core.info(`Stale Branch Threshold: ${daysBeforeStale.toString()}`)
         const existingIssue = await getIssues()
         const filteredIssue = existingIssue.data.filter(
           branchIssue => branchIssue.title === `[${branchName}] is STALE`
         )
         for (const n of filteredIssue) {
           if (n.title === `[${branchName}] is STALE`) {
+            core.info(`Active Branch: ${branchName}`)
+            core.info(`Last Commit: ${commitAge.toString()} days ago.`)
+            core.info(`Stale Branch Threshold: ${daysBeforeStale.toString()}`)
             await closeIssue(n.number, branchName, commitAge)
           }
         }
