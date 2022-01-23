@@ -525,6 +525,7 @@ const get_context_1 = __nccwpck_require__(7782);
 function updateIssue(issueNumber, branch, commitAge) {
     return __awaiter(this, void 0, void 0, function* () {
         let createdAt;
+        let commentUrl;
         const daysUntilDelete = Math.abs(commitAge - get_context_1.daysBeforeDelete);
         try {
             const issueResponse = yield get_context_1.github.rest.issues.createComment({
@@ -541,8 +542,9 @@ function updateIssue(issueNumber, branch, commitAge) {
                 ]
             });
             createdAt = issueResponse.data.created_at || '';
+            commentUrl = issueResponse.data.html_url || '';
             assert.ok(createdAt, 'Created At cannot be empty');
-            core.info(`Issue #${issueNumber}: comment was created at ${createdAt}.`);
+            core.info(`Issue #${issueNumber}: comment was created at ${createdAt}. ${commentUrl}`);
         }
         catch (err) {
             if (err instanceof Error)
