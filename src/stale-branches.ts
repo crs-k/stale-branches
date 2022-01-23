@@ -10,7 +10,7 @@ import {getRecentCommitDate} from './functions/get-commits'
 import {updateIssue} from './functions/update-issue'
 
 export async function run(): Promise<void> {
-  const outputDeletes = ['Branches Deleted']
+  const outputDeletes = new Array('Branches Deleted')
   const outputStales = ['Branches Marked Stale']
   try {
     //Collect Branches
