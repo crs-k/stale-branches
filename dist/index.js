@@ -192,20 +192,20 @@ function deleteBranch(name) {
         const refAppend = 'heads/';
         const refFull = refAppend.concat(name);
         try {
-            // Get info from the most recent release
+            // Deletes branch based on it's ref
             const response = yield get_context_1.github.rest.git.deleteRef({
                 owner: get_context_1.owner,
                 repo: get_context_1.repo,
                 ref: refFull
             });
-            confirm = response.data[0];
+            confirm = response.status;
             assert.ok(response, 'name cannot be empty');
             core.warning(`Branch: ${refFull} has been deleted.`);
         }
         catch (err) {
             if (err instanceof Error)
-                core.setFailed(`Failed to delete branch ${refFull}:  ${err.message}`);
-            confirm = '';
+                core.warning(`Failed to delete branch ${refFull}:  ${err.message}`);
+            confirm = 500;
         }
         return confirm;
     });
@@ -626,8 +626,8 @@ function run() {
                     const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
                     for (const n of filteredIssue) {
                         if (n.title === `[${branchName}] is STALE`) {
-                            yield (0, close_issue_1.closeIssue)(n.number, branchName, commitAge);
                             yield (0, delete_branch_1.deleteBranch)(branchName);
+                            yield (0, close_issue_1.closeIssue)(n.number, branchName, commitAge);
                         }
                     }
                 }

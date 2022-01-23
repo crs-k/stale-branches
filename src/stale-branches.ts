@@ -34,8 +34,8 @@ export async function run(): Promise<void> {
         )
         for (const n of filteredIssue) {
           if (n.title === `[${branchName}] is STALE`) {
-            await closeIssue(n.number, branchName, commitAge)
             await deleteBranch(branchName)
+            await closeIssue(n.number, branchName, commitAge)
           }
         }
       }
