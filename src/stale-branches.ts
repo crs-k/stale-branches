@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import {daysBeforeDelete, daysBeforeStale} from './functions/get-context'
-//import {createIssue} from './functions/create-issue'
+import {createIssue} from './functions/create-issue'
 //import {closeIssue} from './functions/close-issue'
 import {deleteBranch} from './functions/delete-branch'
 import {getBranches} from './functions/get-branches'
@@ -46,6 +46,12 @@ export async function run(): Promise<void> {
         core.info(`Commit Age: ${commitAge.toString()}`)
         core.info(`Allowed Days: ${daysBeforeStale.toString()}`)
         const existingIssue = await getIssues()
+
+        if (!existingIssue.data.find(findIssue => findIssue.title === `[${branchName}] is STALE`)) {
+          await createIssue(branchName, commitAge)
+          core.info(`New issue created: [${branchName}] is STALE`)
+        }
+
         const filteredIssue = existingIssue.data.filter(
           branchIssue => branchIssue.title === `[${branchName}] is STALE`
         )
