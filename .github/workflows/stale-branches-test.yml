@@ -11,3 +11,4 @@ on:
       - uses: ./
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          days-before-stale: 2
