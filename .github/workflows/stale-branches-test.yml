@@ -1,8 +1,9 @@
-  name: 'Close stale issues and PRs'
+name: 'Mark & Delete Stale Branches'
 on:
   schedule:
     - cron: '* * * * *'
 
+jobs:
   Test-Action: # make sure the action works on a clean machine without building
     name: Test - Action
     runs-on: ubuntu-latest
