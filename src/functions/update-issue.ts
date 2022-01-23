@@ -15,11 +15,10 @@ export async function updateIssue(
       owner,
       repo,
       issue_number: issueNumber,
-
       body: `${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \r \r This issue was last updated on ${new Date().toString()}`,
       labels: [
         {
-          name: 'stale 🗑️',
+          name: 'stale branch 🗑️',
           color: 'B60205',
           description: 'Used by Stale Branches Action to label issues'
         }
