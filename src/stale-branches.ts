@@ -1,7 +1,8 @@
 import * as core from '@actions/core'
-//import {createIssue} from './functions/create-issue'
 import {daysBeforeDelete, daysBeforeStale} from './functions/get-context'
+//import {createIssue} from './functions/create-issue'
 //import {closeIssue} from './functions/close-issue'
+import {deleteBranch} from './functions/delete-branch'
 import {getBranches} from './functions/get-branches'
 import {getIssues} from './functions/get-issue'
 import {getMinutes} from './functions/get-time'
@@ -34,7 +35,7 @@ export async function run(): Promise<void> {
         for (const n of filteredIssue) {
           if (n.title === `[${branchName}] is STALE`) {
             //await closeIssue(n.number, branchName, commitAge)
-            core.notice(`Branch: ${branchName} has been deleted.`)
+            await deleteBranch(branchName)
           }
         }
       }
