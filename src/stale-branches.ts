@@ -71,6 +71,6 @@ export async function run(): Promise<void> {
   } catch (error) {
     if (error instanceof Error) core.setFailed(`Action failed with ${error.message}`)
   }
-  core.setOutput('closed-branches', outputDeletes)
-  core.setOutput('stale-branches', outputStales)
+  core.setOutput('closed-branches', JSON.stringify(outputDeletes))
+  core.setOutput('stale-branches', JSON.stringify(outputStales))
 }
