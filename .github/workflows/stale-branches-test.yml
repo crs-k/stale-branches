@@ -1,7 +1,8 @@
-name: 'Mark & Delete Stale Branches'
+name: 'Test - Mark & Delete Stale Branches'
 on:
+  workflow_dispatch:
   schedule:
-    - cron: '* * * * *'
+    - cron: '15 * * * *'
 
 jobs:
   Test-Action: # make sure the action works on a clean machine without building
