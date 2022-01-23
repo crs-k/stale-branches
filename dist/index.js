@@ -604,8 +604,8 @@ const get_commits_1 = __nccwpck_require__(9821);
 const update_issue_1 = __nccwpck_require__(2914);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        const outputDeletes = new Array('Branches Deleted');
-        const outputStales = ['Branches Marked Stale'];
+        const outputDeletes = ['Branches'];
+        const outputStales = ['Branches'];
         try {
             //Collect Branches
             const branches = yield (0, get_branches_1.getBranches)();
