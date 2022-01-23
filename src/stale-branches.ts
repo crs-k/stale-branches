@@ -17,14 +17,14 @@ export async function run(): Promise<void> {
     const branches = await getBranches()
 
     // Assess Branches
-    core.startGroup('Stale Branches')
+
     for (const i of branches.data) {
       const commitResponse = await getRecentCommitDate(i.commit.sha)
       const currentDate = new Date().getTime()
       const commitDate = new Date(commitResponse).getTime()
       const commitAge = getMinutes(currentDate, commitDate)
       const branchName = i.name
-
+      core.startGroup('Deleted Branches')
       //Delete expired branches
       if (commitAge > daysBeforeDelete) {
         core.info(`Dead Branch: ${branchName}`)
@@ -42,8 +42,9 @@ export async function run(): Promise<void> {
           }
         }
       }
-
-      //Update issues for stale branches
+      core.endGroup()
+      core.startGroup('Stale Branches')
+      //Create & Update issues for stale branches
       if (commitAge > daysBeforeStale) {
         core.info(`Stale Branch: ${branchName}`)
         core.info(`Commit Age: ${commitAge.toString()}`)
@@ -66,11 +67,11 @@ export async function run(): Promise<void> {
           }
         }
       }
+      core.endGroup()
     }
-    core.endGroup()
   } catch (error) {
     if (error instanceof Error) core.setFailed(`Action failed with ${error.message}`)
   }
-  core.setOutput('closed-branches', JSON.stringify(outputDeletes))
-  core.setOutput('stale-branches', JSON.stringify(outputStales))
+  core.setOutput('stale-branches', `Stale Branches:  ${JSON.stringify(outputStales)}`)
+  core.setOutput('closed-branches', `Deleted Branches:  ${JSON.stringify(outputDeletes)}`)
 }
