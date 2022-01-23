@@ -1,12 +1,10 @@
 import * as assert from 'assert'
 import * as core from '@actions/core'
 import {daysBeforeDelete, github, owner, repo} from './get-context'
-import {getMinutes} from './get-time'
 
 export async function createIssue(branch: string, commitAge: number): Promise<number> {
   let issueId: number
-  const daysUntilDelete = getMinutes(commitAge, daysBeforeDelete)
-  core.info(`Days before delete: ${daysBeforeDelete}`)
+  const daysUntilDelete = Math.abs(commitAge - daysBeforeDelete)
   try {
     const issueResponse = await github.rest.issues.create({
       owner,
