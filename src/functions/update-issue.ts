@@ -10,6 +10,7 @@ export async function updateIssue(
 ): Promise<string> {
   let createdAt: string
   const daysUntilDelete = getMinutes(commitAge, daysBeforeDelete)
+  core.info(`Days before delete: ${daysBeforeDelete}`)
   try {
     const issueResponse = await github.rest.issues.createComment({
       owner,
