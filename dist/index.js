@@ -658,8 +658,10 @@ function run() {
             if (error instanceof Error)
                 core.setFailed(`Action failed with ${error.message}`);
         }
-        core.setOutput('stale-branches', `Stale Branches:  ${JSON.stringify(outputStales)}`);
-        core.setOutput('closed-branches', `Deleted Branches:  ${JSON.stringify(outputDeletes)}`);
+        core.notice(`\u001b[43mStale Branches:  ${JSON.stringify(outputStales)}`);
+        core.notice(`\u001b[48;2;255;0;0mDeleted Branches:  ${JSON.stringify(outputDeletes)}`);
+        core.setOutput('stale-branches', JSON.stringify(outputStales));
+        core.setOutput('closed-branches', JSON.stringify(outputDeletes));
     });
 }
 exports.run = run;
