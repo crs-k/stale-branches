@@ -542,7 +542,7 @@ function updateIssue(issueNumber, branch, commitAge) {
             });
             createdAt = issueResponse.data.created_at || '';
             assert.ok(createdAt, 'Created At cannot be empty');
-            core.info(`Comment was created at ${createdAt}.`);
+            core.info(`Issue #${issueNumber}: comment was created at ${createdAt}.`);
         }
         catch (err) {
             if (err instanceof Error)
@@ -620,8 +620,8 @@ function run() {
                 //Delete expired branches
                 if (commitAge > get_context_1.daysBeforeDelete) {
                     core.info(`Dead Branch: ${branchName}`);
-                    core.info(`Commit Age: ${commitAge.toString()}`);
-                    core.info(`Allowed Days: ${get_context_1.daysBeforeStale.toString()}`);
+                    core.info(`Last Commit: ${commitAge.toString()} days ago.`);
+                    core.info(`Delete Branch Threshold: ${get_context_1.daysBeforeDelete.toString()}`);
                     const existingIssue = yield (0, get_issue_1.getIssues)();
                     const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
                     for (const n of filteredIssue) {
@@ -635,14 +635,16 @@ function run() {
                 //Create & Update issues for stale branches
                 if (commitAge > get_context_1.daysBeforeStale) {
                     core.info(`Stale Branch: ${branchName}`);
-                    core.info(`Commit Age: ${commitAge.toString()}`);
-                    core.info(`Allowed Days: ${get_context_1.daysBeforeStale.toString()}`);
+                    core.info(`Last Commit: ${commitAge.toString()} days ago.`);
+                    core.info(`Stale Branch Threshold: ${get_context_1.daysBeforeStale.toString()} days.`);
                     const existingIssue = yield (0, get_issue_1.getIssues)();
+                    //Create new issue if existing issue is not found
                     if (!existingIssue.data.find(findIssue => findIssue.title === `[${branchName}] is STALE`)) {
                         yield (0, create_issue_1.createIssue)(branchName, commitAge);
                         core.info(`New issue created: [${branchName}] is STALE`);
                         outputStales.push(branchName);
                     }
+                    //filter out issues that do not match this Action's title convention
                     const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
                     for (const n of filteredIssue) {
                         if (n.title === `[${branchName}] is STALE`) {
