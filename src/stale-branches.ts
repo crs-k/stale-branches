@@ -25,6 +25,22 @@ export async function run(): Promise<void> {
       const commitAge = getMinutes(currentDate, commitDate)
       const branchName = i.name
 
+      //Close issues if a branch becomes active again
+      if (commitAge < daysBeforeStale) {
+        const existingIssue = await getIssues()
+        const filteredIssue = existingIssue.data.filter(
+          branchIssue => branchIssue.title === `[${branchName}] is STALE`
+        )
+        for (const n of filteredIssue) {
+          if (n.title === `[${branchName}] is STALE`) {
+            core.info(`Active Branch: ${branchName}`)
+            core.info(`Last Commit: ${commitAge.toString()} days ago.`)
+            core.info(`Stale Branch Threshold: ${daysBeforeStale.toString()}`)
+            await closeIssue(n.number, branchName, commitAge)
+          }
+        }
+      }
+
       //Delete expired branches
       if (commitAge > daysBeforeDelete) {
         core.info(`Dead Branch: ${branchName}`)
