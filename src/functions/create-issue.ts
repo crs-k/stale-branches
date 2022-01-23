@@ -6,6 +6,7 @@ import {getMinutes} from './get-time'
 export async function createIssue(branch: string, commitAge: number): Promise<number> {
   let issueId: number
   const daysUntilDelete = getMinutes(commitAge, daysBeforeDelete)
+  core.info(`Days before delete: ${daysBeforeDelete}`)
   try {
     const issueResponse = await github.rest.issues.create({
       owner,

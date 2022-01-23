@@ -117,6 +117,7 @@ function createIssue(branch, commitAge) {
     return __awaiter(this, void 0, void 0, function* () {
         let issueId;
         const daysUntilDelete = (0, get_time_1.getMinutes)(commitAge, get_context_1.daysBeforeDelete);
+        core.info(`Days before delete: ${get_context_1.daysBeforeDelete}`);
         try {
             const issueResponse = yield get_context_1.github.rest.issues.create({
                 owner: get_context_1.owner,
