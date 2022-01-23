@@ -1,6 +1,8 @@
 import * as core from '@actions/core'
-//import {createIssue} from './functions/create-issue'
 import {daysBeforeDelete, daysBeforeStale} from './functions/get-context'
+import {closeIssue} from './functions/close-issue'
+import {createIssue} from './functions/create-issue'
+import {deleteBranch} from './functions/delete-branch'
 import {getBranches} from './functions/get-branches'
 import {getIssues} from './functions/get-issue'
 import {getMinutes} from './functions/get-time'
@@ -21,36 +23,41 @@ export async function run(): Promise<void> {
       const commitAge = getMinutes(currentDate, commitDate)
       const branchName = i.name
 
-      if (commitAge > daysBeforeStale) {
-        core.info(`Stale Branch: ${branchName}`)
-        core.info(`Commit Age: ${commitAge.toString()}`)
-        core.info(`Allowed Days: ${daysBeforeStale.toString()}`)
-        const existingIssue = await getIssues()
-        const filteredIssue = existingIssue.data.filter(
-          branchIssue => branchIssue.title === `[STALE] Branch: ${branchName}`
-        )
-        for (const n of filteredIssue) {
-          if (n.title === `[STALE] Branch: ${branchName}`) {
-            await updateIssue(n.number, branchName, commitAge)
-          } else {
-            //await createIssue(branchName, commitAge)
-            core.info('else path')
-          }
-        }
-      }
-
+      //Delete expired branches
       if (commitAge > daysBeforeDelete) {
         core.info(`Dead Branch: ${branchName}`)
         core.info(`Commit Age: ${commitAge.toString()}`)
         core.info(`Allowed Days: ${daysBeforeStale.toString()}`)
         const existingIssue = await getIssues()
         const filteredIssue = existingIssue.data.filter(
-          branchIssue => branchIssue.title === `[STALE] Branch: ${branchName}`
+          branchIssue => branchIssue.title === `[${branchName}] is STALE`
         )
         for (const n of filteredIssue) {
-          if (n.title === `[STALE] Branch: ${branchName}`) {
-            //await updateIssue(n.number, branchName, commitAge)
-            core.notice(`Branch: ${branchName} has been deleted.`)
+          if (n.title === `[${branchName}] is STALE`) {
+            await closeIssue(n.number, branchName, commitAge)
+            await deleteBranch(branchName)
+          }
+        }
+      }
+
+      //Update issues for stale branches
+      if (commitAge > daysBeforeStale) {
+        core.info(`Stale Branch: ${branchName}`)
+        core.info(`Commit Age: ${commitAge.toString()}`)
+        core.info(`Allowed Days: ${daysBeforeStale.toString()}`)
+        const existingIssue = await getIssues()
+
+        if (!existingIssue.data.find(findIssue => findIssue.title === `[${branchName}] is STALE`)) {
+          await createIssue(branchName, commitAge)
+          core.info(`New issue created: [${branchName}] is STALE`)
+        }
+
+        const filteredIssue = existingIssue.data.filter(
+          branchIssue => branchIssue.title === `[${branchName}] is STALE`
+        )
+        for (const n of filteredIssue) {
+          if (n.title === `[${branchName}] is STALE`) {
+            await updateIssue(n.number, branchName, commitAge)
           }
         }
       }
