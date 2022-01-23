@@ -29,27 +29,27 @@ export async function run(): Promise<void> {
         core.info(`Allowed Days: ${daysBeforeStale.toString()}`)
         const existingIssue = await getIssues()
         const filteredIssue = existingIssue.data.filter(
-          branchIssue => branchIssue.title === `[STALE] Branch: ${branchName}`
+          branchIssue => branchIssue.title === `[${branchName}] is STALE`
         )
         for (const n of filteredIssue) {
-          if (n.title === `[STALE] Branch: ${branchName}`) {
+          if (n.title === `[${branchName}] is STALE`) {
             await closeIssue(n.number, branchName, commitAge)
             core.notice(`Branch: ${branchName} has been deleted.`)
           }
         }
       }
 
-      //Create issues for stale branches
+      //Create/Update issues for stale branches
       if (commitAge > daysBeforeStale) {
         core.info(`Stale Branch: ${branchName}`)
         core.info(`Commit Age: ${commitAge.toString()}`)
         core.info(`Allowed Days: ${daysBeforeStale.toString()}`)
         const existingIssue = await getIssues()
         const filteredIssue = existingIssue.data.filter(
-          branchIssue => branchIssue.title === `[STALE] Branch: ${branchName}`
+          branchIssue => branchIssue.title === `[${branchName}] is STALE`
         )
         for (const n of filteredIssue) {
-          if (n.title === `[STALE] Branch: ${branchName}`) {
+          if (n.title === `[${branchName}] is STALE`) {
             await updateIssue(n.number, branchName, commitAge)
           } else {
             //await createIssue(branchName, commitAge)

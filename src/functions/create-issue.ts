@@ -10,7 +10,7 @@ export async function createIssue(branch: string, commitAge: number): Promise<nu
     const issueResponse = await github.rest.issues.create({
       owner,
       repo,
-      title: `[STALE] Branch: ${branch}`,
+      title: `[${branch}] is STALE`,
       body: `${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days.`,
       labels: [
         {
