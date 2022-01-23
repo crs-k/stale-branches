@@ -5,7 +5,9 @@
 
 # Stale Branches
 
-This Action automatically deletes stale branches.
+This Action automatically deletes stale branches. 
+
+When a branch has been inactive for the configured `days-before-stale` input, an issue is opened with the title `[branch-name] is STALE`. Each time the workflow runs, a comment will be added to the issue with updated days since last commit and days remaining until the branch will be deleted on the following workflow run. The time to delete is a function of inputs `days-before-delete` minus `days-before-stale`.
 
 * By default, a stale branch is defined as a branch that:
   * has had no commits in the last 120 days.
