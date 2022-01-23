@@ -189,20 +189,22 @@ function deleteBranch(name) {
     return __awaiter(this, void 0, void 0, function* () {
         core.info('Retrieving branch information...');
         let confirm;
+        const refAppend = 'heads/';
+        const refFull = refAppend.concat(name);
         try {
             // Get info from the most recent release
             const response = yield get_context_1.github.rest.git.deleteRef({
                 owner: get_context_1.owner,
                 repo: get_context_1.repo,
-                ref: name
+                ref: refFull
             });
             confirm = response.data[0];
             assert.ok(response, 'name cannot be empty');
-            core.warning(`Branch: ${name} has been deleted.`);
+            core.warning(`Branch: ${refFull} has been deleted.`);
         }
         catch (err) {
             if (err instanceof Error)
-                core.setFailed(`Failed to delete branch ${name}:  ${err.message}`);
+                core.setFailed(`Failed to delete branch ${refFull}:  ${err.message}`);
             confirm = '';
         }
         return confirm;
