@@ -14,8 +14,9 @@ export async function deleteBranch(name: string): Promise<string> {
       ref: name
     })
     confirm = response.data[0]
-    core.warning(`Branch: ${name} has been deleted.`)
+
     assert.ok(response, 'name cannot be empty')
+    core.warning(`Branch: ${name} has been deleted.`)
   } catch (err) {
     if (err instanceof Error) core.setFailed(`Failed to delete branch ${name}:  ${err.message}`)
     confirm = ''

@@ -1,8 +1,8 @@
 import * as core from '@actions/core'
 import {daysBeforeDelete, daysBeforeStale} from './functions/get-context'
+import {closeIssue} from './functions/close-issue'
 import {createIssue} from './functions/create-issue'
-//import {closeIssue} from './functions/close-issue'
-//import {deleteBranch} from './functions/delete-branch'
+import {deleteBranch} from './functions/delete-branch'
 import {getBranches} from './functions/get-branches'
 import {getIssues} from './functions/get-issue'
 import {getMinutes} from './functions/get-time'
@@ -34,16 +34,13 @@ export async function run(): Promise<void> {
         )
         for (const n of filteredIssue) {
           if (n.title === `[${branchName}] is STALE`) {
-            //await closeIssue(n.number, branchName, commitAge)
-            //await deleteBranch(branchName)
-            core.info(
-              `${branchName} would have been deleted and issue #${n.number} would have been closed.`
-            )
+            await closeIssue(n.number, branchName, commitAge)
+            await deleteBranch(branchName)
           }
         }
       }
 
-      //Create/Update issues for stale branches
+      //Update issues for stale branches
       if (commitAge > daysBeforeStale) {
         core.info(`Stale Branch: ${branchName}`)
         core.info(`Commit Age: ${commitAge.toString()}`)
@@ -61,9 +58,6 @@ export async function run(): Promise<void> {
         for (const n of filteredIssue) {
           if (n.title === `[${branchName}] is STALE`) {
             await updateIssue(n.number, branchName, commitAge)
-          } else {
-            //await createIssue(branchName, commitAge)
-            core.info('else path')
           }
         }
       }

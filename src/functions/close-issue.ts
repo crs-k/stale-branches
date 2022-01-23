@@ -7,7 +7,7 @@ export async function closeIssue(
   branch: string,
   commitAge: number
 ): Promise<string> {
-  let createdAt: string
+  let state: string
 
   try {
     const issueResponse = await github.rest.issues.update({
@@ -25,15 +25,16 @@ export async function closeIssue(
       ]
     })
 
-    createdAt = issueResponse.data.created_at || ''
-    assert.ok(createdAt, 'Created At cannot be empty')
+    state = issueResponse.data.state || ''
+    assert.ok(state, 'Created At cannot be empty')
+    core.info(`Issue #${issueNumber}'s state was changed to ${state}.`)
   } catch (err) {
     if (err instanceof Error)
       core.info(
         `No existing issue returned for issue number: ${issueNumber}. Description: ${err.message}`
       )
-    createdAt = ''
+    state = ''
   }
-  core.info(`Comment was created at ${createdAt}.`)
-  return createdAt
+
+  return state
 }
