@@ -604,8 +604,8 @@ const get_commits_1 = __nccwpck_require__(9821);
 const update_issue_1 = __nccwpck_require__(2914);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        const outputDeletes = ['Branches'];
-        const outputStales = ['Branches'];
+        const outputDeletes = [];
+        const outputStales = [];
         try {
             //Collect Branches
             const branches = yield (0, get_branches_1.getBranches)();
@@ -658,8 +658,8 @@ function run() {
             if (error instanceof Error)
                 core.setFailed(`Action failed with ${error.message}`);
         }
-        core.notice(`\u001b[43mStale Branches:  ${JSON.stringify(outputStales)}`);
-        core.notice(`\u001b[48;2;255;0;0mDeleted Branches:  ${JSON.stringify(outputDeletes)}`);
+        core.notice(`Stale Branches:  ${JSON.stringify(outputStales)}`);
+        core.notice(`Deleted Branches:  ${JSON.stringify(outputDeletes)}`);
         core.setOutput('stale-branches', JSON.stringify(outputStales));
         core.setOutput('closed-branches', JSON.stringify(outputDeletes));
     });

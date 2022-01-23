@@ -10,8 +10,8 @@ import {getRecentCommitDate} from './functions/get-commits'
 import {updateIssue} from './functions/update-issue'
 
 export async function run(): Promise<void> {
-  const outputDeletes: string[] = ['Branches']
-  const outputStales: string[] = ['Branches']
+  const outputDeletes: string[] = []
+  const outputStales: string[] = []
   try {
     //Collect Branches
     const branches = await getBranches()
@@ -71,8 +71,8 @@ export async function run(): Promise<void> {
   } catch (error) {
     if (error instanceof Error) core.setFailed(`Action failed with ${error.message}`)
   }
-  core.notice(`\u001b[43mStale Branches:  ${JSON.stringify(outputStales)}`)
-  core.notice(`\u001b[48;2;255;0;0mDeleted Branches:  ${JSON.stringify(outputDeletes)}`)
+  core.notice(`Stale Branches:  ${JSON.stringify(outputStales)}`)
+  core.notice(`Deleted Branches:  ${JSON.stringify(outputDeletes)}`)
   core.setOutput('stale-branches', JSON.stringify(outputStales))
   core.setOutput('closed-branches', JSON.stringify(outputDeletes))
 }
