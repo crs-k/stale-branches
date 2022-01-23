@@ -8,6 +8,7 @@ export async function updateIssue(
   commitAge: number
 ): Promise<string> {
   let createdAt: string
+  let commentUrl: string
   const daysUntilDelete = Math.abs(commitAge - daysBeforeDelete)
   try {
     const issueResponse = await github.rest.issues.createComment({
@@ -26,8 +27,9 @@ export async function updateIssue(
     })
 
     createdAt = issueResponse.data.created_at || ''
+    commentUrl = issueResponse.data.html_url || ''
     assert.ok(createdAt, 'Created At cannot be empty')
-    core.info(`Comment was created at ${createdAt}.`)
+    core.info(`Issue #${issueNumber}: comment was created at ${createdAt}. ${commentUrl}`)
   } catch (err) {
     if (err instanceof Error)
       core.info(
