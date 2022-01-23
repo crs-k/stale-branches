@@ -15,7 +15,6 @@ export async function run(): Promise<void> {
   try {
     //Collect Branches
     const branches = await getBranches()
-
     // Assess Branches
     core.startGroup('Identified Branches')
     for (const i of branches.data) {
@@ -24,40 +23,6 @@ export async function run(): Promise<void> {
       const commitDate = new Date(commitResponse).getTime()
       const commitAge = getMinutes(currentDate, commitDate)
       const branchName = i.name
-
-      //Close issues if a branch becomes active again
-      if (commitAge < daysBeforeStale) {
-        const existingIssue = await getIssues()
-        const filteredIssue = existingIssue.data.filter(
-          branchIssue => branchIssue.title === `[${branchName}] is STALE`
-        )
-        for (const n of filteredIssue) {
-          if (n.title === `[${branchName}] is STALE`) {
-            core.info(`Active Branch: ${branchName}`)
-            core.info(`Last Commit: ${commitAge.toString()} days ago.`)
-            core.info(`Stale Branch Threshold: ${daysBeforeStale.toString()}`)
-            await closeIssue(n.number, branchName, commitAge)
-          }
-        }
-      }
-
-      //Delete expired branches
-      if (commitAge > daysBeforeDelete) {
-        core.info(`Dead Branch: ${branchName}`)
-        core.info(`Last Commit: ${commitAge.toString()} days ago.`)
-        core.info(`Delete Branch Threshold: ${daysBeforeDelete.toString()}`)
-        const existingIssue = await getIssues()
-        const filteredIssue = existingIssue.data.filter(
-          branchIssue => branchIssue.title === `[${branchName}] is STALE`
-        )
-        for (const n of filteredIssue) {
-          if (n.title === `[${branchName}] is STALE`) {
-            await closeIssue(n.number, branchName, commitAge)
-            await deleteBranch(branchName)
-            outputDeletes.push(branchName)
-          }
-        }
-      }
 
       //Create & Update issues for stale branches
       if (commitAge > daysBeforeStale) {
@@ -82,13 +47,46 @@ export async function run(): Promise<void> {
           }
         }
       }
+
+      //Close issues if a branch becomes active again
+      if (commitAge < daysBeforeStale) {
+        const existingIssue = await getIssues()
+        const filteredIssue = existingIssue.data.filter(
+          branchIssue => branchIssue.title === `[${branchName}] is STALE`
+        )
+        for (const n of filteredIssue) {
+          if (n.title === `[${branchName}] is STALE`) {
+            core.info(`Active Branch: ${branchName}`)
+            core.info(`Last Commit: ${commitAge.toString()} days ago.`)
+            core.info(`Stale Branch Threshold: ${daysBeforeStale.toString()}`)
+            await closeIssue(n.number)
+          }
+        }
+      }
+
+      //Delete expired branches
+      if (commitAge > daysBeforeDelete) {
+        core.info(`Dead Branch: ${branchName}`)
+        core.info(`Last Commit: ${commitAge.toString()} days ago.`)
+        core.info(`Delete Branch Threshold: ${daysBeforeDelete.toString()}`)
+        const existingIssue = await getIssues()
+        const filteredIssue = existingIssue.data.filter(
+          branchIssue => branchIssue.title === `[${branchName}] is STALE`
+        )
+        for (const n of filteredIssue) {
+          if (n.title === `[${branchName}] is STALE`) {
+            await closeIssue(n.number)
+            await deleteBranch(branchName)
+            outputDeletes.push(branchName)
+          }
+        }
+      }
     }
-    core.endGroup()
+    core.notice(`Stale Branches:  ${JSON.stringify(outputStales)}`)
+    core.notice(`Deleted Branches:  ${JSON.stringify(outputDeletes)}`)
+    core.setOutput('stale-branches', JSON.stringify(outputStales))
+    core.setOutput('closed-branches', JSON.stringify(outputDeletes))
   } catch (error) {
     if (error instanceof Error) core.setFailed(`Action failed with ${error.message}`)
   }
-  core.notice(`Stale Branches:  ${JSON.stringify(outputStales)}`)
-  core.notice(`Deleted Branches:  ${JSON.stringify(outputDeletes)}`)
-  core.setOutput('stale-branches', JSON.stringify(outputStales))
-  core.setOutput('closed-branches', JSON.stringify(outputDeletes))
 }

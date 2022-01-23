@@ -14,7 +14,8 @@ export async function getIssues(): Promise<ListIssuesResponseDataType> {
     const issueResponse = await github.rest.issues.listForRepo({
       owner,
       repo,
-      state: 'open'
+      state: 'open',
+      labels: 'stale branch 🗑️'
     })
     issues = issueResponse
 
