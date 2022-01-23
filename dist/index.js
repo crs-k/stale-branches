@@ -626,8 +626,8 @@ function run() {
                     const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
                     for (const n of filteredIssue) {
                         if (n.title === `[${branchName}] is STALE`) {
-                            yield (0, delete_branch_1.deleteBranch)(branchName);
                             yield (0, close_issue_1.closeIssue)(n.number, branchName, commitAge);
+                            yield (0, delete_branch_1.deleteBranch)(branchName);
                         }
                     }
                 }
