@@ -12,6 +12,10 @@ inputs:
     description: 'Number of days a branch has been inactive before it is deleted. Default: 180.'
     required: false
     default: '180'
+  comment-updates:
+    description: 'If this is enabled, a comment with updated information will be added to existing issues each workflow run.'
+    required: false
+    default: false
 outputs:
   closed-branches:
     description: 'List of all closed branches.'

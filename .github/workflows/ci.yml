@@ -51,6 +51,7 @@ jobs:
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
           days-before-stale: 2
+          #comment-updates: true
 
   Build:
     name: Build
