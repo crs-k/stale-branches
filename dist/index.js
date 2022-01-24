@@ -453,31 +453,32 @@ exports.getIssues = getIssues;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getnSeconds = exports.getMinutes = exports.getHours = exports.getDays = void 0;
+exports.getDays = void 0;
 function getDays(date1, date2) {
     const diffMs = Math.abs(date2 - date1);
     const days = Math.round(diffMs / (1000 * 60 * 60 * 24));
     return days;
 }
 exports.getDays = getDays;
-function getHours(date1, date2) {
-    const diffMs = Math.abs(date2 - date1);
-    const hours = Math.round(diffMs / (1000 * 60 * 60));
-    return hours;
+/* USED FOR TESTING
+export function getHours(date1, date2): number {
+  const diffMs = Math.abs(date2 - date1)
+  const hours = Math.round(diffMs / (1000 * 60 * 60))
+  return hours
 }
-exports.getHours = getHours;
-function getMinutes(date1, date2) {
-    const diffMs = Math.abs(date2 - date1);
-    const minutes = Math.round(diffMs / (1000 * 60));
-    return minutes;
+
+export function getMinutes(date1, date2): number {
+  const diffMs = Math.abs(date2 - date1)
+  const minutes = Math.round(diffMs / (1000 * 60))
+  return minutes
 }
-exports.getMinutes = getMinutes;
-function getnSeconds(date1, date2) {
-    const diffMs = Math.abs(date2 - date1);
-    const seconds = Math.round(diffMs / 1000);
-    return seconds;
+
+export function getnSeconds(date1, date2): number {
+  const diffMs = Math.abs(date2 - date1)
+  const seconds = Math.round(diffMs / 1000)
+  return seconds
 }
-exports.getnSeconds = getnSeconds;
+ */
 
 
 /***/ }),
@@ -600,8 +601,8 @@ const close_issue_1 = __nccwpck_require__(4094);
 const create_issue_1 = __nccwpck_require__(9810);
 const delete_branch_1 = __nccwpck_require__(5294);
 const get_branches_1 = __nccwpck_require__(6204);
-const get_issues_1 = __nccwpck_require__(4298);
 const get_time_1 = __nccwpck_require__(1035);
+const get_issues_1 = __nccwpck_require__(4298);
 const get_commits_1 = __nccwpck_require__(9821);
 const update_issue_1 = __nccwpck_require__(2914);
 function run() {
@@ -617,7 +618,7 @@ function run() {
                 const commitResponse = yield (0, get_commits_1.getRecentCommitDate)(branchToCheck.commit.sha);
                 const currentDate = new Date().getTime();
                 const commitDate = new Date(commitResponse).getTime();
-                const commitAge = (0, get_time_1.getMinutes)(currentDate, commitDate);
+                const commitAge = (0, get_time_1.getDays)(currentDate, commitDate);
                 const branchName = branchToCheck.name;
                 //Create & Update issues for stale branches
                 if (commitAge > get_context_1.daysBeforeStale) {

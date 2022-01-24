@@ -4,8 +4,8 @@ import {closeIssue} from './functions/close-issue'
 import {createIssue} from './functions/create-issue'
 import {deleteBranch} from './functions/delete-branch'
 import {getBranches} from './functions/get-branches'
+import {getDays} from './functions/get-time'
 import {getIssues} from './functions/get-issues'
-import {getMinutes} from './functions/get-time'
 import {getRecentCommitDate} from './functions/get-commits'
 import {updateIssue} from './functions/update-issue'
 
@@ -21,7 +21,7 @@ export async function run(): Promise<void> {
       const commitResponse = await getRecentCommitDate(branchToCheck.commit.sha)
       const currentDate = new Date().getTime()
       const commitDate = new Date(commitResponse).getTime()
-      const commitAge = getMinutes(currentDate, commitDate)
+      const commitAge = getDays(currentDate, commitDate)
       const branchName = branchToCheck.name
 
       //Create & Update issues for stale branches
