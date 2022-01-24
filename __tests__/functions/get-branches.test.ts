@@ -1,6 +1,5 @@
 jest.mock('@actions/core')
 jest.mock('@actions/github')
-jest.mock('assert')
 
 const core = require('@actions/core')
 import {getBranches} from '../../src/functions/get-branches'
@@ -12,7 +11,7 @@ describe('Get Branches Function', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
-  test('listBranches endpoint is called', async () => {
+  test('getBranches endpoint is called', async () => {
     await getBranches()
 
     expect(github.rest.repos.listBranches).toHaveBeenCalledWith({
@@ -29,5 +28,14 @@ describe('Get Branches Function', () => {
     await getBranches()
 
     expect(core.info).toHaveBeenNthCalledWith(1, 'Retrieving branch information...')
+  })
+
+  test('Action fails elegantly', async () => {
+    core.setFailed = jest.fn()
+
+    await getBranches()
+
+    expect(github.rest.repos.listBranches).toHaveBeenCalled()
+    expect(core.setFailed).toHaveBeenCalledWith('Failed to retrieve branches for repo.')
   })
 })

@@ -30,7 +30,7 @@ export async function updateIssue(
       createdAt = issueResponse.data.created_at || ''
       commentUrl = issueResponse.data.html_url || ''
       assert.ok(createdAt, 'Created At cannot be empty')
-      core.info(`Issue #${issueNumber}: comment was created at ${createdAt}. ${commentUrl}`)
+      core.info(` Issue #${issueNumber}: comment was created at ${createdAt}. ${commentUrl}`)
     } catch (err) {
       if (err instanceof Error)
         core.info(
