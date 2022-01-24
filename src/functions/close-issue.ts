@@ -15,7 +15,7 @@ export async function closeIssue(issueNumber: number): Promise<string> {
 
     state = issueResponse.data.state || ''
     assert.ok(state, 'Created At cannot be empty')
-    core.info(`Issue #${issueNumber}'s state was changed to ${state}.`)
+    core.info(` Issue #${issueNumber}'s state was changed to ${state}.`)
   } catch (err) {
     if (err instanceof Error)
       core.info(
