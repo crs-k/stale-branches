@@ -7,3 +7,4 @@ export const github = getOctokit(repoToken)
 export const {owner: owner, repo: repo} = context.repo
 export const daysBeforeStale = Number(core.getInput('days-before-stale', {required: false}))
 export const daysBeforeDelete = Number(core.getInput('days-before-delete', {required: false}))
+export const commentUpdates = core.getBooleanInput('comment-updates', {required: false})

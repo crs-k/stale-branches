@@ -365,7 +365,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.daysBeforeDelete = exports.daysBeforeStale = exports.repo = exports.owner = exports.github = void 0;
+exports.commentUpdates = exports.daysBeforeDelete = exports.daysBeforeStale = exports.repo = exports.owner = exports.github = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github_1 = __nccwpck_require__(5438);
 const repoToken = core.getInput('repo-token', { required: true });
@@ -374,6 +374,7 @@ exports.github = (0, github_1.getOctokit)(repoToken);
 _a = github_1.context.repo, exports.owner = _a.owner, exports.repo = _a.repo;
 exports.daysBeforeStale = Number(core.getInput('days-before-stale', { required: false }));
 exports.daysBeforeDelete = Number(core.getInput('days-before-delete', { required: false }));
+exports.commentUpdates = core.getBooleanInput('comment-updates', { required: false });
 
 
 /***/ }),
@@ -517,32 +518,34 @@ const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
 function updateIssue(issueNumber, branch, commitAge) {
     return __awaiter(this, void 0, void 0, function* () {
-        let createdAt;
+        let createdAt = '';
         let commentUrl;
         const daysUntilDelete = Math.abs(commitAge - get_context_1.daysBeforeDelete);
-        try {
-            const issueResponse = yield get_context_1.github.rest.issues.createComment({
-                owner: get_context_1.owner,
-                repo: get_context_1.repo,
-                issue_number: issueNumber,
-                body: `${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \r \r This issue was last updated on ${new Date().toString()}`,
-                labels: [
-                    {
-                        name: 'stale branch 🗑️',
-                        color: 'B60205',
-                        description: 'Used by Stale Branches Action to label issues'
-                    }
-                ]
-            });
-            createdAt = issueResponse.data.created_at || '';
-            commentUrl = issueResponse.data.html_url || '';
-            assert.ok(createdAt, 'Created At cannot be empty');
-            core.info(`Issue #${issueNumber}: comment was created at ${createdAt}. ${commentUrl}`);
-        }
-        catch (err) {
-            if (err instanceof Error)
-                core.info(`No existing issue returned for issue number: ${issueNumber}. Description: ${err.message}`);
-            createdAt = '';
+        if (get_context_1.commentUpdates === true) {
+            try {
+                const issueResponse = yield get_context_1.github.rest.issues.createComment({
+                    owner: get_context_1.owner,
+                    repo: get_context_1.repo,
+                    issue_number: issueNumber,
+                    body: `${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \r \r This issue was last updated on ${new Date().toString()}`,
+                    labels: [
+                        {
+                            name: 'stale branch 🗑️',
+                            color: 'B60205',
+                            description: 'Used by Stale Branches Action to label issues'
+                        }
+                    ]
+                });
+                createdAt = issueResponse.data.created_at || '';
+                commentUrl = issueResponse.data.html_url || '';
+                assert.ok(createdAt, 'Created At cannot be empty');
+                core.info(`Issue #${issueNumber}: comment was created at ${createdAt}. ${commentUrl}`);
+            }
+            catch (err) {
+                if (err instanceof Error)
+                    core.info(`No existing issue returned for issue number: ${issueNumber}. Description: ${err.message}`);
+                createdAt = '';
+            }
         }
         return createdAt;
     });
