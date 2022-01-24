@@ -30,6 +30,7 @@ Inputs are defined in [`action.yml`](action.yml):
 | `repo-token` | `Yes`| Token to use to authenticate with GitHub API. [GITHUB_TOKEN](https://docs.github.com/en/actions/security-guides/automatic-token-authentication#about-the-github_token-secret) suggested. | N/A |
 | `days-before-stale` | `No` | Number of days a branch has been inactive before it is considered stale. | 120 days |
 | `days-before-delete` | `No` | Number of days a branch has been inactive before it is deleted. | 180 days |
+| `comment-updates` | `No` | If this is enabled, a comment with updated information will be added to existing issues each workflow run. | false |
 
 ### Outputs
 Outputs are defined in [`action.yml`](action.yml):
@@ -48,7 +49,7 @@ name: Stale Branches
 
 on:
   schedule:
-    - cron: '30 1 * * *'
+    - cron: '0 6 * * 1-5'
 
 jobs:
   stale_branches:
