@@ -3,7 +3,7 @@ export function getDays(date1, date2): number {
   const days = Math.round(diffMs / (1000 * 60 * 60 * 24))
   return days
 }
-
+/* USED FOR TESTING
 export function getHours(date1, date2): number {
   const diffMs = Math.abs(date2 - date1)
   const hours = Math.round(diffMs / (1000 * 60 * 60))
@@ -21,3 +21,4 @@ export function getnSeconds(date1, date2): number {
   const seconds = Math.round(diffMs / 1000)
   return seconds
 }
+ */
