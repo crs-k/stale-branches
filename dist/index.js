@@ -696,7 +696,7 @@ function run() {
                 const remainingissueBudget = yield (0, get_stale_issue_budget_1.getIssueBudget)();
                 //Create & Update issues for stale branches
                 if (commitAge > get_context_1.daysBeforeStale) {
-                    core.info(`-Stale Branch: ${branchName}`);
+                    core.info(`Stale Branch: ${branchName}`);
                     core.info(` Last Commit: ${commitAge.toString()} days ago.`);
                     core.info(` Stale Branch Threshold: ${get_context_1.daysBeforeStale.toString()} days.`);
                     const existingIssue = yield (0, get_issues_1.getIssues)();
@@ -722,7 +722,7 @@ function run() {
                     const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
                     for (const issueToClose of filteredIssue) {
                         if (issueToClose.title === `[${branchName}] is STALE`) {
-                            core.info(`-Active Branch: ${branchName}`);
+                            core.info(`Active Branch: ${branchName}`);
                             core.info(` Last Commit: ${commitAge.toString()} days ago.`);
                             core.info(` Stale Branch Threshold: ${get_context_1.daysBeforeStale.toString()}`);
                             yield (0, close_issue_1.closeIssue)(issueToClose.number);
@@ -731,7 +731,7 @@ function run() {
                 }
                 //Delete expired branches
                 if (commitAge > get_context_1.daysBeforeDelete) {
-                    core.info(`-Dead Branch: ${branchName}`);
+                    core.info(`Dead Branch: ${branchName}`);
                     core.info(` Last Commit: ${commitAge.toString()} days ago.`);
                     core.info(` Delete Branch Threshold: ${get_context_1.daysBeforeDelete.toString()}`);
                     const existingIssue = yield (0, get_issues_1.getIssues)();

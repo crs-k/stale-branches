@@ -28,7 +28,7 @@ export async function run(): Promise<void> {
 
       //Create & Update issues for stale branches
       if (commitAge > daysBeforeStale) {
-        core.info(`-Stale Branch: ${branchName}`)
+        core.info(`Stale Branch: ${branchName}`)
         core.info(` Last Commit: ${commitAge.toString()} days ago.`)
         core.info(` Stale Branch Threshold: ${daysBeforeStale.toString()} days.`)
         const existingIssue = await getIssues()
@@ -61,7 +61,7 @@ export async function run(): Promise<void> {
         )
         for (const issueToClose of filteredIssue) {
           if (issueToClose.title === `[${branchName}] is STALE`) {
-            core.info(`-Active Branch: ${branchName}`)
+            core.info(`Active Branch: ${branchName}`)
             core.info(` Last Commit: ${commitAge.toString()} days ago.`)
             core.info(` Stale Branch Threshold: ${daysBeforeStale.toString()}`)
             await closeIssue(issueToClose.number)
@@ -71,7 +71,7 @@ export async function run(): Promise<void> {
 
       //Delete expired branches
       if (commitAge > daysBeforeDelete) {
-        core.info(`-Dead Branch: ${branchName}`)
+        core.info(`Dead Branch: ${branchName}`)
         core.info(` Last Commit: ${commitAge.toString()} days ago.`)
         core.info(` Delete Branch Threshold: ${daysBeforeDelete.toString()}`)
         const existingIssue = await getIssues()
