@@ -20,7 +20,7 @@ export async function getIssueBudget(): Promise<number> {
     })
     issues = issueResponse
     issueCount = new Set(issues.data.map(filteredIssues => filteredIssues.number)).size
-    issueBudgetRemaining = Math.max(0, issueCount - maxIssues)
+    issueBudgetRemaining = Math.max(0, maxIssues - issueCount)
     assert.ok(issues, 'Issue ID cannot be empty')
   } catch (err) {
     if (err instanceof Error) {

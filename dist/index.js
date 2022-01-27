@@ -500,7 +500,7 @@ function getIssueBudget() {
             });
             issues = issueResponse;
             issueCount = new Set(issues.data.map(filteredIssues => filteredIssues.number)).size;
-            issueBudgetRemaining = Math.max(0, issueCount - get_context_1.maxIssues);
+            issueBudgetRemaining = Math.max(0, get_context_1.maxIssues - issueCount);
             assert.ok(issues, 'Issue ID cannot be empty');
         }
         catch (err) {
@@ -701,7 +701,8 @@ function run() {
                     core.info(` Stale Branch Threshold: ${get_context_1.daysBeforeStale.toString()} days.`);
                     const existingIssue = yield (0, get_issues_1.getIssues)();
                     //Create new issue if existing issue is not found
-                    if (!existingIssue.data.find(findIssue => findIssue.title === `[${branchName}] is STALE`) && remainingissueBudget > 0) {
+                    if (!existingIssue.data.find(findIssue => findIssue.title === `[${branchName}] is STALE`) &&
+                        remainingissueBudget > 0) {
                         yield (0, create_issue_1.createIssue)(branchName, commitAge);
                         core.info(` New issue created: [${branchName}] is STALE`);
                         outputStales.push(branchName);
