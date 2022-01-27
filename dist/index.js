@@ -688,12 +688,12 @@ function run() {
             // Assess Branches
             core.startGroup('Identified Branches');
             for (const branchToCheck of branches.data) {
-                const commitResponse = yield (0, get_commits_1.getRecentCommitDate)(branchToCheck.commit.sha);
+                const commitDateResponse = yield (0, get_commits_1.getRecentCommitDate)(branchToCheck.commit.sha);
                 const currentDate = new Date().getTime();
-                const commitDate = new Date(commitResponse).getTime();
+                const commitDate = new Date(commitDateResponse).getTime();
                 const commitAge = (0, get_time_1.getDays)(currentDate, commitDate);
                 const branchName = branchToCheck.name;
-                const remainingissueBudget = yield (0, get_stale_issue_budget_1.getIssueBudget)();
+                const issueBudgetRemaining = yield (0, get_stale_issue_budget_1.getIssueBudget)();
                 //Create & Update issues for stale branches
                 if (commitAge > get_context_1.daysBeforeStale) {
                     core.info(`Stale Branch: ${branchName}`);
@@ -702,7 +702,7 @@ function run() {
                     const existingIssue = yield (0, get_issues_1.getIssues)();
                     //Create new issue if existing issue is not found
                     if (!existingIssue.data.find(findIssue => findIssue.title === `[${branchName}] is STALE`) &&
-                        remainingissueBudget > 0) {
+                        issueBudgetRemaining > 0) {
                         yield (0, create_issue_1.createIssue)(branchName, commitAge);
                         core.info(` New issue created: [${branchName}] is STALE`);
                         outputStales.push(branchName);

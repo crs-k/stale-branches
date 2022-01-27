@@ -19,12 +19,12 @@ export async function run(): Promise<void> {
     // Assess Branches
     core.startGroup('Identified Branches')
     for (const branchToCheck of branches.data) {
-      const commitResponse = await getRecentCommitDate(branchToCheck.commit.sha)
+      const commitDateResponse = await getRecentCommitDate(branchToCheck.commit.sha)
       const currentDate = new Date().getTime()
-      const commitDate = new Date(commitResponse).getTime()
+      const commitDate = new Date(commitDateResponse).getTime()
       const commitAge = getDays(currentDate, commitDate)
       const branchName = branchToCheck.name
-      const remainingissueBudget = await getIssueBudget()
+      const issueBudgetRemaining = await getIssueBudget()
 
       //Create & Update issues for stale branches
       if (commitAge > daysBeforeStale) {
@@ -35,7 +35,7 @@ export async function run(): Promise<void> {
         //Create new issue if existing issue is not found
         if (
           !existingIssue.data.find(findIssue => findIssue.title === `[${branchName}] is STALE`) &&
-          remainingissueBudget > 0
+          issueBudgetRemaining > 0
         ) {
           await createIssue(branchName, commitAge)
           core.info(` New issue created: [${branchName}] is STALE`)
