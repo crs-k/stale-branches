@@ -5,6 +5,7 @@ import {createIssue} from './functions/create-issue'
 import {deleteBranch} from './functions/delete-branch'
 import {getBranches} from './functions/get-branches'
 import {getDays} from './functions/get-time'
+import {getIssueBudget} from './functions/get-stale-issue-budget'
 import {getIssues} from './functions/get-issues'
 import {getRecentCommitDate} from './functions/get-commits'
 import {updateIssue} from './functions/update-issue'
@@ -23,6 +24,7 @@ export async function run(): Promise<void> {
       const commitDate = new Date(commitResponse).getTime()
       const commitAge = getDays(currentDate, commitDate)
       const branchName = branchToCheck.name
+      const remainingissueBudget = await getIssueBudget()
 
       //Create & Update issues for stale branches
       if (commitAge > daysBeforeStale) {
@@ -31,7 +33,10 @@ export async function run(): Promise<void> {
         core.info(` Stale Branch Threshold: ${daysBeforeStale.toString()} days.`)
         const existingIssue = await getIssues()
         //Create new issue if existing issue is not found
-        if (!existingIssue.data.find(findIssue => findIssue.title === `[${branchName}] is STALE`)) {
+        if (
+          !existingIssue.data.find(findIssue => findIssue.title === `[${branchName}] is STALE`) &&
+          remainingissueBudget > 0
+        ) {
           await createIssue(branchName, commitAge)
           core.info(` New issue created: [${branchName}] is STALE`)
           outputStales.push(branchName)
