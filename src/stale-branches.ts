@@ -14,8 +14,9 @@ export async function run(): Promise<void> {
   const outputDeletes: string[] = []
   const outputStales: string[] = []
   try {
-    //Collect Branches
+    //Collect Branches & budget
     const branches = await getBranches()
+    let issueBudgetRemaining = await getIssueBudget()
     // Assess Branches
     core.startGroup('Identified Branches')
     for (const branchToCheck of branches.data) {
@@ -24,7 +25,6 @@ export async function run(): Promise<void> {
       const commitDate = new Date(commitDateResponse).getTime()
       const commitAge = getDays(currentDate, commitDate)
       const branchName = branchToCheck.name
-      const issueBudgetRemaining = await getIssueBudget()
 
       //Create & Update issues for stale branches
       if (commitAge > daysBeforeStale) {
@@ -38,7 +38,9 @@ export async function run(): Promise<void> {
           issueBudgetRemaining > 0
         ) {
           await createIssue(branchName, commitAge)
+          issueBudgetRemaining--
           core.info(` New issue created: [${branchName}] is STALE`)
+          core.info(` Issue Budget Remaining: ${issueBudgetRemaining}`)
           outputStales.push(branchName)
         }
         //filter out issues that do not match this Action's title convention

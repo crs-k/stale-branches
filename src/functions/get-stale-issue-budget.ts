@@ -29,6 +29,6 @@ export async function getIssueBudget(): Promise<number> {
     core.setFailed(`Failed to calculate issue budget.`)
     issueBudgetRemaining = 0
   }
-  core.info(`Remaining Issue Budget: ${issueBudgetRemaining}`)
+  core.info(`Issue Budget Remaining: ${issueBudgetRemaining}`)
   return issueBudgetRemaining
 }
