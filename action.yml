@@ -16,6 +16,10 @@ inputs:
     description: 'If this is enabled, a comment with updated information will be added to existing issues each workflow run.'
     required: false
     default: false
+  max-issues:
+    description: 'This is the maximum of Stale Branch issues that will be open at a given time.'
+    required: false
+    default: '20'
 outputs:
   closed-branches:
     description: 'List of all closed branches.'

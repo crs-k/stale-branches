@@ -367,7 +367,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.commentUpdates = exports.daysBeforeDelete = exports.daysBeforeStale = exports.repo = exports.owner = exports.github = void 0;
+exports.maxIssues = exports.commentUpdates = exports.daysBeforeDelete = exports.daysBeforeStale = exports.repo = exports.owner = exports.github = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github_1 = __nccwpck_require__(5438);
 const repoToken = core.getInput('repo-token', { required: true });
@@ -377,6 +377,7 @@ _a = github_1.context.repo, exports.owner = _a.owner, exports.repo = _a.repo;
 exports.daysBeforeStale = Number(core.getInput('days-before-stale', { required: false }));
 exports.daysBeforeDelete = Number(core.getInput('days-before-delete', { required: false }));
 exports.commentUpdates = core.getBooleanInput('comment-updates', { required: false });
+exports.maxIssues = Number(core.getInput('max-issues', { required: false }));
 
 
 /***/ }),
@@ -443,6 +444,77 @@ function getIssues() {
     });
 }
 exports.getIssues = getIssues;
+
+
+/***/ }),
+
+/***/ 7705:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getIssueBudget = void 0;
+const assert = __importStar(__nccwpck_require__(9491));
+const core = __importStar(__nccwpck_require__(2186));
+const get_context_1 = __nccwpck_require__(7782);
+function getIssueBudget() {
+    return __awaiter(this, void 0, void 0, function* () {
+        let issues;
+        let issueCount = 0;
+        let issueBudgetRemaining;
+        try {
+            const issueResponse = yield get_context_1.github.rest.issues.listForRepo({
+                owner: get_context_1.owner,
+                repo: get_context_1.repo,
+                state: 'open',
+                labels: 'stale branch 🗑️'
+            });
+            issues = issueResponse;
+            issueCount = new Set(issues.data.map(filteredIssues => filteredIssues.number)).size;
+            issueBudgetRemaining = Math.max(0, get_context_1.maxIssues - issueCount);
+            assert.ok(issues, 'Issue ID cannot be empty');
+        }
+        catch (err) {
+            if (err instanceof Error) {
+                core.setFailed(`Failed to calculate issue budget: ${err.message}`);
+            }
+            core.setFailed(`Failed to calculate issue budget.`);
+            issueBudgetRemaining = 0;
+        }
+        core.info(`Issue Budget Remaining: ${issueBudgetRemaining}`);
+        return issueBudgetRemaining;
+    });
+}
+exports.getIssueBudget = getIssueBudget;
 
 
 /***/ }),
@@ -602,6 +674,7 @@ const create_issue_1 = __nccwpck_require__(9810);
 const delete_branch_1 = __nccwpck_require__(5294);
 const get_branches_1 = __nccwpck_require__(6204);
 const get_time_1 = __nccwpck_require__(1035);
+const get_stale_issue_budget_1 = __nccwpck_require__(7705);
 const get_issues_1 = __nccwpck_require__(4298);
 const get_commits_1 = __nccwpck_require__(9821);
 const update_issue_1 = __nccwpck_require__(2914);
@@ -610,26 +683,30 @@ function run() {
         const outputDeletes = [];
         const outputStales = [];
         try {
-            //Collect Branches
+            //Collect Branches & budget
             const branches = yield (0, get_branches_1.getBranches)();
+            let issueBudgetRemaining = yield (0, get_stale_issue_budget_1.getIssueBudget)();
             // Assess Branches
             core.startGroup('Identified Branches');
             for (const branchToCheck of branches.data) {
-                const commitResponse = yield (0, get_commits_1.getRecentCommitDate)(branchToCheck.commit.sha);
+                const commitDateResponse = yield (0, get_commits_1.getRecentCommitDate)(branchToCheck.commit.sha);
                 const currentDate = new Date().getTime();
-                const commitDate = new Date(commitResponse).getTime();
+                const commitDate = new Date(commitDateResponse).getTime();
                 const commitAge = (0, get_time_1.getDays)(currentDate, commitDate);
                 const branchName = branchToCheck.name;
                 //Create & Update issues for stale branches
                 if (commitAge > get_context_1.daysBeforeStale) {
-                    core.info(`-Stale Branch: ${branchName}`);
+                    core.info(`Stale Branch: ${branchName}`);
                     core.info(` Last Commit: ${commitAge.toString()} days ago.`);
                     core.info(` Stale Branch Threshold: ${get_context_1.daysBeforeStale.toString()} days.`);
                     const existingIssue = yield (0, get_issues_1.getIssues)();
                     //Create new issue if existing issue is not found
-                    if (!existingIssue.data.find(findIssue => findIssue.title === `[${branchName}] is STALE`)) {
+                    if (!existingIssue.data.find(findIssue => findIssue.title === `[${branchName}] is STALE`) &&
+                        issueBudgetRemaining > 0) {
                         yield (0, create_issue_1.createIssue)(branchName, commitAge);
+                        issueBudgetRemaining--;
                         core.info(` New issue created: [${branchName}] is STALE`);
+                        core.info(` Issue Budget Remaining: ${issueBudgetRemaining}`);
                         outputStales.push(branchName);
                     }
                     //filter out issues that do not match this Action's title convention
@@ -647,7 +724,7 @@ function run() {
                     const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
                     for (const issueToClose of filteredIssue) {
                         if (issueToClose.title === `[${branchName}] is STALE`) {
-                            core.info(`-Active Branch: ${branchName}`);
+                            core.info(`Active Branch: ${branchName}`);
                             core.info(` Last Commit: ${commitAge.toString()} days ago.`);
                             core.info(` Stale Branch Threshold: ${get_context_1.daysBeforeStale.toString()}`);
                             yield (0, close_issue_1.closeIssue)(issueToClose.number);
@@ -656,7 +733,7 @@ function run() {
                 }
                 //Delete expired branches
                 if (commitAge > get_context_1.daysBeforeDelete) {
-                    core.info(`-Dead Branch: ${branchName}`);
+                    core.info(`Dead Branch: ${branchName}`);
                     core.info(` Last Commit: ${commitAge.toString()} days ago.`);
                     core.info(` Delete Branch Threshold: ${get_context_1.daysBeforeDelete.toString()}`);
                     const existingIssue = yield (0, get_issues_1.getIssues)();
