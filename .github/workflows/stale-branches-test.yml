@@ -6,6 +6,10 @@ on:
   schedule:
     - cron: '0 6 * * 1-5'
 
+permissions:
+  issues: write
+  contents: write
+
 jobs:
   stale_branches:
     runs-on: ubuntu-latest
