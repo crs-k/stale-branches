@@ -51,13 +51,17 @@ name: Stale Branches
 on:
   schedule:
     - cron: '0 6 * * 1-5'
+    
+permissions:
+  issues: write
+  contents: write
 
 jobs:
   stale_branches:
     runs-on: ubuntu-latest
     steps:
     - name: Stale Branches
-      uses: crs-k/stale-branches@v0.1.0
+      uses: crs-k/stale-branches@v0.2.1
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
 ```
