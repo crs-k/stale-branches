@@ -23,6 +23,5 @@ export async function closeIssue(issueNumber: number): Promise<string> {
       )
     state = ''
   }
-
   return state
 }
