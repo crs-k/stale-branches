@@ -710,6 +710,7 @@ function run() {
                         if (issueToUpdate.title === `[${branchName}] is STALE`) {
                             yield (0, update_issue_1.updateIssue)(issueToUpdate.number, branchName, commitAge);
                             outputStales.push(branchName);
+                            core.notice(`Stale Branches:  ${JSON.stringify(outputStales)}`);
                         }
                     }
                 }
@@ -739,6 +740,8 @@ function run() {
                     }
                 }
             }
+            core.notice(`Stale Branches:  ${JSON.stringify(outputStales)}`);
+            core.notice(`Deleted Branches:  ${JSON.stringify(outputDeletes)}`);
             core.setOutput('stale-branches', JSON.stringify(outputStales));
             core.setOutput('deleted-branches', JSON.stringify(outputDeletes));
         }
