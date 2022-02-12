@@ -83,7 +83,8 @@ export async function run(): Promise<void> {
         }
       }
     }
-
+    core.notice(`Stale Branches:  ${JSON.stringify(outputStales)}`)
+    core.notice(`Deleted Branches:  ${JSON.stringify(outputDeletes)}`)
     core.setOutput('stale-branches', JSON.stringify(outputStales))
     core.setOutput('deleted-branches', JSON.stringify(outputDeletes))
   } catch (error) {
