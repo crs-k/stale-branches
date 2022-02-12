@@ -30,7 +30,7 @@ describe('Get Commits Function', () => {
 
     expect(github.rest.repos.getCommit).toHaveBeenCalled()
     expect(core.setFailed).toHaveBeenCalledWith(
-      `Failed to retrieve commit for repo with Cannot read properties of undefined (reading 'data')`
+      `Failed to retrieve commit for repo. Error: Cannot read properties of undefined (reading 'data')`
     )
   })
 })
