@@ -706,6 +706,7 @@ function run() {
                     }
                     //filter out issues that do not match this Action's title convention
                     const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
+                    //Update existing issues
                     for (const issueToUpdate of filteredIssue) {
                         if (issueToUpdate.title === `[${branchName}] is STALE`) {
                             yield (0, update_issue_1.updateIssue)(issueToUpdate.number, branchName, commitAge);
@@ -719,9 +720,9 @@ function run() {
                     const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
                     for (const issueToClose of filteredIssue) {
                         if (issueToClose.title === `[${branchName}] is STALE`) {
-                            core.info(`Active Branch: ${branchName}`);
+                            core.info(`${branchName} has become active again.`);
                             core.info(` Last Commit: ${commitAge.toString()} days ago.`);
-                            core.info(` Stale Branch Threshold: ${get_context_1.daysBeforeStale.toString()}`);
+                            core.info(` Closing Issue #${issueToClose.number}`);
                             yield (0, close_issue_1.closeIssue)(issueToClose.number);
                         }
                     }
@@ -730,10 +731,10 @@ function run() {
                 if (commitAge > get_context_1.daysBeforeDelete) {
                     const existingIssue = yield (0, get_issues_1.getIssues)();
                     const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
-                    for (const n of filteredIssue) {
-                        if (n.title === `[${branchName}] is STALE`) {
-                            yield (0, close_issue_1.closeIssue)(n.number);
+                    for (const issueToDelete of filteredIssue) {
+                        if (issueToDelete.title === `[${branchName}] is STALE`) {
                             yield (0, delete_branch_1.deleteBranch)(branchName);
+                            yield (0, close_issue_1.closeIssue)(issueToDelete.number);
                             outputDeletes.push(branchName);
                         }
                     }
