@@ -13,10 +13,10 @@ export async function getRecentCommitDate(sha: string): Promise<string> {
       page: 1
     })
     commitDate = branchResponse.data.commit.author?.date || ''
-    assert.ok(commitDate, 'Date cannot be empty')
+    assert.ok(commitDate, 'Date cannot be empty.')
   } catch (err) {
     if (err instanceof Error)
-      core.setFailed(`Failed to retrieve commit for ${repo} with ${err.message}`)
+      core.setFailed(`Failed to retrieve commit for ${repo}. Error: ${err.message}`)
     commitDate = ''
   }
 
