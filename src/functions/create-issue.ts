@@ -4,7 +4,7 @@ import {daysBeforeDelete, github, owner, repo} from './get-context'
 
 export async function createIssue(branch: string, commitAge: number): Promise<number> {
   let issueId: number
-  const daysUntilDelete = Math.abs(commitAge - daysBeforeDelete)
+  const daysUntilDelete = Math.max(0, Math.abs(commitAge - daysBeforeDelete))
   try {
     const issueResponse = await github.rest.issues.create({
       owner,
