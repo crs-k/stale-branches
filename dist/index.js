@@ -50,8 +50,8 @@ function closeIssue(issueNumber) {
                 state: 'closed'
             });
             state = issueResponse.data.state || '';
-            assert.ok(state, 'Created At cannot be empty');
-            core.info(` Issue #${issueNumber}'s state was changed to ${state}.`);
+            assert.ok(state, 'State cannot be empty');
+            core.info(`Issue #${issueNumber}'s state was changed to ${state}.`);
         }
         catch (err) {
             if (err instanceof Error)
@@ -107,7 +107,7 @@ const get_context_1 = __nccwpck_require__(7782);
 function createIssue(branch, commitAge) {
     return __awaiter(this, void 0, void 0, function* () {
         let issueId;
-        const daysUntilDelete = Math.abs(commitAge - get_context_1.daysBeforeDelete);
+        const daysUntilDelete = Math.max(0, Math.abs(commitAge - get_context_1.daysBeforeDelete));
         try {
             const issueResponse = yield get_context_1.github.rest.issues.create({
                 owner: get_context_1.owner,
@@ -123,11 +123,11 @@ function createIssue(branch, commitAge) {
                 ]
             });
             issueId = issueResponse.data.id || 0;
-            assert.ok(issueId, 'Date cannot be empty');
+            assert.ok(issueId, 'Issue ID cannot be empty');
         }
         catch (err) {
             if (err instanceof Error)
-                core.setFailed(`Failed to create issue for ${branch} with ${err.message}`);
+                core.setFailed(`Failed to create issue for ${branch}. Error: ${err.message}`);
             issueId = 0;
         }
         return issueId;
@@ -178,7 +178,6 @@ const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
 function deleteBranch(name) {
     return __awaiter(this, void 0, void 0, function* () {
-        core.info('Retrieving branch information...');
         let confirm;
         const refAppend = 'heads/';
         const refFull = refAppend.concat(name);
@@ -191,11 +190,11 @@ function deleteBranch(name) {
             });
             confirm = response.status;
             assert.ok(response, 'name cannot be empty');
-            core.warning(`Branch: ${refFull} has been deleted.`);
+            core.notice(`Branch: ${refFull} has been deleted.`);
         }
         catch (err) {
             if (err instanceof Error)
-                core.error(`Failed to delete branch ${refFull}:  ${err.message}`);
+                core.error(`Failed to delete branch ${refFull}. Error:  ${err.message}`);
             confirm = 500;
         }
         return confirm;
@@ -246,7 +245,6 @@ const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
 function getBranches() {
     return __awaiter(this, void 0, void 0, function* () {
-        core.info('Retrieving branch information...');
         let branches;
         try {
             // Get info from the most recent release
@@ -258,11 +256,11 @@ function getBranches() {
                 page: 1
             });
             branches = response;
-            assert.ok(response, 'Response cannot be empty');
+            assert.ok(response, 'Response cannot be empty.');
         }
         catch (err) {
             if (err instanceof Error) {
-                core.setFailed(`Failed to retrieve branches for ${get_context_1.repo} with ${err.message}`);
+                core.setFailed(`Failed to retrieve branches for ${get_context_1.repo}. Error: ${err.message}`);
             }
             core.setFailed(`Failed to retrieve branches for ${get_context_1.repo}.`);
             branches = {};
@@ -326,11 +324,11 @@ function getRecentCommitDate(sha) {
                 page: 1
             });
             commitDate = ((_a = branchResponse.data.commit.author) === null || _a === void 0 ? void 0 : _a.date) || '';
-            assert.ok(commitDate, 'Date cannot be empty');
+            assert.ok(commitDate, 'Date cannot be empty.');
         }
         catch (err) {
             if (err instanceof Error)
-                core.setFailed(`Failed to retrieve commit for ${get_context_1.repo} with ${err.message}`);
+                core.setFailed(`Failed to retrieve commit for ${get_context_1.repo}. Error: ${err.message}`);
             commitDate = '';
         }
         return commitDate;
@@ -435,7 +433,7 @@ function getIssues() {
         }
         catch (err) {
             if (err instanceof Error) {
-                core.setFailed(`Failed to locate issues with ${err.message}`);
+                core.setFailed(`Failed to locate issues. Error: ${err.message}`);
             }
             core.setFailed(`Failed to locate issues.`);
             issues = {};
@@ -505,12 +503,12 @@ function getIssueBudget() {
         }
         catch (err) {
             if (err instanceof Error) {
-                core.setFailed(`Failed to calculate issue budget: ${err.message}`);
+                core.setFailed(`Failed to calculate issue budget. Error: ${err.message}`);
             }
             core.setFailed(`Failed to calculate issue budget.`);
             issueBudgetRemaining = 0;
         }
-        core.info(`Issue Budget Remaining: ${issueBudgetRemaining}`);
+        core.info(`Issue Budget Remaining: ${issueBudgetRemaining}.`);
         return issueBudgetRemaining;
     });
 }
@@ -597,7 +595,7 @@ function updateIssue(issueNumber, branch, commitAge) {
     return __awaiter(this, void 0, void 0, function* () {
         let createdAt = '';
         let commentUrl;
-        const daysUntilDelete = Math.abs(commitAge - get_context_1.daysBeforeDelete);
+        const daysUntilDelete = Math.max(0, Math.abs(commitAge - get_context_1.daysBeforeDelete));
         if (get_context_1.commentUpdates === true) {
             try {
                 const issueResponse = yield get_context_1.github.rest.issues.createComment({
@@ -616,11 +614,11 @@ function updateIssue(issueNumber, branch, commitAge) {
                 createdAt = issueResponse.data.created_at || '';
                 commentUrl = issueResponse.data.html_url || '';
                 assert.ok(createdAt, 'Created At cannot be empty');
-                core.info(` Issue #${issueNumber}: comment was created at ${createdAt}. ${commentUrl}`);
+                core.info(`Issue #${issueNumber}: comment was created at ${createdAt}. ${commentUrl}`);
             }
             catch (err) {
                 if (err instanceof Error)
-                    core.info(`No existing issue returned for issue number: ${issueNumber}. Description: ${err.message}`);
+                    core.info(`No existing issue returned for issue number: ${issueNumber}. Error: ${err.message}`);
                 createdAt = '';
             }
         }
@@ -696,17 +694,14 @@ function run() {
                 const branchName = branchToCheck.name;
                 //Create & Update issues for stale branches
                 if (commitAge > get_context_1.daysBeforeStale) {
-                    core.info(`Stale Branch: ${branchName}`);
-                    core.info(` Last Commit: ${commitAge.toString()} days ago.`);
-                    core.info(` Stale Branch Threshold: ${get_context_1.daysBeforeStale.toString()} days.`);
                     const existingIssue = yield (0, get_issues_1.getIssues)();
                     //Create new issue if existing issue is not found
                     if (!existingIssue.data.find(findIssue => findIssue.title === `[${branchName}] is STALE`) &&
                         issueBudgetRemaining > 0) {
                         yield (0, create_issue_1.createIssue)(branchName, commitAge);
                         issueBudgetRemaining--;
-                        core.info(` New issue created: [${branchName}] is STALE`);
-                        core.info(` Issue Budget Remaining: ${issueBudgetRemaining}`);
+                        core.info(`New issue created: [${branchName}] is STALE`);
+                        core.info(`Issue Budget Remaining: ${issueBudgetRemaining}`);
                         outputStales.push(branchName);
                     }
                     //filter out issues that do not match this Action's title convention
@@ -733,9 +728,6 @@ function run() {
                 }
                 //Delete expired branches
                 if (commitAge > get_context_1.daysBeforeDelete) {
-                    core.info(`Dead Branch: ${branchName}`);
-                    core.info(` Last Commit: ${commitAge.toString()} days ago.`);
-                    core.info(` Delete Branch Threshold: ${get_context_1.daysBeforeDelete.toString()}`);
                     const existingIssue = yield (0, get_issues_1.getIssues)();
                     const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
                     for (const n of filteredIssue) {
@@ -747,14 +739,12 @@ function run() {
                     }
                 }
             }
-            core.notice(`Stale Branches:  ${JSON.stringify(outputStales)}`);
-            core.notice(`Deleted Branches:  ${JSON.stringify(outputDeletes)}`);
             core.setOutput('stale-branches', JSON.stringify(outputStales));
             core.setOutput('closed-branches', JSON.stringify(outputDeletes));
         }
         catch (error) {
             if (error instanceof Error)
-                core.setFailed(`Action failed with ${error.message}`);
+                core.setFailed(`Action failed. Error: ${error.message}`);
         }
     });
 }
