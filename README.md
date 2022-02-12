@@ -31,7 +31,7 @@ Inputs are defined in [`action.yml`](action.yml):
 | `days-before-stale` | `No` | Number of days a branch has been inactive before it is considered stale. | 120 days |
 | `days-before-delete` | `No` | Number of days a branch has been inactive before it is deleted. | 180 days |
 | `comment-updates` | `No` | If this is enabled, a comment with updated information will be added to existing issues each workflow run. | false |
-| `max-issues` | `No` | This is the maximum of Stale Branch issues that will be open at a given time. | 20 |
+| `max-issues` | `No` | This is the maximum number of branches that this action will assess per workflow run. | 20 |
 
 ### Outputs
 Outputs are defined in [`action.yml`](action.yml):

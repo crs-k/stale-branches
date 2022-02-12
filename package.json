@@ -1,8 +1,8 @@
 {
-  "name": "typescript-action",
+  "name": "@crs-k/stale-branches",
   "version": "0.0.0",
   "private": true,
-  "description": "TypeScript template action",
+  "description": "Finds and deletes stale branches",
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
@@ -11,16 +11,14 @@
     "lint": "eslint src/**/*.ts",
     "package": "set NODE_OPTIONS=--openssl-legacy-provider && ncc build --source-map --license licenses.txt",
     "test": "jest --coverage",
-    "all": "npm run format && npm run lint && npm run build && npm test && npm run package"
+    "all": "npm run build && npm run format && npm run lint && npm run package && npm test"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git://github.com/crs-k/stale-branches.git"
   },
   "keywords": [
-    "actions",
-    "node",
-    "setup"
+    "actions"
   ],
   "author": "",
   "license": "MIT",
