@@ -740,7 +740,7 @@ function run() {
                 }
             }
             core.notice(`Stale Branches:  ${JSON.stringify(outputStales)}`);
-            core.notice(`Deleted Branches:  ${JSON.stringify(outputDeletes)}`);
+            core.notice(`\u001b[31;46mDeleted Branches:  ${JSON.stringify(outputDeletes)}`);
             core.setOutput('stale-branches', JSON.stringify(outputStales));
             core.setOutput('deleted-branches', JSON.stringify(outputDeletes));
         }
