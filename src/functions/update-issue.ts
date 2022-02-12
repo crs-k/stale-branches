@@ -9,7 +9,7 @@ export async function updateIssue(
 ): Promise<string> {
   let createdAt = ''
   let commentUrl: string
-  const daysUntilDelete = Math.abs(commitAge - daysBeforeDelete)
+  const daysUntilDelete = Math.max(0, Math.abs(commitAge - daysBeforeDelete))
 
   if (commentUpdates === true) {
     try {
@@ -30,11 +30,11 @@ export async function updateIssue(
       createdAt = issueResponse.data.created_at || ''
       commentUrl = issueResponse.data.html_url || ''
       assert.ok(createdAt, 'Created At cannot be empty')
-      core.info(` Issue #${issueNumber}: comment was created at ${createdAt}. ${commentUrl}`)
+      core.info(`Issue #${issueNumber}: comment was created at ${createdAt}. ${commentUrl}`)
     } catch (err) {
       if (err instanceof Error)
         core.info(
-          `No existing issue returned for issue number: ${issueNumber}. Description: ${err.message}`
+          `No existing issue returned for issue number: ${issueNumber}. Error: ${err.message}`
         )
       createdAt = ''
     }
