@@ -9,7 +9,6 @@ type ListBranchesResponseDataType = GetResponseTypeFromEndpointMethod<
 >
 
 export async function getBranches(): Promise<ListBranchesResponseDataType> {
-  core.info('Retrieving branch information...')
   let branches: ListBranchesResponseDataType
 
   try {
@@ -23,10 +22,10 @@ export async function getBranches(): Promise<ListBranchesResponseDataType> {
     })
     branches = response
 
-    assert.ok(response, 'Response cannot be empty')
+    assert.ok(response, 'Response cannot be empty.')
   } catch (err) {
     if (err instanceof Error) {
-      core.setFailed(`Failed to retrieve branches for ${repo} with ${err.message}`)
+      core.setFailed(`Failed to retrieve branches for ${repo}. Error: ${err.message}`)
     }
     core.setFailed(`Failed to retrieve branches for ${repo}.`)
     branches = {} as ListBranchesResponseDataType
