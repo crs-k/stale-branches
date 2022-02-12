@@ -48,6 +48,7 @@ export async function run(): Promise<void> {
           if (issueToUpdate.title === `[${branchName}] is STALE`) {
             await updateIssue(issueToUpdate.number, branchName, commitAge)
             outputStales.push(branchName)
+            core.notice(`Stale Branches:  ${JSON.stringify(outputStales)}`)
           }
         }
       }
