@@ -21,8 +21,8 @@ inputs:
     required: false
     default: '20'
 outputs:
-  closed-branches:
-    description: 'List of all closed branches.'
+  deleted-branches:
+    description: 'List of all deleted branches.'
   stale-branches:
     description: 'List of all stale branches.'
 runs:

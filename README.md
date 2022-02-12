@@ -39,7 +39,7 @@ Outputs are defined in [`action.yml`](action.yml):
 | Name | Description |
 | ---- | ----------- |
 | `stale-branches` | List of all branches identified as stale during a workflow run. |
-| `closed-branches` | List of all branches deleted during a workflow run. |
+| `deleted-branches` | List of all branches deleted during a workflow run. |
 
 
 ## Example workflow
