@@ -24,11 +24,11 @@ export async function getIssueBudget(): Promise<number> {
     assert.ok(issues, 'Issue ID cannot be empty')
   } catch (err) {
     if (err instanceof Error) {
-      core.setFailed(`Failed to calculate issue budget: ${err.message}`)
+      core.setFailed(`Failed to calculate issue budget. Error: ${err.message}`)
     }
     core.setFailed(`Failed to calculate issue budget.`)
     issueBudgetRemaining = 0
   }
-  core.info(`Issue Budget Remaining: ${issueBudgetRemaining}`)
+  core.info(`Issue Budget Remaining: ${issueBudgetRemaining}.`)
   return issueBudgetRemaining
 }

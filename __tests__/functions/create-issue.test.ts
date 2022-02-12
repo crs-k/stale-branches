@@ -21,7 +21,7 @@ describe('Create Issue Function', () => {
 
     await createIssue(branchName, commitAge)
     expect(core.setFailed).toHaveBeenCalledWith(
-      `Failed to create issue for test with Cannot read properties of undefined (reading 'data')`
+      `Failed to create issue for test. Error: Cannot read properties of undefined (reading 'data')`
     )
   })
 })

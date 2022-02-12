@@ -23,12 +23,12 @@ describe('Get Branches Function', () => {
     })
   })
 
-  test('Infos are set', async () => {
+  /*   test('Infos are set', async () => {
     core.info = jest.fn()
     await getBranches()
 
     expect(core.info).toHaveBeenNthCalledWith(1, 'Retrieving branch information...')
-  })
+  }) */
 
   test('Action fails elegantly', async () => {
     core.setFailed = jest.fn()

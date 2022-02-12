@@ -4,7 +4,7 @@ import {daysBeforeDelete, github, owner, repo} from './get-context'
 
 export async function createIssue(branch: string, commitAge: number): Promise<number> {
   let issueId: number
-  const daysUntilDelete = Math.abs(commitAge - daysBeforeDelete)
+  const daysUntilDelete = Math.max(0, Math.abs(commitAge - daysBeforeDelete))
   try {
     const issueResponse = await github.rest.issues.create({
       owner,
@@ -20,10 +20,10 @@ export async function createIssue(branch: string, commitAge: number): Promise<nu
       ]
     })
     issueId = issueResponse.data.id || 0
-    assert.ok(issueId, 'Date cannot be empty')
+    assert.ok(issueId, 'Issue ID cannot be empty')
   } catch (err) {
     if (err instanceof Error)
-      core.setFailed(`Failed to create issue for ${branch} with ${err.message}`)
+      core.setFailed(`Failed to create issue for ${branch}. Error: ${err.message}`)
     issueId = 0
   }
 

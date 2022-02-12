@@ -21,7 +21,7 @@ describe('Delete Branch Function', () => {
 
     await deleteBranch(branchName)
     expect(core.error).toHaveBeenCalledWith(
-      `Failed to delete branch heads/test:  Cannot read properties of undefined (reading 'status')`
+      `Failed to delete branch heads/test. Error:  Cannot read properties of undefined (reading 'status')`
     )
   })
 })
