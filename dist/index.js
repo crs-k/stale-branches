@@ -107,7 +107,7 @@ const get_context_1 = __nccwpck_require__(7782);
 function createIssue(branch, commitAge) {
     return __awaiter(this, void 0, void 0, function* () {
         let issueId;
-        const daysUntilDelete = Math.max(0, (commitAge - get_context_1.daysBeforeDelete));
+        const daysUntilDelete = Math.max(0, commitAge - get_context_1.daysBeforeDelete);
         try {
             const issueResponse = yield get_context_1.github.rest.issues.create({
                 owner: get_context_1.owner,
@@ -595,7 +595,7 @@ function updateIssue(issueNumber, branch, commitAge) {
     return __awaiter(this, void 0, void 0, function* () {
         let createdAt = '';
         let commentUrl;
-        const daysUntilDelete = Math.max(0, (commitAge - get_context_1.daysBeforeDelete));
+        const daysUntilDelete = Math.max(0, commitAge - get_context_1.daysBeforeDelete);
         if (get_context_1.commentUpdates === true) {
             try {
                 const issueResponse = yield get_context_1.github.rest.issues.createComment({
