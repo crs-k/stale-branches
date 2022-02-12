@@ -9,7 +9,7 @@ export async function updateIssue(
 ): Promise<string> {
   let createdAt = ''
   let commentUrl: string
-  const daysUntilDelete = Math.max(0, Math.abs(commitAge - daysBeforeDelete))
+  const daysUntilDelete = Math.max(0, commitAge - daysBeforeDelete)
 
   if (commentUpdates === true) {
     try {
