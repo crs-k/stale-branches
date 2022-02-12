@@ -20,10 +20,10 @@ export async function createIssue(branch: string, commitAge: number): Promise<nu
       ]
     })
     issueId = issueResponse.data.id || 0
-    assert.ok(issueId, 'Date cannot be empty')
+    assert.ok(issueId, 'Issue ID cannot be empty')
   } catch (err) {
     if (err instanceof Error)
-      core.setFailed(`Failed to create issue for ${branch} with ${err.message}`)
+      core.setFailed(`Failed to create issue for ${branch}. Error: ${err.message}`)
     issueId = 0
   }
 
