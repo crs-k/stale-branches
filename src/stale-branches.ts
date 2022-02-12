@@ -28,9 +28,6 @@ export async function run(): Promise<void> {
 
       //Create & Update issues for stale branches
       if (commitAge > daysBeforeStale) {
-        core.info(`Stale Branch: ${branchName}`)
-        core.info(` Last Commit: ${commitAge.toString()} days ago.`)
-        core.info(` Stale Branch Threshold: ${daysBeforeStale.toString()} days.`)
         const existingIssue = await getIssues()
         //Create new issue if existing issue is not found
         if (
@@ -39,8 +36,8 @@ export async function run(): Promise<void> {
         ) {
           await createIssue(branchName, commitAge)
           issueBudgetRemaining--
-          core.info(` New issue created: [${branchName}] is STALE`)
-          core.info(` Issue Budget Remaining: ${issueBudgetRemaining}`)
+          core.info(`New issue created: [${branchName}] is STALE`)
+          core.info(`Issue Budget Remaining: ${issueBudgetRemaining}`)
           outputStales.push(branchName)
         }
         //filter out issues that do not match this Action's title convention
@@ -73,9 +70,6 @@ export async function run(): Promise<void> {
 
       //Delete expired branches
       if (commitAge > daysBeforeDelete) {
-        core.info(`Dead Branch: ${branchName}`)
-        core.info(` Last Commit: ${commitAge.toString()} days ago.`)
-        core.info(` Delete Branch Threshold: ${daysBeforeDelete.toString()}`)
         const existingIssue = await getIssues()
         const filteredIssue = existingIssue.data.filter(
           branchIssue => branchIssue.title === `[${branchName}] is STALE`
@@ -89,8 +83,7 @@ export async function run(): Promise<void> {
         }
       }
     }
-    core.notice(`Stale Branches:  ${JSON.stringify(outputStales)}`)
-    core.notice(`Deleted Branches:  ${JSON.stringify(outputDeletes)}`)
+
     core.setOutput('stale-branches', JSON.stringify(outputStales))
     core.setOutput('closed-branches', JSON.stringify(outputDeletes))
   } catch (error) {
