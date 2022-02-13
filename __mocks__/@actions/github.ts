@@ -16,9 +16,13 @@ let create = jest.fn().mockReturnValue({
   data: {id: 1, owner: 'owner', repo: 'repo'}
 })
 
+let deleteRef = jest.fn().mockReturnValue({
+  data: {id: 1, owner: 'owner', repo: 'repo'}
+})
+
 const github = {
   rest: {
-    git: {deleteRef: jest.fn()},
+    git: {deleteRef},
     issues: {
       update,
       create,
