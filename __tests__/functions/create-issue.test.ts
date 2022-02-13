@@ -14,9 +14,9 @@ let commitAge = 1
 describe('Create Issue Function', () => {
   test('createIssue endpoint is called', async () => {
     await createIssue(branchName, commitAge)
-
     expect(github.rest.issues.create).toHaveBeenCalled()
   })
+
   test('Action fails elegantly', async () => {
     core.setFailed = jest.fn()
     assert.ok = jest.fn()
