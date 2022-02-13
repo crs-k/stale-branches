@@ -20,6 +20,10 @@ let deleteRef = jest.fn().mockReturnValue({
   data: {id: 1, owner: 'owner', repo: 'repo'}
 })
 
+let listBranches = jest.fn().mockReturnValue({
+  data: {id: 1, owner: 'owner', repo: 'repo'}
+})
+
 const github = {
   rest: {
     git: {deleteRef},
