@@ -16,9 +16,6 @@ describe('Create Issue Function', () => {
     await createIssue(branchName, commitAge)
 
     expect(github.rest.issues.create).toHaveBeenCalled()
-    expect(github.rest.issues.create).toHaveReturnedWith({
-      data: {id: 1, owner: 'owner', repo: 'repo', state: 'closed'}
-    })
   })
   test('Action fails elegantly', async () => {
     core.setFailed = jest.fn()
