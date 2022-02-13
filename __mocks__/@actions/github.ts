@@ -12,12 +12,16 @@ let update = jest.fn().mockReturnValue({
   data: {issue_number: 1, owner: 'owner', repo: 'repo', state: 'closed'}
 })
 
+let create = jest.fn().mockReturnValue({
+  data: {id: 1, owner: 'owner', repo: 'repo', state: 'closed'}
+})
+
 const github = {
   rest: {
     git: {deleteRef: jest.fn()},
     issues: {
       update,
-      create: jest.fn(),
+      create,
       listForRepo: jest.fn(),
       createComment: jest.fn()
     },
