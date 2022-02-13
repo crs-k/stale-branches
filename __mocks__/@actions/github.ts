@@ -24,6 +24,10 @@ let listBranches = jest.fn().mockReturnValue({
   data: {id: 1, owner: 'owner', repo: 'repo'}
 })
 
+let getCommit = jest.fn().mockReturnValue({
+  data: {id: 1, commit: {author: {date: 'January 25, 2006'}}, repo: 'repo'}
+})
+
 const github = {
   rest: {
     git: {deleteRef},
@@ -35,8 +39,8 @@ const github = {
     },
     repos: {
       get: jest.fn(),
-      listBranches: jest.fn(),
-      getCommit: jest.fn()
+      listBranches,
+      getCommit
     }
   }
 }
