@@ -1,6 +1,4 @@
 jest.mock('@actions/core')
-
-const core = require('@actions/core')
 import {github, owner, repo} from '../../src/functions/get-context'
 
 describe('Get Context Function', () => {

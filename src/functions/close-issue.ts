@@ -13,7 +13,7 @@ export async function closeIssue(issueNumber: number): Promise<string> {
       state: 'closed'
     })
 
-    state = issueResponse.data.state || ''
+    state = issueResponse.data.state
     assert.ok(state, 'State cannot be empty')
     core.info(`Issue #${issueNumber}'s state was changed to ${state}.`)
   } catch (err) {

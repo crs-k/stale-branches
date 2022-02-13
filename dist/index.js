@@ -49,7 +49,7 @@ function closeIssue(issueNumber) {
                 issue_number: issueNumber,
                 state: 'closed'
             });
-            state = issueResponse.data.state || '';
+            state = issueResponse.data.state;
             assert.ok(state, 'State cannot be empty');
             core.info(`Issue #${issueNumber}'s state was changed to ${state}.`);
         }
@@ -122,7 +122,7 @@ function createIssue(branch, commitAge) {
                     }
                 ]
             });
-            issueId = issueResponse.data.id || 0;
+            issueId = issueResponse.data.id;
             assert.ok(issueId, 'Issue ID cannot be empty');
         }
         catch (err) {
@@ -194,7 +194,7 @@ function deleteBranch(name) {
         }
         catch (err) {
             if (err instanceof Error)
-                core.error(`Failed to delete branch ${refFull}. Error:  ${err.message}`);
+                core.error(`Failed to delete branch ${refFull}. Error: ${err.message}`);
             confirm = 500;
         }
         return confirm;
@@ -312,7 +312,6 @@ const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
 function getRecentCommitDate(sha) {
-    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         let commitDate;
         try {
@@ -323,7 +322,7 @@ function getRecentCommitDate(sha) {
                 per_page: 1,
                 page: 1
             });
-            commitDate = ((_a = branchResponse.data.commit.author) === null || _a === void 0 ? void 0 : _a.date) || '';
+            commitDate = branchResponse.data.commit.author.date;
             assert.ok(commitDate, 'Date cannot be empty.');
         }
         catch (err) {
@@ -611,8 +610,8 @@ function updateIssue(issueNumber, branch, commitAge) {
                         }
                     ]
                 });
-                createdAt = issueResponse.data.created_at || '';
-                commentUrl = issueResponse.data.html_url || '';
+                createdAt = issueResponse.data.created_at;
+                commentUrl = issueResponse.data.html_url;
                 assert.ok(createdAt, 'Created At cannot be empty');
                 core.info(`Issue #${issueNumber}: comment was created at ${createdAt}. ${commentUrl}`);
             }
@@ -706,6 +705,7 @@ function run() {
                     }
                     //filter out issues that do not match this Action's title convention
                     const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
+                    //Update existing issues
                     for (const issueToUpdate of filteredIssue) {
                         if (issueToUpdate.title === `[${branchName}] is STALE`) {
                             yield (0, update_issue_1.updateIssue)(issueToUpdate.number, branchName, commitAge);
@@ -719,9 +719,9 @@ function run() {
                     const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
                     for (const issueToClose of filteredIssue) {
                         if (issueToClose.title === `[${branchName}] is STALE`) {
-                            core.info(`Active Branch: ${branchName}`);
+                            core.info(`${branchName} has become active again.`);
                             core.info(` Last Commit: ${commitAge.toString()} days ago.`);
-                            core.info(` Stale Branch Threshold: ${get_context_1.daysBeforeStale.toString()}`);
+                            core.info(` Closing Issue #${issueToClose.number}`);
                             yield (0, close_issue_1.closeIssue)(issueToClose.number);
                         }
                     }
@@ -730,10 +730,10 @@ function run() {
                 if (commitAge > get_context_1.daysBeforeDelete) {
                     const existingIssue = yield (0, get_issues_1.getIssues)();
                     const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
-                    for (const n of filteredIssue) {
-                        if (n.title === `[${branchName}] is STALE`) {
-                            yield (0, close_issue_1.closeIssue)(n.number);
+                    for (const issueToDelete of filteredIssue) {
+                        if (issueToDelete.title === `[${branchName}] is STALE`) {
                             yield (0, delete_branch_1.deleteBranch)(branchName);
+                            yield (0, close_issue_1.closeIssue)(issueToDelete.number);
                             outputDeletes.push(branchName);
                         }
                     }

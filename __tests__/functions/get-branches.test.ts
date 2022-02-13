@@ -1,16 +1,14 @@
 jest.mock('@actions/core')
 jest.mock('@actions/github')
+jest.mock('assert')
+jest.mock('../../src/functions/get-context')
 
 const core = require('@actions/core')
+const assert = require('assert')
 import {getBranches} from '../../src/functions/get-branches'
 import {github} from '../../src/functions/get-context'
 
-jest.mock('../../src/functions/get-context')
-
 describe('Get Branches Function', () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
   test('getBranches endpoint is called', async () => {
     await getBranches()
 
@@ -23,19 +21,17 @@ describe('Get Branches Function', () => {
     })
   })
 
-  /*   test('Infos are set', async () => {
-    core.info = jest.fn()
-    await getBranches()
-
-    expect(core.info).toHaveBeenNthCalledWith(1, 'Retrieving branch information...')
-  }) */
-
   test('Action fails elegantly', async () => {
     core.setFailed = jest.fn()
+    assert.ok = jest.fn()
+    assert.ok.mockImplementation(() => {
+      throw new Error('Response cannot be empty.')
+    })
 
     await getBranches()
-
-    expect(github.rest.repos.listBranches).toHaveBeenCalled()
-    expect(core.setFailed).toHaveBeenCalledWith('Failed to retrieve branches for repo.')
+    expect(core.setFailed).toHaveBeenCalledWith(
+      `Failed to retrieve branches for repo. Error: Response cannot be empty.`
+    )
+    expect(core.setFailed).toHaveBeenCalledWith(`Failed to retrieve branches for repo.`)
   })
 })
