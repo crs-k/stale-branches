@@ -194,7 +194,7 @@ function deleteBranch(name) {
         }
         catch (err) {
             if (err instanceof Error)
-                core.error(`Failed to delete branch ${refFull}. Error:  ${err.message}`);
+                core.error(`Failed to delete branch ${refFull}. Error: ${err.message}`);
             confirm = 500;
         }
         return confirm;

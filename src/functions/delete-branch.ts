@@ -20,7 +20,7 @@ export async function deleteBranch(name: string): Promise<number> {
     core.info(`Branch: ${refFull} has been deleted.`)
   } catch (err) {
     if (err instanceof Error)
-      core.error(`Failed to delete branch ${refFull}. Error:  ${err.message}`)
+      core.error(`Failed to delete branch ${refFull}. Error: ${err.message}`)
     confirm = 500
   }
 
