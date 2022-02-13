@@ -9,9 +9,9 @@
     "format": "prettier --write **/*.ts",
     "format-check": "prettier --check **/*.ts",
     "lint": "eslint src/**/*.ts",
-    "package": "set NODE_OPTIONS=--openssl-legacy-provider && ncc build --source-map --license licenses.txt",
+    "package": "set NODE_OPTIONS=--openssl-legacy-provider && ncc build --source-map",
     "test": "jest --coverage",
-    "all": "npm run build && npm run format && npm run lint && npm run package && npm test"
+    "all": "npm run format && npm run lint && npm test && npm run build && npm run package"
   },
   "repository": {
     "type": "git",
