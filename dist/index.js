@@ -312,7 +312,6 @@ const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
 function getRecentCommitDate(sha) {
-    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         let commitDate;
         try {
@@ -323,7 +322,7 @@ function getRecentCommitDate(sha) {
                 per_page: 1,
                 page: 1
             });
-            commitDate = (_a = branchResponse.data.commit.author) === null || _a === void 0 ? void 0 : _a.date;
+            commitDate = branchResponse.data.commit.author.date;
             assert.ok(commitDate, 'Date cannot be empty.');
         }
         catch (err) {
@@ -611,8 +610,8 @@ function updateIssue(issueNumber, branch, commitAge) {
                         }
                     ]
                 });
-                createdAt = issueResponse.data.created_at || '';
-                commentUrl = issueResponse.data.html_url || '';
+                createdAt = issueResponse.data.created_at;
+                commentUrl = issueResponse.data.html_url;
                 assert.ok(createdAt, 'Created At cannot be empty');
                 core.info(`Issue #${issueNumber}: comment was created at ${createdAt}. ${commentUrl}`);
             }

@@ -7,16 +7,15 @@ const core = require('@actions/core')
 const assert = require('assert')
 import {updateIssue} from '../../src/functions/update-issue'
 import {github} from '../../src/functions/get-context'
-import  * as context  from '../../src/functions/get-context'
+import * as context from '../../src/functions/get-context'
 
 let issueNumber = 20
 let branchName = 'test'
 let commitAge = 100
 
 describe('Get Commits Function', () => {
-
   test('updateIssue endpoint is called', async () => {
-    Object.defineProperty(context,'commentUpdates',{value: true})
+    Object.defineProperty(context, 'commentUpdates', {value: true})
     await updateIssue(issueNumber, branchName, commitAge)
     expect(github.rest.issues.createComment).toHaveBeenCalled()
   })
