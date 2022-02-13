@@ -13,7 +13,7 @@ let update = jest.fn().mockReturnValue({
 })
 
 let create = jest.fn().mockReturnValue({
-  data: {id: 1, owner: 'owner', repo: 'repo', state: 'closed'}
+  data: {id: 1, owner: 'owner', repo: 'repo'}
 })
 
 const github = {
