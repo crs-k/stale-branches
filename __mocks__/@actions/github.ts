@@ -8,6 +8,9 @@ export const context = {
 export const daysBeforeStale: number = 120
 export const daysBeforeDelete: number = 180
 export const commentUpdates: boolean = true
+export const maxIssues: number = 20
+export const repoToken: string = '20'
+
 let update = jest.fn().mockReturnValue({
   data: {issue_number: 1, owner: 'owner', repo: 'repo', state: 'closed'}
 })
@@ -28,14 +31,22 @@ let getCommit = jest.fn().mockReturnValue({
   data: {id: 1, commit: {author: {date: 'January 25, 2006'}}, repo: 'repo'}
 })
 
+let listForRepo = jest.fn().mockReturnValue({
+  data: {id: 1, owner: 'owner', repo: 'repo'}
+})
+
+let createComment = jest.fn().mockReturnValue({
+  data: {id: 1, owner: 'owner', repo: 'repo'}
+})
+
 const github = {
   rest: {
     git: {deleteRef},
     issues: {
       update,
       create,
-      listForRepo: jest.fn(),
-      createComment: jest.fn()
+      listForRepo,
+      createComment
     },
     repos: {
       get: jest.fn(),
