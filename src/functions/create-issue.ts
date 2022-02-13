@@ -19,7 +19,7 @@ export async function createIssue(branch: string, commitAge: number): Promise<nu
         }
       ]
     })
-    issueId = issueResponse.data.id || 0
+    issueId = issueResponse.data.id
     assert.ok(issueId, 'Issue ID cannot be empty')
   } catch (err) {
     if (err instanceof Error)
