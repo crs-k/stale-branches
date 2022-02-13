@@ -1,12 +1,13 @@
 jest.mock('@actions/core')
 jest.mock('@actions/github')
+jest.mock('assert')
+jest.mock('../../src/functions/get-context')
 
 const core = require('@actions/core')
+const assert = require('assert')
 import {getIssues} from '../../src/functions/get-issues'
 import {github} from '../../src/functions/get-context'
 
-jest.mock('../../src/functions/get-context')
-let sha = '123'
 describe('Get Commits Function', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -24,10 +25,15 @@ describe('Get Commits Function', () => {
 
   test('Action fails elegantly', async () => {
     core.setFailed = jest.fn()
+    assert.ok = jest.fn()
+    assert.ok.mockImplementation(() => {
+      throw new Error('Issue ID cannot be empty')
+    })
 
     await getIssues()
-
-    expect(github.rest.issues.listForRepo).toHaveBeenCalled()
+    expect(core.setFailed).toHaveBeenCalledWith(
+      `Failed to locate issues. Error: Issue ID cannot be empty`
+    )
     expect(core.setFailed).toHaveBeenCalledWith(`Failed to locate issues.`)
   })
 })
