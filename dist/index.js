@@ -323,7 +323,7 @@ function getRecentCommitDate(sha) {
                 per_page: 1,
                 page: 1
             });
-            commitDate = ((_a = branchResponse.data.commit.author) === null || _a === void 0 ? void 0 : _a.date) || '';
+            commitDate = (_a = branchResponse.data.commit.author) === null || _a === void 0 ? void 0 : _a.date;
             assert.ok(commitDate, 'Date cannot be empty.');
         }
         catch (err) {
