@@ -21,3 +21,4 @@ jobs:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
         days-before-stale: 1
         comment-updates: true
+        tag-committer: true
