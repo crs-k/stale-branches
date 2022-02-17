@@ -33,5 +33,5 @@ runs:
   using: 'node12'
   main: 'dist/index.js'
 branding:
-  icon: 'save'
+  icon: 'delete'
   color: 'blue'

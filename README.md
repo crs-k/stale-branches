@@ -32,6 +32,7 @@ Inputs are defined in [`action.yml`](action.yml):
 | `days-before-delete` | `No` | Number of days a branch has been inactive before it is deleted. | 180 days |
 | `comment-updates` | `No` | If this is enabled, a comment with updated information will be added to existing issues each workflow run. | false |
 | `max-issues` | `No` | This is the maximum number of branches that this action will assess per workflow run. | 20 |
+| `tag-committer` | `No` | When an issue is opened, this will tag the stale branchs last committer in the comments. | false |
 
 ### Outputs
 Outputs are defined in [`action.yml`](action.yml):
