@@ -17,14 +17,14 @@ let lastCommitter = 'crs-k'
 describe('Get Commits Function', () => {
   test('updateIssue endpoint is called with tag committer enabled', async () => {
     Object.defineProperty(context, 'commentUpdates', {value: true})
-    Object.defineProperty(context, 'tagLastComitter', {value: true})
+    Object.defineProperty(context, 'tagLastCommitter', {value: true})
     await updateIssue(issueNumber, branchName, commitAge, lastCommitter)
     expect(github.rest.issues.createComment).toHaveBeenCalled()
   })
 
   test('updateIssue endpoint is called with tag committer disabled', async () => {
     Object.defineProperty(context, 'commentUpdates', {value: true})
-    Object.defineProperty(context, 'tagLastComitter', {value: false})
+    Object.defineProperty(context, 'tagLastCommitter', {value: false})
     await updateIssue(issueNumber, branchName, commitAge, lastCommitter)
     expect(github.rest.issues.createComment).toHaveBeenCalled()
   })

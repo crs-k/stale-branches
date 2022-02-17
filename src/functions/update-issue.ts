@@ -1,6 +1,13 @@
 import * as assert from 'assert'
 import * as core from '@actions/core'
-import {commentUpdates, daysBeforeDelete, github, owner, repo, tagLastComitter} from './get-context'
+import {
+  commentUpdates,
+  daysBeforeDelete,
+  github,
+  owner,
+  repo,
+  tagLastCommitter
+} from './get-context'
 
 export async function updateIssue(
   issueNumber: number,
@@ -14,7 +21,7 @@ export async function updateIssue(
   const daysUntilDelete = Math.max(0, daysBeforeDelete - commitAge)
 
   if (commentUpdates === true) {
-    switch (tagLastComitter) {
+    switch (tagLastCommitter) {
       case true:
         bodyString = `@${lastCommitter}, \r \r ${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \r \r This issue was last updated on ${new Date().toString()}`
         break

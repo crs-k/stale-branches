@@ -15,13 +15,13 @@ let lastCommitter = 'crs-k'
 
 describe('Create Issue Function', () => {
   test('createIssue endpoint is called with tag committer enabled', async () => {
-    Object.defineProperty(context, 'tagLastComitter', {value: true})
+    Object.defineProperty(context, 'tagLastCommitter', {value: true})
     await createIssue(branchName, commitAge, lastCommitter)
     expect(github.rest.issues.create).toHaveBeenCalled()
   })
 
   test('createIssue endpoint is called with tag committer disabled', async () => {
-    Object.defineProperty(context, 'tagLastComitter', {value: false})
+    Object.defineProperty(context, 'tagLastCommitter', {value: false})
     await createIssue(branchName, commitAge, lastCommitter)
     expect(github.rest.issues.create).toHaveBeenCalled()
   })
