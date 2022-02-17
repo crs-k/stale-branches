@@ -7,13 +7,16 @@ const core = require('@actions/core')
 const assert = require('assert')
 import {createIssue} from '../../src/functions/create-issue'
 import {github} from '../../src/functions/get-context'
+import * as context from '../../src/functions/get-context'
 
 let branchName = 'test'
 let commitAge = 1
+let lastCommitter = 'crs-k'
 
 describe('Create Issue Function', () => {
   test('createIssue endpoint is called', async () => {
-    await createIssue(branchName, commitAge)
+    Object.defineProperty(context, 'tagLastComitter', {value: true})
+    await createIssue(branchName, commitAge, lastCommitter)
     expect(github.rest.issues.create).toHaveBeenCalled()
   })
 
@@ -24,7 +27,7 @@ describe('Create Issue Function', () => {
       throw new Error('Issue ID cannot be empty')
     })
 
-    await createIssue(branchName, commitAge)
+    await createIssue(branchName, commitAge, lastCommitter)
     expect(core.setFailed).toHaveBeenCalledWith(
       `Failed to create issue for test. Error: Issue ID cannot be empty`
     )
