@@ -12,11 +12,20 @@ import * as context from '../../src/functions/get-context'
 let issueNumber = 20
 let branchName = 'test'
 let commitAge = 100
+let lastCommitter = 'crs-k'
 
 describe('Get Commits Function', () => {
-  test('updateIssue endpoint is called', async () => {
+  test('updateIssue endpoint is called with tag committer enabled', async () => {
     Object.defineProperty(context, 'commentUpdates', {value: true})
-    await updateIssue(issueNumber, branchName, commitAge)
+    Object.defineProperty(context, 'tagLastComitter', {value: true})
+    await updateIssue(issueNumber, branchName, commitAge, lastCommitter)
+    expect(github.rest.issues.createComment).toHaveBeenCalled()
+  })
+
+  test('updateIssue endpoint is called with tag committer disabled', async () => {
+    Object.defineProperty(context, 'commentUpdates', {value: true})
+    Object.defineProperty(context, 'tagLastComitter', {value: false})
+    await updateIssue(issueNumber, branchName, commitAge, lastCommitter)
     expect(github.rest.issues.createComment).toHaveBeenCalled()
   })
 
@@ -27,7 +36,7 @@ describe('Get Commits Function', () => {
       throw new Error('Created At cannot be empty')
     })
 
-    await updateIssue(issueNumber, branchName, commitAge)
+    await updateIssue(issueNumber, branchName, commitAge, lastCommitter)
     expect(core.info).toHaveBeenCalledWith(
       `No existing issue returned for issue number: 20. Error: Created At cannot be empty`
     )

@@ -7,7 +7,7 @@ import {getBranches} from './functions/get-branches'
 import {getDays} from './functions/get-time'
 import {getIssueBudget} from './functions/get-stale-issue-budget'
 import {getIssues} from './functions/get-issues'
-import {getRecentCommitDate} from './functions/get-commits'
+import {getRecentCommitDateAndLogin} from './functions/get-commits'
 import {updateIssue} from './functions/update-issue'
 
 export async function run(): Promise<void> {
@@ -21,9 +21,10 @@ export async function run(): Promise<void> {
     // Assess Branches
     core.startGroup('Identified Branches')
     for (const branchToCheck of branches.data) {
-      const commitDateResponse = await getRecentCommitDate(branchToCheck.commit.sha)
+      const commitDateResponse = await getRecentCommitDateAndLogin(branchToCheck.commit.sha)
+      const {0: lastCommitDate, 1: lastCommitLogin} = commitDateResponse
       const currentDate = new Date().getTime()
-      const commitDate = new Date(commitDateResponse).getTime()
+      const commitDate = new Date(lastCommitDate).getTime()
       const commitAge = getDays(currentDate, commitDate)
       const branchName = branchToCheck.name
 
@@ -36,7 +37,7 @@ export async function run(): Promise<void> {
           !existingIssue.data.find(findIssue => findIssue.title === `[${branchName}] is STALE`) &&
           issueBudgetRemaining > 0
         ) {
-          await createIssue(branchName, commitAge)
+          await createIssue(branchName, commitAge, lastCommitLogin)
           issueBudgetRemaining--
           core.info(`New issue created: [${branchName}] is STALE`)
           core.info(`Issue Budget Remaining: ${issueBudgetRemaining}`)
@@ -50,7 +51,7 @@ export async function run(): Promise<void> {
         //Update existing issues
         for (const issueToUpdate of filteredIssue) {
           if (issueToUpdate.title === `[${branchName}] is STALE`) {
-            await updateIssue(issueToUpdate.number, branchName, commitAge)
+            await updateIssue(issueToUpdate.number, branchName, commitAge, lastCommitLogin)
             outputStales.push(branchName)
           }
         }
