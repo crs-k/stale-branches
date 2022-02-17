@@ -111,7 +111,7 @@ function createIssue(branch, commitAge, lastCommitter) {
         const daysUntilDelete = Math.max(0, get_context_1.daysBeforeDelete - commitAge);
         switch (get_context_1.tagLastComitter) {
             case true:
-                bodyString = `${lastCommitter}, \r \r ${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days.`;
+                bodyString = `@${lastCommitter}, \r \r ${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days.`;
                 break;
             case false:
                 bodyString = `${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days.`;
@@ -614,7 +614,7 @@ function updateIssue(issueNumber, branch, commitAge, lastCommitter) {
         if (get_context_1.commentUpdates === true) {
             switch (get_context_1.tagLastComitter) {
                 case true:
-                    bodyString = `${lastCommitter}, \r \r ${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \r \r This issue was last updated on ${new Date().toString()}`;
+                    bodyString = `@${lastCommitter}, \r \r ${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \r \r This issue was last updated on ${new Date().toString()}`;
                     break;
                 case false:
                     bodyString = `${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \r \r This issue was last updated on ${new Date().toString()}`;
