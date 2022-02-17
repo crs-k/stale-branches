@@ -9,4 +9,4 @@ export const daysBeforeStale = Number(core.getInput('days-before-stale', {requir
 export const daysBeforeDelete = Number(core.getInput('days-before-delete', {required: false}))
 export const commentUpdates = core.getBooleanInput('comment-updates', {required: false})
 export const maxIssues = Number(core.getInput('max-issues', {required: false}))
-export const tagLastComitter = core.getBooleanInput('tag-committer', {required: false})
+export const tagLastCommitter = core.getBooleanInput('tag-committer', {required: false})

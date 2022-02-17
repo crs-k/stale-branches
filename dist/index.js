@@ -109,7 +109,7 @@ function createIssue(branch, commitAge, lastCommitter) {
         let issueId;
         let bodyString;
         const daysUntilDelete = Math.max(0, get_context_1.daysBeforeDelete - commitAge);
-        switch (get_context_1.tagLastComitter) {
+        switch (get_context_1.tagLastCommitter) {
             case true:
                 bodyString = `@${lastCommitter}, \r \r ${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days.`;
                 break;
@@ -378,7 +378,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.tagLastComitter = exports.maxIssues = exports.commentUpdates = exports.daysBeforeDelete = exports.daysBeforeStale = exports.repo = exports.owner = exports.github = void 0;
+exports.tagLastCommitter = exports.maxIssues = exports.commentUpdates = exports.daysBeforeDelete = exports.daysBeforeStale = exports.repo = exports.owner = exports.github = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github_1 = __nccwpck_require__(5438);
 const repoToken = core.getInput('repo-token', { required: true });
@@ -389,7 +389,7 @@ exports.daysBeforeStale = Number(core.getInput('days-before-stale', { required: 
 exports.daysBeforeDelete = Number(core.getInput('days-before-delete', { required: false }));
 exports.commentUpdates = core.getBooleanInput('comment-updates', { required: false });
 exports.maxIssues = Number(core.getInput('max-issues', { required: false }));
-exports.tagLastComitter = core.getBooleanInput('tag-committer', { required: false });
+exports.tagLastCommitter = core.getBooleanInput('tag-committer', { required: false });
 
 
 /***/ }),
@@ -612,7 +612,7 @@ function updateIssue(issueNumber, branch, commitAge, lastCommitter) {
         let bodyString;
         const daysUntilDelete = Math.max(0, get_context_1.daysBeforeDelete - commitAge);
         if (get_context_1.commentUpdates === true) {
-            switch (get_context_1.tagLastComitter) {
+            switch (get_context_1.tagLastCommitter) {
                 case true:
                     bodyString = `@${lastCommitter}, \r \r ${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \r \r This issue was last updated on ${new Date().toString()}`;
                     break;

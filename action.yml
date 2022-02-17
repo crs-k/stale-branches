@@ -21,7 +21,7 @@ inputs:
     required: false
     default: '20'
   tag-committer:
-    description: 'When an issue is opened, this will tag the stale branchs last comitter in the comments.'
+    description: 'When an issue is opened, this will tag the stale branchs last committer in the comments.'
     required: false
     default: false
 outputs:
@@ -33,5 +33,5 @@ runs:
   using: 'node12'
   main: 'dist/index.js'
 branding:
-  icon: 'save'
+  icon: 'delete'
   color: 'blue'
