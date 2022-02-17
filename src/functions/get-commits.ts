@@ -2,7 +2,7 @@ import * as assert from 'assert'
 import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
 
-export async function getRecentCommitDate(sha: string): Promise<[string, string]> {
+export async function getRecentCommitDateAndLogin(sha: string): Promise<[string, string]> {
   let commitDate: string | undefined
   let lastCommitter: string | undefined
   try {
@@ -23,9 +23,6 @@ export async function getRecentCommitDate(sha: string): Promise<[string, string]
     commitDate = ''
     lastCommitter = ''
   }
-  const data: [commitDate: string, lastCommitter: string] = [
-    commitDate,
-    lastCommitter
-  ]
+  const data: [commitDate: string, lastCommitter: string] = [commitDate, lastCommitter]
   return data
 }
