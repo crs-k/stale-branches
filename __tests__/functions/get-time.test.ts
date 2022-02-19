@@ -1,6 +1,6 @@
 import * as timeFuncs from '../../src/functions/get-time'
 
-describe('Time Functions', () => {
+describe('Get Time Functions', () => {
   let startDate = new Date('2022-01-24T01:45:30.000Z')
   let endDate = new Date('2022-01-22T01:45:30.000Z')
 

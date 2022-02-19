@@ -28,16 +28,6 @@ export async function getBranches(): Promise<ListBranchesResponseDataType> {
       core.info(`${branches.data.length} branches found`)
       assert.ok(response, 'Response cannot be empty.')
     }
-
-    /*     // Get info from the most recent release
-    const response = await github.rest.repos.listBranches({
-      owner,
-      repo,
-      protected: false,
-      per_page: 100,
-      page: 1
-    })
-    branches = response */
   } catch (err) {
     if (err instanceof Error) {
       core.setFailed(`Failed to retrieve branches for ${repo}. Error: ${err.message}`)

@@ -286,15 +286,6 @@ function getBranches() {
                 }
                 finally { if (e_1) throw e_1.error; }
             }
-            /*     // Get info from the most recent release
-            const response = await github.rest.repos.listBranches({
-              owner,
-              repo,
-              protected: false,
-              per_page: 100,
-              page: 1
-            })
-            branches = response */
         }
         catch (err) {
             if (err instanceof Error) {
