@@ -772,10 +772,8 @@ function run() {
             for (const branchToCheck of branches) {
                 if (issueBudgetRemaining < 1)
                     break;
-                const commitDateResponse = yield (0, get_commit_date_1.getRecentCommitDate)(branchToCheck.commit.sha);
-                const commitLoginResponse = yield (0, get_committer_login_1.getRecentCommitLogin)(branchToCheck.commit.sha);
-                const lastCommitDate = commitDateResponse;
-                const lastCommitLogin = commitLoginResponse;
+                const lastCommitDate = yield (0, get_commit_date_1.getRecentCommitDate)(branchToCheck.commit.sha);
+                const lastCommitLogin = yield (0, get_committer_login_1.getRecentCommitLogin)(branchToCheck.commit.sha);
                 const currentDate = new Date().getTime();
                 const commitDate = new Date(lastCommitDate).getTime();
                 const commitAge = (0, get_time_1.getDays)(currentDate, commitDate);
