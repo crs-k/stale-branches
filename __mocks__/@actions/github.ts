@@ -46,7 +46,7 @@ let createComment = jest.fn().mockReturnValue({
   data: {id: 1, owner: 'owner', repo: 'repo'}
 })
 
-let iterator = jest.fn().mockReturnValue(listBranches)
+let paginate = jest.fn().mockReturnValue(listBranches)
 
 const github = {
   rest: {
@@ -63,9 +63,7 @@ const github = {
       getCommit
     }
   },
-  paginate: {
-    iterator
-  }
+  paginate
 }
 
 export const getOctokit = jest.fn().mockImplementation(() => github)
