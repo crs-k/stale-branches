@@ -31,7 +31,7 @@ Inputs are defined in [`action.yml`](action.yml):
 | `days-before-stale` | `No` | Number of days a branch has been inactive before it is considered stale. | 120 days |
 | `days-before-delete` | `No` | Number of days a branch has been inactive before it is deleted. | 180 days |
 | `comment-updates` | `No` | If this is enabled, a comment with updated information will be added to existing issues each workflow run. | false |
-| `max-issues` | `No` | This dictates the number of issues that can exist. It also limits the number of branches that can be deleted per run. | 20 |
+| `max-issues` | `No` | This dictates the number of `stale branch 🗑️` issues that can exist. It also limits the number of branches that can be deleted per run. | 20 |
 | `tag-committer` | `No` | When an issue is opened, this will tag the stale branchs last committer in the comments. | false |
 
 ### Outputs
