@@ -770,6 +770,8 @@ function run() {
             // Assess Branches
             core.startGroup('Identified Branches');
             for (const branchToCheck of branches) {
+                if (issueBudgetRemaining < 1)
+                    break;
                 const commitDateResponse = yield (0, get_commit_date_1.getRecentCommitDate)(branchToCheck.commit.sha);
                 const commitLoginResponse = yield (0, get_committer_login_1.getRecentCommitLogin)(branchToCheck.commit.sha);
                 const lastCommitDate = commitDateResponse;
