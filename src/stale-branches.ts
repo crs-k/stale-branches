@@ -20,7 +20,7 @@ export async function run(): Promise<void> {
 
     // Assess Branches
     core.startGroup('Identified Branches')
-    for (const branchToCheck of branches.data) {
+    for (const branchToCheck of branches) {
       const commitDateResponse = await getRecentCommitDateAndLogin(branchToCheck.commit.sha)
       const {0: lastCommitDate, 1: lastCommitLogin} = commitDateResponse
       const currentDate = new Date().getTime()
