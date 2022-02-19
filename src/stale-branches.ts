@@ -22,6 +22,7 @@ export async function run(): Promise<void> {
     // Assess Branches
     core.startGroup('Identified Branches')
     for (const branchToCheck of branches) {
+      if (issueBudgetRemaining < 1) break
       const commitDateResponse = await getRecentCommitDate(branchToCheck.commit.sha)
       const commitLoginResponse = await getRecentCommitLogin(branchToCheck.commit.sha)
       const lastCommitDate = commitDateResponse

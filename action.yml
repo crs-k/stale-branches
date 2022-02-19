@@ -17,7 +17,7 @@ inputs:
     required: false
     default: false
   max-issues:
-    description: 'This is the maximum of Stale Branch issues that will be open at a given time.'
+    description: 'This dictates the number of Stale issues that can exist. It also limits the number of branches that can be deleted per run.'
     required: false
     default: '20'
   tag-committer:
