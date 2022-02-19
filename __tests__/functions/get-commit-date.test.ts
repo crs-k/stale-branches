@@ -5,7 +5,7 @@ jest.mock('../../src/functions/get-context')
 
 const core = require('@actions/core')
 const assert = require('assert')
-import {getRecentCommitDateAndLogin} from '../../src/functions/get-commits'
+import {getRecentCommitDate} from '../../src/functions/get-commit-date'
 import {github} from '../../src/functions/get-context'
 
 let sha = '123'
@@ -14,7 +14,7 @@ describe('Get Commits Function', () => {
     jest.clearAllMocks()
   })
   test('getRecentCommitDate endpoint is called', async () => {
-    await getRecentCommitDateAndLogin(sha)
+    await getRecentCommitDate(sha)
 
     expect(github.rest.repos.getCommit).toHaveBeenCalledWith({
       owner: 'owner',
@@ -32,9 +32,9 @@ describe('Get Commits Function', () => {
       throw new Error('Date cannot be empty.')
     })
 
-    await getRecentCommitDateAndLogin(sha)
+    await getRecentCommitDate(sha)
     expect(core.setFailed).toHaveBeenCalledWith(
-      `Failed to retrieve commit for repo. Error: Date cannot be empty.`
+      `Failed to retrieve commit for 123 in repo. Error: Date cannot be empty.`
     )
   })
 })
