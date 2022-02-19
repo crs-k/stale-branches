@@ -1,3 +1,5 @@
+import {PaginateInterface} from '@octokit/plugin-paginate-rest'
+
 export const context = {
   repo: {
     owner: 'owner',
@@ -44,6 +46,8 @@ let createComment = jest.fn().mockReturnValue({
   data: {id: 1, owner: 'owner', repo: 'repo'}
 })
 
+let iterator = jest.fn().mockReturnValue(listBranches)
+
 const github = {
   rest: {
     git: {deleteRef},
@@ -58,6 +62,9 @@ const github = {
       listBranches,
       getCommit
     }
+  },
+  paginate: {
+    iterator
   }
 }
 
