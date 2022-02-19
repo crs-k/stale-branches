@@ -247,25 +247,45 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __asyncValues = (this && this.__asyncValues) || function (o) {
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var m = o[Symbol.asyncIterator], i;
+    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
+    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
+    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getBranches = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
 function getBranches() {
+    var e_1, _a;
     return __awaiter(this, void 0, void 0, function* () {
-        let branches;
+        let branches = {};
         try {
-            // Get info from the most recent release
-            const response = yield get_context_1.github.rest.repos.listBranches({
+            const parameters = {
                 owner: get_context_1.owner,
                 repo: get_context_1.repo,
                 protected: false,
-                per_page: 100,
-                page: 1
-            });
-            branches = response;
-            assert.ok(response, 'Response cannot be empty.');
+                per_page: 100
+            };
+            try {
+                for (var _b = __asyncValues(get_context_1.github.paginate.iterator(get_context_1.github.rest.repos.listBranches, parameters)), _c; _c = yield _b.next(), !_c.done;) {
+                    const response = _c.value;
+                    // do whatever you want with each response, break out of the loop, etc.
+                    branches = response;
+                    core.info(`${branches.data.length} branches found`);
+                    assert.ok(response, 'Response cannot be empty.');
+                }
+            }
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (_c && !_c.done && (_a = _b.return)) yield _a.call(_b);
+                }
+                finally { if (e_1) throw e_1.error; }
+            }
         }
         catch (err) {
             if (err instanceof Error) {

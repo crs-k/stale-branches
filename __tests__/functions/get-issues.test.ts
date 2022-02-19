@@ -8,7 +8,7 @@ const assert = require('assert')
 import {getIssues} from '../../src/functions/get-issues'
 import {github} from '../../src/functions/get-context'
 
-describe('Get Commits Function', () => {
+describe('Get Issues Function', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })

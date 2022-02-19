@@ -14,7 +14,7 @@ let branchName = 'test'
 let commitAge = 100
 let lastCommitter = 'crs-k'
 
-describe('Get Commits Function', () => {
+describe('Update Issue Function', () => {
   test('updateIssue endpoint is called with tag committer enabled', async () => {
     Object.defineProperty(context, 'commentUpdates', {value: true})
     Object.defineProperty(context, 'tagLastCommitter', {value: true})
