@@ -12,7 +12,7 @@ describe('Get Branches Function', () => {
   test('github.paginate.iterator endpoint is called', async () => {
     await getBranches()
 
-    expect(github.paginate.iterator).toHaveBeenCalled()
+    expect(github.paginate).toHaveBeenCalled()
   })
 
   test('Action fails elegantly', async () => {
@@ -24,7 +24,7 @@ describe('Get Branches Function', () => {
 
     await getBranches()
     expect(core.setFailed).toHaveBeenCalledWith(
-      `Failed to retrieve branches for repo. Error: o[Symbol.iterator] is not a function`
+      `Failed to retrieve branches for repo. Error: Response cannot be empty.`
     )
     expect(core.setFailed).toHaveBeenCalledWith(`Failed to retrieve branches for repo.`)
   })
