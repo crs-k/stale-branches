@@ -10,7 +10,6 @@ import {github} from '../../src/functions/get-context'
 import * as context from '../../src/functions/get-context'
 
 describe('Get Stale Issue Budget Function', () => {
-
   test('getIssueBudget endpoint is called', async () => {
     Object.defineProperty(context, 'maxIssues', {value: 1})
 
