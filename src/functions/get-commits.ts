@@ -19,7 +19,7 @@ export async function getRecentCommitDateAndLogin(sha: string): Promise<[string,
     assert.ok(lastCommitter, 'Committer cannot be empty.')
   } catch (err) {
     if (err instanceof Error)
-      core.setFailed(`Failed to retrieve commit for ${repo}. Error: ${err.message}`)
+      core.warning(`Failed to retrieve commit for ${sha} in ${repo}. Error: ${err.message}`)
     commitDate = ''
     lastCommitter = ''
   }
