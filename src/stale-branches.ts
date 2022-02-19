@@ -7,7 +7,8 @@ import {getBranches} from './functions/get-branches'
 import {getDays} from './functions/get-time'
 import {getIssueBudget} from './functions/get-stale-issue-budget'
 import {getIssues} from './functions/get-issues'
-import {getRecentCommitDateAndLogin} from './functions/get-commits'
+import {getRecentCommitDate} from './functions/get-commit-date'
+import {getRecentCommitLogin} from './functions/get-committer-login'
 import {updateIssue} from './functions/update-issue'
 
 export async function run(): Promise<void> {
@@ -21,8 +22,10 @@ export async function run(): Promise<void> {
     // Assess Branches
     core.startGroup('Identified Branches')
     for (const branchToCheck of branches) {
-      const commitDateResponse = await getRecentCommitDateAndLogin(branchToCheck.commit.sha)
-      const {0: lastCommitDate, 1: lastCommitLogin} = commitDateResponse
+      const commitDateResponse = await getRecentCommitDate(branchToCheck.commit.sha)
+      const commitLoginResponse = await getRecentCommitLogin(branchToCheck.commit.sha)
+      const lastCommitDate = commitDateResponse
+      const lastCommitLogin = commitLoginResponse
       const currentDate = new Date().getTime()
       const commitDate = new Date(lastCommitDate).getTime()
       const commitAge = getDays(currentDate, commitDate)

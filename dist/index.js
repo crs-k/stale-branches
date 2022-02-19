@@ -281,7 +281,7 @@ exports.getBranches = getBranches;
 
 /***/ }),
 
-/***/ 9821:
+/***/ 6267:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -315,14 +315,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getRecentCommitDateAndLogin = void 0;
+exports.getRecentCommitDate = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
-function getRecentCommitDateAndLogin(sha) {
+function getRecentCommitDate(sha) {
     return __awaiter(this, void 0, void 0, function* () {
         let commitDate;
-        let lastCommitter;
         try {
             const branchResponse = yield get_context_1.github.rest.repos.getCommit({
                 owner: get_context_1.owner,
@@ -332,21 +331,82 @@ function getRecentCommitDateAndLogin(sha) {
                 page: 1
             });
             commitDate = branchResponse.data.commit.committer.date;
-            lastCommitter = branchResponse.data.committer.login;
             assert.ok(commitDate, 'Date cannot be empty.');
+        }
+        catch (err) {
+            if (err instanceof Error)
+                core.setFailed(`Failed to retrieve commit for ${sha} in ${get_context_1.repo}. Error: ${err.message}`);
+            commitDate = '';
+        }
+        return commitDate;
+    });
+}
+exports.getRecentCommitDate = getRecentCommitDate;
+
+
+/***/ }),
+
+/***/ 4764:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getRecentCommitLogin = void 0;
+const assert = __importStar(__nccwpck_require__(9491));
+const core = __importStar(__nccwpck_require__(2186));
+const get_context_1 = __nccwpck_require__(7782);
+function getRecentCommitLogin(sha) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let lastCommitter;
+        try {
+            const branchResponse = yield get_context_1.github.rest.repos.getCommit({
+                owner: get_context_1.owner,
+                repo: get_context_1.repo,
+                ref: sha,
+                per_page: 1,
+                page: 1
+            });
+            lastCommitter = branchResponse.data.committer.login;
             assert.ok(lastCommitter, 'Committer cannot be empty.');
         }
         catch (err) {
             if (err instanceof Error)
                 core.warning(`Failed to retrieve commit for ${sha} in ${get_context_1.repo}. Error: ${err.message}`);
-            commitDate = '';
             lastCommitter = '';
         }
-        const data = [commitDate, lastCommitter];
-        return data;
+        return lastCommitter;
     });
 }
-exports.getRecentCommitDateAndLogin = getRecentCommitDateAndLogin;
+exports.getRecentCommitLogin = getRecentCommitLogin;
 
 
 /***/ }),
@@ -696,7 +756,8 @@ const get_branches_1 = __nccwpck_require__(6204);
 const get_time_1 = __nccwpck_require__(1035);
 const get_stale_issue_budget_1 = __nccwpck_require__(7705);
 const get_issues_1 = __nccwpck_require__(4298);
-const get_commits_1 = __nccwpck_require__(9821);
+const get_commit_date_1 = __nccwpck_require__(6267);
+const get_committer_login_1 = __nccwpck_require__(4764);
 const update_issue_1 = __nccwpck_require__(2914);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -709,8 +770,10 @@ function run() {
             // Assess Branches
             core.startGroup('Identified Branches');
             for (const branchToCheck of branches) {
-                const commitDateResponse = yield (0, get_commits_1.getRecentCommitDateAndLogin)(branchToCheck.commit.sha);
-                const { 0: lastCommitDate, 1: lastCommitLogin } = commitDateResponse;
+                const commitDateResponse = yield (0, get_commit_date_1.getRecentCommitDate)(branchToCheck.commit.sha);
+                const commitLoginResponse = yield (0, get_committer_login_1.getRecentCommitLogin)(branchToCheck.commit.sha);
+                const lastCommitDate = commitDateResponse;
+                const lastCommitLogin = commitLoginResponse;
                 const currentDate = new Date().getTime();
                 const commitDate = new Date(lastCommitDate).getTime();
                 const commitAge = (0, get_time_1.getDays)(currentDate, commitDate);
