@@ -26,15 +26,15 @@ describe('Get Commits Function', () => {
   })
 
   test('Action fails elegantly', async () => {
-    core.setFailed = jest.fn()
+    core.warning = jest.fn()
     assert.ok = jest.fn()
     assert.ok.mockImplementation(() => {
       throw new Error('Date cannot be empty.')
     })
 
     await getRecentCommitDateAndLogin(sha)
-    expect(core.setFailed).toHaveBeenCalledWith(
-      `Failed to retrieve commit for repo. Error: Date cannot be empty.`
+    expect(core.warning).toHaveBeenCalledWith(
+      `Failed to retrieve commit for 123 in repo. Error: Date cannot be empty.`
     )
   })
 })
