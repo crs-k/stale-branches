@@ -1,10 +1,60 @@
 import * as githubActual from '../../src/functions/get-context'
 // eslint-disable-next-line import/named
 import {GetResponseTypeFromEndpointMethod} from '@octokit/types'
+import {BranchResponse} from '../../src/types/branches'
+
+export const context = {
+  repo: {
+    owner: 'owner',
+    repo: 'repo'
+  }
+}
+
+export const daysBeforeStale: number = 120
+export const daysBeforeDelete: number = 180
+export const commentUpdates: boolean = true
+export const maxIssues: number = 20
+export const repoToken: string = '20'
 
 type ListIssuesResponseDataType = GetResponseTypeFromEndpointMethod<
   typeof githubActual.github.rest.issues.listForRepo
 >
+
+type ListBranchesResponseDataType = GetResponseTypeFromEndpointMethod<
+  typeof githubActual.github.rest.repos.listBranches
+>
+
+let branchesFiltered: BranchResponse[] = [
+  {branchName: 'Branch 1', commmitSha: 'SHA 1'},
+  {branchName: 'Branch 2', commmitSha: 'SHA 2'},
+  {branchName: 'Branch 3', commmitSha: 'SHA 3'},
+  {branchName: 'Branch 4', commmitSha: 'SHA 4'},
+  {branchName: 'Branch 5', commmitSha: 'SHA 5'},
+  {branchName: 'Branch 6', commmitSha: 'SHA 6'}
+]
+
+let branches: ListBranchesResponseDataType = {
+  headers: {},
+  status: 200,
+  url: 'string',
+  data: [
+    {
+      name: 'main',
+      commit: {
+        sha: 'c5b97d5ae6c19d5c5df71a34c7fbeeda2479ccbc',
+        url: 'https://api.github.com/repos/octocat/Hello-World/commits/c5b97d5ae6c19d5c5df71a34c7fbeeda2479ccbc'
+      },
+      protected: true,
+      protection: {
+        required_status_checks: {
+          enforcement_level: 'non_admins',
+          contexts: ['ci-test', 'linter']
+        }
+      },
+      protection_url: 'https://api.github.com/repos/octocat/hello-world/branches/master/protection'
+    }
+  ]
+}
 
 let issues: ListIssuesResponseDataType = {
   headers: {},
@@ -171,19 +221,6 @@ let issues: ListIssuesResponseDataType = {
   ]
 }
 
-export const context = {
-  repo: {
-    owner: 'owner',
-    repo: 'repo'
-  }
-}
-
-export const daysBeforeStale: number = 120
-export const daysBeforeDelete: number = 180
-export const commentUpdates: boolean = true
-export const maxIssues: number = 20
-export const repoToken: string = '20'
-
 let update = jest.fn().mockReturnValue({
   data: {issue_number: 1, owner: 'owner', repo: 'repo', state: 'closed'}
 })
@@ -196,9 +233,7 @@ let deleteRef = jest.fn().mockReturnValue({
   data: {id: 1, owner: 'owner', repo: 'repo'}
 })
 
-let listBranches = jest.fn().mockReturnValue({
-  data: {id: 1, owner: 'owner', repo: 'repo'}
-})
+let listBranches = jest.fn().mockReturnValue(branches)
 
 let getCommit = jest.fn().mockReturnValue({
   data: {
@@ -215,7 +250,7 @@ let createComment = jest.fn().mockReturnValue({
   data: {id: 1, owner: 'owner', repo: 'repo'}
 })
 
-let paginate = jest.fn().mockReturnValue(listBranches)
+let paginate = jest.fn().mockReturnValue(branchesFiltered)
 
 const github = {
   rest: {

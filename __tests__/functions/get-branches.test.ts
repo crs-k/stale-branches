@@ -9,10 +9,14 @@ import {getBranches} from '../../src/functions/get-branches'
 import {github} from '../../src/functions/get-context'
 
 describe('Get Branches Function', () => {
-  test('github.paginate.iterator endpoint is called', async () => {
+  test('github.paginate endpoint is called', async () => {
+    core.info = jest.fn()
+    assert.ok = jest.fn()
     await getBranches()
 
     expect(github.paginate).toHaveBeenCalled()
+    expect(core.info).toHaveBeenCalledWith(`6 branches found.`)
+    expect(assert.ok).toHaveBeenCalled()
   })
 
   test('Action fails elegantly', async () => {
