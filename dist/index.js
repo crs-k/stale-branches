@@ -256,13 +256,13 @@ function getBranches() {
     return __awaiter(this, void 0, void 0, function* () {
         let branches;
         try {
-            const response = yield get_context_1.github.paginate(get_context_1.github.rest.repos.listBranches, {
+            const branchResponse = yield get_context_1.github.paginate(get_context_1.github.rest.repos.listBranches, {
                 owner: get_context_1.owner,
                 repo: get_context_1.repo,
                 protected: false,
                 per_page: 100
-            });
-            branches = response;
+            }, response => response.data.map(branch => ({ branchName: branch.name, commmitSha: branch.commit.sha })));
+            branches = branchResponse;
             core.info(`${branches.length} branches found.`);
             assert.ok(branches, 'Response cannot be empty.');
         }
@@ -271,7 +271,7 @@ function getBranches() {
                 core.setFailed(`Failed to retrieve branches for ${get_context_1.repo}. Error: ${err.message}`);
             }
             core.setFailed(`Failed to retrieve branches for ${get_context_1.repo}.`);
-            branches = {};
+            branches = [{ branchName: '', commmitSha: '' }];
         }
         return branches;
     });
@@ -772,12 +772,12 @@ function run() {
             for (const branchToCheck of branches) {
                 if (issueBudgetRemaining < 1)
                     break;
-                const lastCommitDate = yield (0, get_commit_date_1.getRecentCommitDate)(branchToCheck.commit.sha);
-                const lastCommitLogin = yield (0, get_committer_login_1.getRecentCommitLogin)(branchToCheck.commit.sha);
+                const lastCommitDate = yield (0, get_commit_date_1.getRecentCommitDate)(branchToCheck.commmitSha);
+                const lastCommitLogin = yield (0, get_committer_login_1.getRecentCommitLogin)(branchToCheck.commmitSha);
                 const currentDate = new Date().getTime();
                 const commitDate = new Date(lastCommitDate).getTime();
                 const commitAge = (0, get_time_1.getDays)(currentDate, commitDate);
-                const branchName = branchToCheck.name;
+                const branchName = branchToCheck.branchName;
                 //Create & Update issues for stale branches
                 if (commitAge > get_context_1.daysBeforeStale) {
                     const existingIssue = yield (0, get_issues_1.getIssues)();
