@@ -264,6 +264,7 @@ function getBranches() {
             }, response => response.data.map(branch => ({ branchName: branch.name, commmitSha: branch.commit.sha })));
             branches = branchResponse;
             core.info(`${branches.length} branches found.`);
+            core.info(`${branches}`);
             assert.ok(branches, 'Response cannot be empty.');
         }
         catch (err) {
