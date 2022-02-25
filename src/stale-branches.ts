@@ -92,7 +92,7 @@ export async function run(): Promise<void> {
       core.endGroup()
     }
     core.notice(`Stale Branches:  ${outputStales.length}`)
-    core.notice(`Deleted Branches:  ${JSON.stringify(outputDeletes)}`)
+    core.notice(`Deleted Branches:  ${outputDeletes.length}`)
     core.setOutput('stale-branches', JSON.stringify(outputStales))
     core.setOutput('deleted-branches', JSON.stringify(outputDeletes))
   } catch (error) {
