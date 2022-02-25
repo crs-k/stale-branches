@@ -589,7 +589,7 @@ function getIssueBudget() {
             core.setFailed(`Failed to calculate issue budget.`);
             issueBudgetRemaining = 0;
         }
-        core.info(`${ansi_styles_1.default.bold.open}[${ansi_styles_1.default.magenta.open}${issueBudgetRemaining}${ansi_styles_1.default.magenta.close}] ${ansi_styles_1.default.greenBright.open}issue budget remaining${ansi_styles_1.default.greenBright.close}.${ansi_styles_1.default.bold.close}`);
+        core.info(`${ansi_styles_1.default.bold.open}[${ansi_styles_1.default.magenta.open}${issueBudgetRemaining}${ansi_styles_1.default.magenta.close}] ${ansi_styles_1.default.greenBright.open}max-issues budget remaining${ansi_styles_1.default.greenBright.close}.${ansi_styles_1.default.bold.close}`);
         return issueBudgetRemaining;
     });
 }
