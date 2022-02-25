@@ -38,7 +38,7 @@ export async function run(): Promise<void> {
 
       core.startGroup(logBranchGroupColor(branchName, commitAge, daysBeforeStale, daysBeforeDelete))
       core.info(logLastCommitColor(commitAge, daysBeforeStale, daysBeforeDelete))
-      core.info(JSON.stringify(filteredIssue.at(10)))
+      core.info(JSON.stringify(filteredIssue.toString()))
       //Create issues for stale branches
       if (commitAge > daysBeforeStale) {
         //Create new issue if existing issue is not found & issue budget is >0
