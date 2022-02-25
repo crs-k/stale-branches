@@ -802,7 +802,7 @@ function run() {
                     if (!existingIssue.data.find(findIssue => findIssue.title === `[${branchName}] is STALE`) && issueBudgetRemaining > 0) {
                         yield (0, create_issue_1.createIssue)(branchName, commitAge, lastCommitLogin);
                         issueBudgetRemaining--;
-                        core.info(`New issue created: [${branchName}] is STALE`);
+                        core.info(`${ansi_styles_1.default.bold.open}New issue created:${ansi_styles_1.default.bold.close} ${ansi_styles_1.default.yellowBright.open}[${branchName}] is STALE${ansi_styles_1.default.yellowBright.close}.`);
                         core.info(`[${ansi_styles_1.default.magenta.open}${issueBudgetRemaining}${ansi_styles_1.default.magenta.close}] issue budget remaining.`);
                         outputStales.push(branchName);
                     }
