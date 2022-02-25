@@ -47,7 +47,9 @@ export async function run(): Promise<void> {
           await createIssue(branchName, commitAge, lastCommitLogin)
           issueBudgetRemaining--
           core.info(logMaxIssues(issueBudgetRemaining))
-          outputStales.push(branchName)
+          if (outputStales.includes(branchName) === false) {
+            outputStales.push(branchName)
+          }
         }
       }
 
@@ -66,7 +68,9 @@ export async function run(): Promise<void> {
         for (const issueToUpdate of filteredIssue) {
           if (issueToUpdate.title === `[${branchName}] is STALE`) {
             await updateIssue(issueToUpdate.number, branchName, commitAge, lastCommitLogin)
-            outputStales.push(branchName)
+            if (outputStales.includes(branchName) === false) {
+              outputStales.push(branchName)
+            }
           }
         }
       }
@@ -77,7 +81,9 @@ export async function run(): Promise<void> {
           if (issueToDelete.title === `[${branchName}] is STALE`) {
             await deleteBranch(branchName)
             await closeIssue(issueToDelete.number)
-            outputDeletes.push(branchName)
+            if (outputDeletes.includes(branchName) === false) {
+              outputDeletes.push(branchName)
+            }
           }
         }
       }

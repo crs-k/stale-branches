@@ -1007,7 +1007,9 @@ function run() {
                         yield (0, create_issue_1.createIssue)(branchName, commitAge, lastCommitLogin);
                         issueBudgetRemaining--;
                         core.info((0, log_max_issues_1.logMaxIssues)(issueBudgetRemaining));
-                        outputStales.push(branchName);
+                        if (outputStales.includes(branchName) === false) {
+                            outputStales.push(branchName);
+                        }
                     }
                 }
                 //Close issues if a branch becomes active again
@@ -1024,7 +1026,9 @@ function run() {
                     for (const issueToUpdate of filteredIssue) {
                         if (issueToUpdate.title === `[${branchName}] is STALE`) {
                             yield (0, update_issue_1.updateIssue)(issueToUpdate.number, branchName, commitAge, lastCommitLogin);
-                            outputStales.push(branchName);
+                            if (outputStales.includes(branchName) === false) {
+                                outputStales.push(branchName);
+                            }
                         }
                     }
                 }
@@ -1034,7 +1038,9 @@ function run() {
                         if (issueToDelete.title === `[${branchName}] is STALE`) {
                             yield (0, delete_branch_1.deleteBranch)(branchName);
                             yield (0, close_issue_1.closeIssue)(issueToDelete.number);
-                            outputDeletes.push(branchName);
+                            if (outputDeletes.includes(branchName) === false) {
+                                outputDeletes.push(branchName);
+                            }
                         }
                     }
                 }
