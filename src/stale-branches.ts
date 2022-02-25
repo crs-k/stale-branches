@@ -9,6 +9,7 @@ import {getIssueBudget} from './functions/get-stale-issue-budget'
 import {getIssues} from './functions/get-issues'
 import {getRecentCommitDate} from './functions/get-commit-date'
 import {getRecentCommitLogin} from './functions/get-committer-login'
+import {logBranchGroupColor} from './functions/log-branch-group-color'
 import styles from 'ansi-styles'
 import {updateIssue} from './functions/update-issue'
 
@@ -31,14 +32,14 @@ export async function run(): Promise<void> {
       const commitAge = getDays(currentDate, commitDate)
       const branchName = branchToCheck.branchName
 
-      core.startGroup(`[${styles.blue.open}${branchName}${styles.blue.close}]`)
+      core.startGroup(logBranchGroupColor(branchName, commitAge, daysBeforeStale, daysBeforeDelete))
       core.info(`Last Commit: ${styles.magenta.open}${commitAge.toString()}${styles.magenta.close} days ago.`)
 
       //Create issues for stale branches
       if (commitAge > daysBeforeStale) {
         const existingIssue = await getIssues()
 
-        //Create new issue if existing issue is not found
+        //Create new issue if existing issue is not found & issue budget is >0
         if (!existingIssue.data.find(findIssue => findIssue.title === `[${branchName}] is STALE`) && issueBudgetRemaining > 0) {
           await createIssue(branchName, commitAge, lastCommitLogin)
           issueBudgetRemaining--

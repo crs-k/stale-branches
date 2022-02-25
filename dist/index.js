@@ -638,6 +638,36 @@ export function getnSeconds(date1, date2): number {
 
 /***/ }),
 
+/***/ 5861:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.logBranchGroupColor = void 0;
+const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+function logBranchGroupColor(branchName, commitAge, daysBeforeStale, daysBeforeDelete) {
+    let groupColor = `[${ansi_styles_1.default.blue.open}${branchName}${ansi_styles_1.default.blue.close}]`;
+    //color group based on age of branch
+    if (commitAge > daysBeforeDelete) {
+        groupColor = `[${ansi_styles_1.default.redBright.open}${branchName}${ansi_styles_1.default.redBright.close}]`;
+    }
+    else if (commitAge > daysBeforeStale) {
+        groupColor = `[${ansi_styles_1.default.yellowBright.open}${branchName}${ansi_styles_1.default.yellowBright.close}]`;
+    }
+    else if (commitAge < daysBeforeStale) {
+        groupColor = `[${ansi_styles_1.default.blue.open}${branchName}${ansi_styles_1.default.blue.close}]`;
+    }
+    return groupColor;
+}
+exports.logBranchGroupColor = logBranchGroupColor;
+
+
+/***/ }),
+
 /***/ 2914:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -777,6 +807,7 @@ const get_stale_issue_budget_1 = __nccwpck_require__(7705);
 const get_issues_1 = __nccwpck_require__(4298);
 const get_commit_date_1 = __nccwpck_require__(6267);
 const get_committer_login_1 = __nccwpck_require__(4764);
+const log_branch_group_color_1 = __nccwpck_require__(5861);
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 const update_issue_1 = __nccwpck_require__(2914);
 function run() {
@@ -796,12 +827,12 @@ function run() {
                 const commitDate = new Date(lastCommitDate).getTime();
                 const commitAge = (0, get_time_1.getDays)(currentDate, commitDate);
                 const branchName = branchToCheck.branchName;
-                core.startGroup(`[${ansi_styles_1.default.blue.open}${branchName}${ansi_styles_1.default.blue.close}]`);
+                core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchName, commitAge, get_context_1.daysBeforeStale, get_context_1.daysBeforeDelete));
                 core.info(`Last Commit: ${ansi_styles_1.default.magenta.open}${commitAge.toString()}${ansi_styles_1.default.magenta.close} days ago.`);
                 //Create issues for stale branches
                 if (commitAge > get_context_1.daysBeforeStale) {
                     const existingIssue = yield (0, get_issues_1.getIssues)();
-                    //Create new issue if existing issue is not found
+                    //Create new issue if existing issue is not found & issue budget is >0
                     if (!existingIssue.data.find(findIssue => findIssue.title === `[${branchName}] is STALE`) && issueBudgetRemaining > 0) {
                         yield (0, create_issue_1.createIssue)(branchName, commitAge, lastCommitLogin);
                         issueBudgetRemaining--;
