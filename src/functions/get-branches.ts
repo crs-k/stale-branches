@@ -2,6 +2,7 @@ import * as assert from 'assert'
 import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
 import {BranchResponse} from '../types/branches'
+import styles from 'ansi-styles'
 
 export async function getBranches(): Promise<BranchResponse[]> {
   let branches: BranchResponse[]
@@ -21,7 +22,7 @@ export async function getBranches(): Promise<BranchResponse[]> {
     )
     branches = branchResponse
 
-    core.info(`[${branches.length}] branches found.`)
+    core.info(`[${styles.magenta.open}${branches.length}${styles.magenta.close}] branches found.`)
     assert.ok(branches, 'Response cannot be empty.')
   } catch (err) {
     if (err instanceof Error) {

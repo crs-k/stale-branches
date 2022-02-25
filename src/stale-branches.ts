@@ -33,7 +33,7 @@ export async function run(): Promise<void> {
       core.info(
         `[${styles.blue.open}${branchName}${styles.blue.close}] - Last Commit: ${
           styles.magenta.open
-        }${commitAge.toString()}${styles.magenta.open} days ago.`
+        }${commitAge.toString()}${styles.magenta.close} days ago.`
       )
       //Create & Update issues for stale branches
       if (commitAge > daysBeforeStale) {

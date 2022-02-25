@@ -7,6 +7,7 @@ const core = require('@actions/core')
 const assert = require('assert')
 import {getBranches} from '../../src/functions/get-branches'
 import {github} from '../../src/functions/get-context'
+import styles from 'ansi-styles'
 
 describe('Get Branches Function', () => {
   test('github.paginate endpoint is called', async () => {
@@ -15,7 +16,9 @@ describe('Get Branches Function', () => {
     await getBranches()
 
     expect(github.paginate).toHaveBeenCalled()
-    expect(core.info).toHaveBeenCalledWith(`[6] branches found.`)
+    expect(core.info).toHaveBeenCalledWith(
+      `[${styles.magenta.open}6${styles.magenta.close}] branches found.`
+    )
     expect(assert.ok).toHaveBeenCalled()
   })
 

@@ -247,11 +247,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getBranches = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
+const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function getBranches() {
     return __awaiter(this, void 0, void 0, function* () {
         let branches;
@@ -263,7 +267,7 @@ function getBranches() {
                 per_page: 100
             }, response => response.data.map(branch => ({ branchName: branch.name, commmitSha: branch.commit.sha })));
             branches = branchResponse;
-            core.info(`[${branches.length}] branches found.`);
+            core.info(`[${ansi_styles_1.default.magenta.open}${branches.length}${ansi_styles_1.default.magenta.close}] branches found.`);
             assert.ok(branches, 'Response cannot be empty.');
         }
         catch (err) {
@@ -782,7 +786,7 @@ function run() {
                 const commitAge = (0, get_time_1.getDays)(currentDate, commitDate);
                 const branchName = branchToCheck.branchName;
                 core.startGroup(`[${ansi_styles_1.default.blue.open}${branchName}${ansi_styles_1.default.blue.close}]`);
-                core.info(`[${ansi_styles_1.default.blue.open}${branchName}${ansi_styles_1.default.blue.close}] - Last Commit: ${ansi_styles_1.default.magenta.open}${commitAge.toString()}${ansi_styles_1.default.magenta.open} days ago.`);
+                core.info(`[${ansi_styles_1.default.blue.open}${branchName}${ansi_styles_1.default.blue.close}] - Last Commit: ${ansi_styles_1.default.magenta.open}${commitAge.toString()}${ansi_styles_1.default.magenta.close} days ago.`);
                 //Create & Update issues for stale branches
                 if (commitAge > get_context_1.daysBeforeStale) {
                     const existingIssue = yield (0, get_issues_1.getIssues)();
