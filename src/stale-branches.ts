@@ -44,7 +44,7 @@ export async function run(): Promise<void> {
         if (!existingIssue.data.find(findIssue => findIssue.title === `[${branchName}] is STALE`) && issueBudgetRemaining > 0) {
           await createIssue(branchName, commitAge, lastCommitLogin)
           issueBudgetRemaining--
-          core.info(`${styles.bold.open}New issue created:${styles.bold.close} ${styles.yellowBright.open}[${branchName}] is STALE${styles.yellowBright.close}.`)
+
           core.info(`[${styles.magenta.open}${issueBudgetRemaining}${styles.magenta.close}] max-issues budget remaining.`)
           outputStales.push(branchName)
         }

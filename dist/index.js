@@ -108,6 +108,7 @@ exports.createIssue = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
+const log_new_issue_1 = __nccwpck_require__(2344);
 function createIssue(branch, commitAge, lastCommitter) {
     return __awaiter(this, void 0, void 0, function* () {
         let issueId;
@@ -137,6 +138,7 @@ function createIssue(branch, commitAge, lastCommitter) {
             });
             issueId = issueResponse.data.id;
             assert.ok(issueId, 'Issue ID cannot be empty');
+            core.info((0, log_new_issue_1.logNewIssue)(branch));
         }
         catch (err) {
             if (err instanceof Error)
@@ -698,6 +700,26 @@ exports.logLastCommitColor = logLastCommitColor;
 
 /***/ }),
 
+/***/ 2344:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.logNewIssue = void 0;
+const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+function logNewIssue(branchName) {
+    const newIssue = `${ansi_styles_1.default.bold.open}New issue created:${ansi_styles_1.default.bold.close} ${ansi_styles_1.default.magentaBright.open}[${branchName}] is STALE${ansi_styles_1.default.magentaBright.close}.`;
+    return newIssue;
+}
+exports.logNewIssue = logNewIssue;
+
+
+/***/ }),
+
 /***/ 2914:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -867,7 +889,6 @@ function run() {
                     if (!existingIssue.data.find(findIssue => findIssue.title === `[${branchName}] is STALE`) && issueBudgetRemaining > 0) {
                         yield (0, create_issue_1.createIssue)(branchName, commitAge, lastCommitLogin);
                         issueBudgetRemaining--;
-                        core.info(`${ansi_styles_1.default.bold.open}New issue created:${ansi_styles_1.default.bold.close} ${ansi_styles_1.default.yellowBright.open}[${branchName}] is STALE${ansi_styles_1.default.yellowBright.close}.`);
                         core.info(`[${ansi_styles_1.default.magenta.open}${issueBudgetRemaining}${ansi_styles_1.default.magenta.close}] max-issues budget remaining.`);
                         outputStales.push(branchName);
                     }
