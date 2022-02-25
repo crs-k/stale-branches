@@ -15,12 +15,6 @@ on:
   workflow_dispatch:
   push:
     branches: [ main ]
-  pull_request:
-    # The branches below must be a subset of the branches above
-    branches: [ main ]
-    paths-ignore:
-      - '**/*.md'
-      - '**/*.txt'
   schedule:
     - cron: '0 19 * * 1'
 
