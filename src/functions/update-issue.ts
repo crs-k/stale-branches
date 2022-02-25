@@ -37,9 +37,7 @@ export async function updateIssue(issueNumber: number, branch: string, commitAge
       createdAt = issueResponse.data.created_at
       commentUrl = issueResponse.data.html_url
       assert.ok(createdAt, 'Created At cannot be empty')
-      core.info(
-        `[${styles.blue.open}${branch}${styles.blue.close}] - Issue ${styles.yellowBright.open}#${issueNumber}${styles.yellowBright.close} comment was created at ${styles.magenta.open}${createdAt}${styles.magenta.close}. ${commentUrl}`
-      )
+      core.info(`Issue ${styles.yellowBright.open}#${issueNumber}${styles.yellowBright.close} comment was created at ${styles.magenta.open}${createdAt}${styles.magenta.close}. ${commentUrl}`)
     } catch (err) {
       if (err instanceof Error) core.info(`No existing issue returned for issue number: ${issueNumber}. Error: ${err.message}`)
       createdAt = ''

@@ -708,7 +708,7 @@ function updateIssue(issueNumber, branch, commitAge, lastCommitter) {
                 createdAt = issueResponse.data.created_at;
                 commentUrl = issueResponse.data.html_url;
                 assert.ok(createdAt, 'Created At cannot be empty');
-                core.info(`[${ansi_styles_1.default.blue.open}${branch}${ansi_styles_1.default.blue.close}] - Issue ${ansi_styles_1.default.yellowBright.open}#${issueNumber}${ansi_styles_1.default.yellowBright.close} comment was created at ${ansi_styles_1.default.magenta.open}${createdAt}${ansi_styles_1.default.magenta.close}. ${commentUrl}`);
+                core.info(`Issue ${ansi_styles_1.default.yellowBright.open}#${issueNumber}${ansi_styles_1.default.yellowBright.close} comment was created at ${ansi_styles_1.default.magenta.open}${createdAt}${ansi_styles_1.default.magenta.close}. ${commentUrl}`);
             }
             catch (err) {
                 if (err instanceof Error)
@@ -794,7 +794,7 @@ function run() {
                 const commitAge = (0, get_time_1.getDays)(currentDate, commitDate);
                 const branchName = branchToCheck.branchName;
                 core.startGroup(`[${ansi_styles_1.default.blue.open}${branchName}${ansi_styles_1.default.blue.close}]`);
-                core.info(`[${ansi_styles_1.default.blue.open}${branchName}${ansi_styles_1.default.blue.close}] - Last Commit [${ansi_styles_1.default.magenta.open}${commitAge.toString()}${ansi_styles_1.default.magenta.close}] days ago.`);
+                core.info(`Last Commit [${ansi_styles_1.default.magenta.open}${commitAge.toString()}${ansi_styles_1.default.magenta.close}] days ago.`);
                 //Create & Update issues for stale branches
                 if (commitAge > get_context_1.daysBeforeStale) {
                     const existingIssue = yield (0, get_issues_1.getIssues)();
