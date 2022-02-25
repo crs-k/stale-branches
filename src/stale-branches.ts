@@ -31,9 +31,9 @@ export async function run(): Promise<void> {
       const branchName = branchToCheck.branchName
       core.startGroup(`[${styles.blue.open}${branchName}${styles.blue.close}]`)
       core.info(
-        `[${styles.blue.open}${branchName}${
-          styles.blue.close
-        }] - Last Commit: ${commitAge.toString()} days ago.`
+        `[${styles.blue.open}${branchName}${styles.blue.close}] - Last Commit: ${
+          styles.magenta.open
+        }${commitAge.toString()}${styles.magenta.open} days ago.`
       )
       //Create & Update issues for stale branches
       if (commitAge > daysBeforeStale) {
