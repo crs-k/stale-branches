@@ -996,6 +996,8 @@ function run() {
                 const commitDate = new Date(lastCommitDate).getTime();
                 const commitAge = (0, get_time_1.getDays)(currentDate, commitDate);
                 const branchName = branchToCheck.branchName;
+                const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
+                core.info(JSON.stringify(filteredIssue));
                 core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchName, commitAge, get_context_1.daysBeforeStale, get_context_1.daysBeforeDelete));
                 core.info((0, log_last_commit_color_1.logLastCommitColor)(commitAge, get_context_1.daysBeforeStale, get_context_1.daysBeforeDelete));
                 //Create issues for stale branches
@@ -1010,8 +1012,6 @@ function run() {
                 }
                 //Close issues if a branch becomes active again
                 if (commitAge < get_context_1.daysBeforeStale) {
-                    //const existingIssue = await getIssues()
-                    const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
                     for (const issueToClose of filteredIssue) {
                         if (issueToClose.title === `[${branchName}] is STALE`) {
                             core.info((0, log_active_branch_1.logActiveBranch)(branchName));
@@ -1021,10 +1021,6 @@ function run() {
                 }
                 //Update existing issues
                 if (commitAge > get_context_1.daysBeforeStale) {
-                    //const existingIssue = await getIssues()
-                    //filter out issues that do not match this Action's title convention
-                    const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
-                    //Update existing issues
                     for (const issueToUpdate of filteredIssue) {
                         if (issueToUpdate.title === `[${branchName}] is STALE`) {
                             yield (0, update_issue_1.updateIssue)(issueToUpdate.number, branchName, commitAge, lastCommitLogin);
@@ -1034,8 +1030,6 @@ function run() {
                 }
                 //Delete expired branches
                 if (commitAge > get_context_1.daysBeforeDelete) {
-                    //const existingIssue = await getIssues()
-                    const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
                     for (const issueToDelete of filteredIssue) {
                         if (issueToDelete.title === `[${branchName}] is STALE`) {
                             yield (0, delete_branch_1.deleteBranch)(branchName);
