@@ -637,6 +637,26 @@ export function getnSeconds(date1, date2): number {
 
 /***/ }),
 
+/***/ 1182:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.logActiveBranch = void 0;
+const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+function logActiveBranch(branchName) {
+    const closeIssue = `[${ansi_styles_1.default.green.open}${branchName}${ansi_styles_1.default.green.close}] has become active again.`;
+    return closeIssue;
+}
+exports.logActiveBranch = logActiveBranch;
+
+
+/***/ }),
+
 /***/ 3839:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -887,9 +907,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
 const core = __importStar(__nccwpck_require__(2186));
@@ -903,10 +920,10 @@ const get_stale_issue_budget_1 = __nccwpck_require__(7705);
 const get_issues_1 = __nccwpck_require__(4298);
 const get_commit_date_1 = __nccwpck_require__(6267);
 const get_committer_login_1 = __nccwpck_require__(4764);
+const log_active_branch_1 = __nccwpck_require__(1182);
 const log_branch_group_color_1 = __nccwpck_require__(3839);
 const log_last_commit_color_1 = __nccwpck_require__(2965);
 const log_max_issues_1 = __nccwpck_require__(5487);
-const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 const update_issue_1 = __nccwpck_require__(2914);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -944,8 +961,7 @@ function run() {
                     const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
                     for (const issueToClose of filteredIssue) {
                         if (issueToClose.title === `[${branchName}] is STALE`) {
-                            core.info(`[${ansi_styles_1.default.blue.open}${branchName}${ansi_styles_1.default.blue.close}] has become active again.`);
-                            core.info(`Closing Issue ${ansi_styles_1.default.yellowBright.open}#${issueToClose.number}${ansi_styles_1.default.yellowBright.close}`);
+                            core.info((0, log_active_branch_1.logActiveBranch)(branchName));
                             yield (0, close_issue_1.closeIssue)(issueToClose.number);
                         }
                     }

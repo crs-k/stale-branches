@@ -9,10 +9,10 @@ import {getIssueBudget} from './functions/get-stale-issue-budget'
 import {getIssues} from './functions/get-issues'
 import {getRecentCommitDate} from './functions/get-commit-date'
 import {getRecentCommitLogin} from './functions/get-committer-login'
+import {logActiveBranch} from './functions/logging/log-active-branch'
 import {logBranchGroupColor} from './functions/logging/log-branch-group-color'
 import {logLastCommitColor} from './functions/logging/log-last-commit-color'
 import {logMaxIssues} from './functions/logging/log-max-issues'
-import styles from 'ansi-styles'
 import {updateIssue} from './functions/update-issue'
 
 export async function run(): Promise<void> {
@@ -57,8 +57,7 @@ export async function run(): Promise<void> {
         const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`)
         for (const issueToClose of filteredIssue) {
           if (issueToClose.title === `[${branchName}] is STALE`) {
-            core.info(`[${styles.blue.open}${branchName}${styles.blue.close}] has become active again.`)
-            core.info(`Closing Issue ${styles.yellowBright.open}#${issueToClose.number}${styles.yellowBright.close}`)
+            core.info(logActiveBranch(branchName))
             await closeIssue(issueToClose.number)
           }
         }
