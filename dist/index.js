@@ -638,7 +638,7 @@ export function getnSeconds(date1, date2): number {
 
 /***/ }),
 
-/***/ 5861:
+/***/ 3839:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -664,6 +664,36 @@ function logBranchGroupColor(branchName, commitAge, daysBeforeStale, daysBeforeD
     return groupColor;
 }
 exports.logBranchGroupColor = logBranchGroupColor;
+
+
+/***/ }),
+
+/***/ 2965:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.logLastCommitColor = void 0;
+const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+function logLastCommitColor(commitAge, daysBeforeStale, daysBeforeDelete) {
+    let commitColor = `Last Commit: ${ansi_styles_1.default.magenta.open}${commitAge.toString()}${ansi_styles_1.default.magenta.close} days ago.`;
+    //color group based on age of branch
+    if (commitAge > daysBeforeDelete) {
+        commitColor = `Last Commit: ${ansi_styles_1.default.redBright.open}${commitAge.toString()}${ansi_styles_1.default.redBright.close} days ago.`;
+    }
+    else if (commitAge > daysBeforeStale) {
+        commitColor = `Last Commit: ${ansi_styles_1.default.yellowBright.open}${commitAge.toString()}${ansi_styles_1.default.yellowBright.close} days ago.`;
+    }
+    else if (commitAge < daysBeforeStale) {
+        commitColor = `Last Commit: ${ansi_styles_1.default.greenBright.open}${commitAge.toString()}${ansi_styles_1.default.greenBright.close} days ago.`;
+    }
+    return commitColor;
+}
+exports.logLastCommitColor = logLastCommitColor;
 
 
 /***/ }),
@@ -807,7 +837,8 @@ const get_stale_issue_budget_1 = __nccwpck_require__(7705);
 const get_issues_1 = __nccwpck_require__(4298);
 const get_commit_date_1 = __nccwpck_require__(6267);
 const get_committer_login_1 = __nccwpck_require__(4764);
-const log_branch_group_color_1 = __nccwpck_require__(5861);
+const log_branch_group_color_1 = __nccwpck_require__(3839);
+const log_last_commit_color_1 = __nccwpck_require__(2965);
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 const update_issue_1 = __nccwpck_require__(2914);
 function run() {
@@ -820,7 +851,8 @@ function run() {
             let issueBudgetRemaining = yield (0, get_stale_issue_budget_1.getIssueBudget)();
             // Assess Branches
             for (const branchToCheck of branches) {
-                // if (issueBudgetRemaining < 1) break
+                if (issueBudgetRemaining < 1)
+                    break;
                 const lastCommitDate = yield (0, get_commit_date_1.getRecentCommitDate)(branchToCheck.commmitSha);
                 const lastCommitLogin = yield (0, get_committer_login_1.getRecentCommitLogin)(branchToCheck.commmitSha);
                 const currentDate = new Date().getTime();
@@ -828,7 +860,7 @@ function run() {
                 const commitAge = (0, get_time_1.getDays)(currentDate, commitDate);
                 const branchName = branchToCheck.branchName;
                 core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchName, commitAge, get_context_1.daysBeforeStale, get_context_1.daysBeforeDelete));
-                core.info(`Last Commit: ${ansi_styles_1.default.magenta.open}${commitAge.toString()}${ansi_styles_1.default.magenta.close} days ago.`);
+                core.info((0, log_last_commit_color_1.logLastCommitColor)(commitAge, get_context_1.daysBeforeStale, get_context_1.daysBeforeDelete));
                 //Create issues for stale branches
                 if (commitAge > get_context_1.daysBeforeStale) {
                     const existingIssue = yield (0, get_issues_1.getIssues)();
@@ -880,8 +912,8 @@ function run() {
                 }
                 core.endGroup();
             }
-            core.notice(`${ansi_styles_1.default.yellowBright.open}Stale Branches${ansi_styles_1.default.yellowBright.close}:  ${JSON.stringify(outputStales)}`);
-            core.notice(`${ansi_styles_1.default.redBright.open}Deleted Branches${ansi_styles_1.default.redBright.close}:  ${JSON.stringify(outputDeletes)}`);
+            core.notice(`Stale Branches:  ${JSON.stringify(outputStales)}`);
+            core.notice(`Deleted Branches:  ${JSON.stringify(outputDeletes)}`);
             core.setOutput('stale-branches', JSON.stringify(outputStales));
             core.setOutput('deleted-branches', JSON.stringify(outputDeletes));
         }

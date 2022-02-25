@@ -9,7 +9,8 @@ import {getIssueBudget} from './functions/get-stale-issue-budget'
 import {getIssues} from './functions/get-issues'
 import {getRecentCommitDate} from './functions/get-commit-date'
 import {getRecentCommitLogin} from './functions/get-committer-login'
-import {logBranchGroupColor} from './functions/log-branch-group-color'
+import {logBranchGroupColor} from './functions/logging/log-branch-group-color'
+import {logLastCommitColor} from './functions/logging/log-last-commit-color'
 import styles from 'ansi-styles'
 import {updateIssue} from './functions/update-issue'
 
@@ -23,7 +24,7 @@ export async function run(): Promise<void> {
 
     // Assess Branches
     for (const branchToCheck of branches) {
-      // if (issueBudgetRemaining < 1) break
+      if (issueBudgetRemaining < 1) break
 
       const lastCommitDate = await getRecentCommitDate(branchToCheck.commmitSha)
       const lastCommitLogin = await getRecentCommitLogin(branchToCheck.commmitSha)
@@ -33,7 +34,7 @@ export async function run(): Promise<void> {
       const branchName = branchToCheck.branchName
 
       core.startGroup(logBranchGroupColor(branchName, commitAge, daysBeforeStale, daysBeforeDelete))
-      core.info(`Last Commit: ${styles.magenta.open}${commitAge.toString()}${styles.magenta.close} days ago.`)
+      core.info(logLastCommitColor(commitAge, daysBeforeStale, daysBeforeDelete))
 
       //Create issues for stale branches
       if (commitAge > daysBeforeStale) {
@@ -90,8 +91,8 @@ export async function run(): Promise<void> {
       }
       core.endGroup()
     }
-    core.notice(`${styles.yellowBright.open}Stale Branches${styles.yellowBright.close}:  ${JSON.stringify(outputStales)}`)
-    core.notice(`${styles.redBright.open}Deleted Branches${styles.redBright.close}:  ${JSON.stringify(outputDeletes)}`)
+    core.notice(`Stale Branches:  ${JSON.stringify(outputStales)}`)
+    core.notice(`Deleted Branches:  ${JSON.stringify(outputDeletes)}`)
     core.setOutput('stale-branches', JSON.stringify(outputStales))
     core.setOutput('deleted-branches', JSON.stringify(outputDeletes))
   } catch (error) {
