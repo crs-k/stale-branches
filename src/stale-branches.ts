@@ -9,6 +9,7 @@ import {getIssueBudget} from './functions/get-stale-issue-budget'
 import {getIssues} from './functions/get-issues'
 import {getRecentCommitDate} from './functions/get-commit-date'
 import {getRecentCommitLogin} from './functions/get-committer-login'
+import styles from 'ansi-styles'
 import {updateIssue} from './functions/update-issue'
 
 export async function run(): Promise<void> {
@@ -28,7 +29,7 @@ export async function run(): Promise<void> {
       const commitDate = new Date(lastCommitDate).getTime()
       const commitAge = getDays(currentDate, commitDate)
       const branchName = branchToCheck.branchName
-      core.startGroup(`[${branchName}]x`)
+      core.startGroup(`${styles.green.open}[${branchName}]${styles.green.close}`)
       //Create & Update issues for stale branches
       if (commitAge > daysBeforeStale) {
         const existingIssue = await getIssues()
