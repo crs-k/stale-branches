@@ -984,6 +984,7 @@ function run() {
         try {
             //Collect Branches & budget
             const branches = yield (0, get_branches_1.getBranches)();
+            const outputTotal = branches.length;
             let issueBudgetRemaining = yield (0, get_stale_issue_budget_1.getIssueBudget)();
             const existingIssue = yield (0, get_issues_1.getIssues)();
             // Assess Branches
@@ -1039,6 +1040,7 @@ function run() {
                 }
                 core.endGroup();
             }
+            core.notice(`Total Branches:  ${outputTotal}`);
             core.notice(`Stale Branches:  ${outputStales.length}`);
             core.notice(`Deleted Branches:  ${outputDeletes.length}`);
             core.setOutput('stale-branches', JSON.stringify(outputStales));

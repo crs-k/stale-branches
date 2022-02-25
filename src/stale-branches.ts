@@ -21,6 +21,7 @@ export async function run(): Promise<void> {
   try {
     //Collect Branches & budget
     const branches = await getBranches()
+    const outputTotal = branches.length
     let issueBudgetRemaining = await getIssueBudget()
     const existingIssue = await getIssues()
 
@@ -82,6 +83,7 @@ export async function run(): Promise<void> {
       }
       core.endGroup()
     }
+    core.notice(`Total Branches:  ${outputTotal}`)
     core.notice(`Stale Branches:  ${outputStales.length}`)
     core.notice(`Deleted Branches:  ${outputDeletes.length}`)
     core.setOutput('stale-branches', JSON.stringify(outputStales))
