@@ -22,6 +22,7 @@ export async function run(): Promise<void> {
     //Collect Branches & budget
     const branches = await getBranches()
     let issueBudgetRemaining = await getIssueBudget()
+    const existingIssue = await getIssues()
 
     // Assess Branches
     for (const branchToCheck of branches) {
@@ -39,8 +40,6 @@ export async function run(): Promise<void> {
 
       //Create issues for stale branches
       if (commitAge > daysBeforeStale) {
-        const existingIssue = await getIssues()
-
         //Create new issue if existing issue is not found & issue budget is >0
         if (!existingIssue.data.find(findIssue => findIssue.title === `[${branchName}] is STALE`) && issueBudgetRemaining > 0) {
           await createIssue(branchName, commitAge, lastCommitLogin)
@@ -53,7 +52,7 @@ export async function run(): Promise<void> {
 
       //Close issues if a branch becomes active again
       if (commitAge < daysBeforeStale) {
-        const existingIssue = await getIssues()
+        //const existingIssue = await getIssues()
         const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`)
         for (const issueToClose of filteredIssue) {
           if (issueToClose.title === `[${branchName}] is STALE`) {
@@ -65,7 +64,7 @@ export async function run(): Promise<void> {
 
       //Update existing issues
       if (commitAge > daysBeforeStale) {
-        const existingIssue = await getIssues()
+        //const existingIssue = await getIssues()
         //filter out issues that do not match this Action's title convention
         const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`)
         //Update existing issues
@@ -79,7 +78,7 @@ export async function run(): Promise<void> {
 
       //Delete expired branches
       if (commitAge > daysBeforeDelete) {
-        const existingIssue = await getIssues()
+        //const existingIssue = await getIssues()
         const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`)
         for (const issueToDelete of filteredIssue) {
           if (issueToDelete.title === `[${branchName}] is STALE`) {
