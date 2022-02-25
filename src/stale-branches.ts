@@ -30,6 +30,11 @@ export async function run(): Promise<void> {
       const commitAge = getDays(currentDate, commitDate)
       const branchName = branchToCheck.branchName
       core.startGroup(`[${styles.green.open}${branchName}${styles.green.close}]`)
+      core.info(
+        `[${styles.green.open}${branchName}${
+          styles.green.close
+        }] - Last Commit: ${commitAge.toString()} days ago.`
+      )
       //Create & Update issues for stale branches
       if (commitAge > daysBeforeStale) {
         const existingIssue = await getIssues()
@@ -68,7 +73,6 @@ export async function run(): Promise<void> {
         for (const issueToClose of filteredIssue) {
           if (issueToClose.title === `[${branchName}] is STALE`) {
             core.info(`${branchName} has become active again.`)
-            core.info(` Last Commit: ${commitAge.toString()} days ago.`)
             core.info(` Closing Issue #${issueToClose.number}`)
             await closeIssue(issueToClose.number)
           }

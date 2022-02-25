@@ -782,6 +782,7 @@ function run() {
                 const commitAge = (0, get_time_1.getDays)(currentDate, commitDate);
                 const branchName = branchToCheck.branchName;
                 core.startGroup(`[${ansi_styles_1.default.green.open}${branchName}${ansi_styles_1.default.green.close}]`);
+                core.info(`[${ansi_styles_1.default.green.open}${branchName}${ansi_styles_1.default.green.close}] - Last Commit: ${commitAge.toString()} days ago.`);
                 //Create & Update issues for stale branches
                 if (commitAge > get_context_1.daysBeforeStale) {
                     const existingIssue = yield (0, get_issues_1.getIssues)();
@@ -811,7 +812,6 @@ function run() {
                     for (const issueToClose of filteredIssue) {
                         if (issueToClose.title === `[${branchName}] is STALE`) {
                             core.info(`${branchName} has become active again.`);
-                            core.info(` Last Commit: ${commitAge.toString()} days ago.`);
                             core.info(` Closing Issue #${issueToClose.number}`);
                             yield (0, close_issue_1.closeIssue)(issueToClose.number);
                         }
