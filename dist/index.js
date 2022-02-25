@@ -772,13 +772,13 @@ function run() {
             for (const branchToCheck of branches) {
                 if (issueBudgetRemaining < 1)
                     break;
-                core.startGroup(`[${branchToCheck}]`);
                 const lastCommitDate = yield (0, get_commit_date_1.getRecentCommitDate)(branchToCheck.commmitSha);
                 const lastCommitLogin = yield (0, get_committer_login_1.getRecentCommitLogin)(branchToCheck.commmitSha);
                 const currentDate = new Date().getTime();
                 const commitDate = new Date(lastCommitDate).getTime();
                 const commitAge = (0, get_time_1.getDays)(currentDate, commitDate);
                 const branchName = branchToCheck.branchName;
+                core.startGroup(`[${branchName}]`);
                 //Create & Update issues for stale branches
                 if (commitAge > get_context_1.daysBeforeStale) {
                     const existingIssue = yield (0, get_issues_1.getIssues)();
