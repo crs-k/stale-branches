@@ -774,7 +774,7 @@ function run() {
             //Collect Branches & budget
             const branches = yield (0, get_branches_1.getBranches)();
             let issueBudgetRemaining = yield (0, get_stale_issue_budget_1.getIssueBudget)();
-            core.info(`Issue Budget Remaining: ${ansi_styles_1.default.magenta.open}${issueBudgetRemaining}${ansi_styles_1.default.magenta.close}.`);
+            core.info(`[${ansi_styles_1.default.magenta.open}${issueBudgetRemaining}${ansi_styles_1.default.magenta.close}] issue budget remaining.`);
             // Assess Branches
             for (const branchToCheck of branches) {
                 if (issueBudgetRemaining < 1)
@@ -786,7 +786,7 @@ function run() {
                 const commitAge = (0, get_time_1.getDays)(currentDate, commitDate);
                 const branchName = branchToCheck.branchName;
                 core.startGroup(`[${ansi_styles_1.default.blue.open}${branchName}${ansi_styles_1.default.blue.close}]`);
-                core.info(`[${ansi_styles_1.default.blue.open}${branchName}${ansi_styles_1.default.blue.close}] - Last Commit: ${ansi_styles_1.default.magenta.open}${commitAge.toString()}${ansi_styles_1.default.magenta.close} days ago.`);
+                core.info(`[${ansi_styles_1.default.blue.open}${branchName}${ansi_styles_1.default.blue.close}] - Last Commit [${ansi_styles_1.default.magenta.open}${commitAge.toString()}${ansi_styles_1.default.magenta.close}] days ago.`);
                 //Create & Update issues for stale branches
                 if (commitAge > get_context_1.daysBeforeStale) {
                     const existingIssue = yield (0, get_issues_1.getIssues)();
@@ -795,7 +795,7 @@ function run() {
                         yield (0, create_issue_1.createIssue)(branchName, commitAge, lastCommitLogin);
                         issueBudgetRemaining--;
                         core.info(`New issue created: [${branchName}] is STALE`);
-                        core.info(`Issue Budget Remaining: ${ansi_styles_1.default.magenta.open}${issueBudgetRemaining}${ansi_styles_1.default.magenta.close}.`);
+                        core.info(`[${ansi_styles_1.default.magenta.open}${issueBudgetRemaining}${ansi_styles_1.default.magenta.close}] issue budget remaining.`);
                         outputStales.push(branchName);
                     }
                     //filter out issues that do not match this Action's title convention

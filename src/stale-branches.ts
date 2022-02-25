@@ -19,7 +19,7 @@ export async function run(): Promise<void> {
     //Collect Branches & budget
     const branches = await getBranches()
     let issueBudgetRemaining = await getIssueBudget()
-    core.info(`Issue Budget Remaining: ${styles.magenta.open}${issueBudgetRemaining}${styles.magenta.close}.`)
+    core.info(`[${styles.magenta.open}${issueBudgetRemaining}${styles.magenta.close}] issue budget remaining.`)
 
     // Assess Branches
     for (const branchToCheck of branches) {
@@ -31,7 +31,7 @@ export async function run(): Promise<void> {
       const commitAge = getDays(currentDate, commitDate)
       const branchName = branchToCheck.branchName
       core.startGroup(`[${styles.blue.open}${branchName}${styles.blue.close}]`)
-      core.info(`[${styles.blue.open}${branchName}${styles.blue.close}] - Last Commit: ${styles.magenta.open}${commitAge.toString()}${styles.magenta.close} days ago.`)
+      core.info(`[${styles.blue.open}${branchName}${styles.blue.close}] - Last Commit [${styles.magenta.open}${commitAge.toString()}${styles.magenta.close}] days ago.`)
       //Create & Update issues for stale branches
       if (commitAge > daysBeforeStale) {
         const existingIssue = await getIssues()
@@ -41,7 +41,7 @@ export async function run(): Promise<void> {
           await createIssue(branchName, commitAge, lastCommitLogin)
           issueBudgetRemaining--
           core.info(`New issue created: [${branchName}] is STALE`)
-          core.info(`Issue Budget Remaining: ${styles.magenta.open}${issueBudgetRemaining}${styles.magenta.close}.`)
+          core.info(`[${styles.magenta.open}${issueBudgetRemaining}${styles.magenta.close}] issue budget remaining.`)
           outputStales.push(branchName)
         }
 

@@ -10,7 +10,7 @@
     "format-check": "prettier --check **/*.ts",
     "lint": "eslint src/**/*.ts",
     "package": "set NODE_OPTIONS=--openssl-legacy-provider && ncc build --source-map",
-    "test": "jest --coverage --no-colors",
+    "test": "jest --coverage",
     "all": "npm run format && npm run lint && npm test && npm run build && npm run package"
   },
   "repository": {
