@@ -7,9 +7,10 @@ const core = require('@actions/core')
 const assert = require('assert')
 import {closeIssue} from '../../src/functions/close-issue'
 import {github} from '../../src/functions/get-context'
-import styles from 'ansi-styles'
+import {logCloseIssue} from '../../src/functions/logging/log-close-issue'
 
 let issueNumber = 1
+let state = 'closed'
 
 describe('Close Issue Function', () => {
   test('closeIssue endpoint is called', async () => {
@@ -28,7 +29,7 @@ describe('Close Issue Function', () => {
   test('Infos are set', async () => {
     core.info = jest.fn()
     await closeIssue(issueNumber)
-    expect(core.info).toHaveBeenCalledWith(`Issue ${styles.yellowBright.open}#1${styles.yellowBright.close}'s state was changed to ${styles.magenta.open}closed${styles.magenta.close}.`)
+    expect(core.info).toHaveBeenCalledWith(logCloseIssue(issueNumber, state))
   })
 
   test('Action fails elegantly', async () => {

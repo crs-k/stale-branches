@@ -34,15 +34,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.closeIssue = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
-const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+const log_close_issue_1 = __nccwpck_require__(3730);
 function closeIssue(issueNumber) {
     return __awaiter(this, void 0, void 0, function* () {
         let state;
@@ -55,7 +52,7 @@ function closeIssue(issueNumber) {
             });
             state = issueResponse.data.state;
             assert.ok(state, 'State cannot be empty');
-            core.info(`Issue ${ansi_styles_1.default.yellowBright.open}#${issueNumber}${ansi_styles_1.default.yellowBright.close}'s state was changed to ${ansi_styles_1.default.magenta.open}${state}${ansi_styles_1.default.magenta.close}.`);
+            core.info((0, log_close_issue_1.logCloseIssue)(issueNumber, state));
         }
         catch (err) {
             if (err instanceof Error)
@@ -666,6 +663,26 @@ function logBranchGroupColor(branchName, commitAge, daysBeforeStale, daysBeforeD
     return groupColor;
 }
 exports.logBranchGroupColor = logBranchGroupColor;
+
+
+/***/ }),
+
+/***/ 3730:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.logCloseIssue = void 0;
+const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+function logCloseIssue(issueNumber, state) {
+    const closeIssue = `Issue ${ansi_styles_1.default.cyanBright.open}#${issueNumber}${ansi_styles_1.default.cyanBright.close}'s state was changed to ${ansi_styles_1.default.redBright.open}${state}${ansi_styles_1.default.redBright.close}.`;
+    return closeIssue;
+}
+exports.logCloseIssue = logCloseIssue;
 
 
 /***/ }),
