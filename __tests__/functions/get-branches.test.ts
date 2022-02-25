@@ -15,7 +15,7 @@ describe('Get Branches Function', () => {
     await getBranches()
 
     expect(github.paginate).toHaveBeenCalled()
-    expect(core.info).toHaveBeenCalledWith(`6 branches found.`)
+    expect(core.info).toHaveBeenCalledWith(`[6] branches found.`)
     expect(assert.ok).toHaveBeenCalled()
   })
 
