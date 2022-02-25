@@ -7,6 +7,7 @@ const core = require('@actions/core')
 const assert = require('assert')
 import {closeIssue} from '../../src/functions/close-issue'
 import {github} from '../../src/functions/get-context'
+import styles from 'ansi-styles'
 
 let issueNumber = 1
 
@@ -27,7 +28,7 @@ describe('Close Issue Function', () => {
   test('Infos are set', async () => {
     core.info = jest.fn()
     await closeIssue(issueNumber)
-    expect(core.info).toHaveBeenCalledWith(`Issue #1's state was changed to closed.`)
+    expect(core.info).toHaveBeenCalledWith(`Issue ${styles.yellowBright.open}#1${styles.yellowBright.close}'s state was changed to ${styles.magenta.open}closed${styles.magenta.close}.`)
   })
 
   test('Action fails elegantly', async () => {

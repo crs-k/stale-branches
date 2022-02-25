@@ -34,11 +34,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.closeIssue = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
+const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function closeIssue(issueNumber) {
     return __awaiter(this, void 0, void 0, function* () {
         let state;
@@ -51,7 +55,7 @@ function closeIssue(issueNumber) {
             });
             state = issueResponse.data.state;
             assert.ok(state, 'State cannot be empty');
-            core.info(`Issue #${issueNumber}'s state was changed to ${state}.`);
+            core.info(`Issue ${ansi_styles_1.default.yellowBright.open}#${issueNumber}${ansi_styles_1.default.yellowBright.close}'s state was changed to ${ansi_styles_1.default.magenta.open}${state}${ansi_styles_1.default.magenta.close}.`);
         }
         catch (err) {
             if (err instanceof Error)
@@ -823,7 +827,7 @@ function run() {
                     for (const issueToClose of filteredIssue) {
                         if (issueToClose.title === `[${branchName}] is STALE`) {
                             core.info(`[${ansi_styles_1.default.blue.open}${branchName}${ansi_styles_1.default.blue.close}] has become active again.`);
-                            core.info(`Closing Issue [${ansi_styles_1.default.yellowBright.open}#${issueToClose.number}${ansi_styles_1.default.yellowBright.close}]`);
+                            core.info(`Closing Issue ${ansi_styles_1.default.yellowBright.open}#${issueToClose.number}${ansi_styles_1.default.yellowBright.close}`);
                             yield (0, close_issue_1.closeIssue)(issueToClose.number);
                         }
                     }

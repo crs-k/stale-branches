@@ -62,7 +62,7 @@ export async function run(): Promise<void> {
         for (const issueToClose of filteredIssue) {
           if (issueToClose.title === `[${branchName}] is STALE`) {
             core.info(`[${styles.blue.open}${branchName}${styles.blue.close}] has become active again.`)
-            core.info(`Closing Issue [${styles.yellowBright.open}#${issueToClose.number}${styles.yellowBright.close}]`)
+            core.info(`Closing Issue ${styles.yellowBright.open}#${issueToClose.number}${styles.yellowBright.close}`)
             await closeIssue(issueToClose.number)
           }
         }
