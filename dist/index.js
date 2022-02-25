@@ -188,6 +188,7 @@ exports.deleteBranch = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
+const log_delete_branch_1 = __nccwpck_require__(4083);
 function deleteBranch(name) {
     return __awaiter(this, void 0, void 0, function* () {
         let confirm;
@@ -202,7 +203,7 @@ function deleteBranch(name) {
             });
             confirm = response.status;
             assert.ok(response, 'response cannot be empty');
-            core.info(`Branch: ${refFull} has been deleted.`);
+            core.info((0, log_delete_branch_1.logDeleteBranch)(refFull));
         }
         catch (err) {
             if (err instanceof Error)
@@ -703,6 +704,26 @@ function logCloseIssue(issueNumber, state) {
     return closeIssue;
 }
 exports.logCloseIssue = logCloseIssue;
+
+
+/***/ }),
+
+/***/ 4083:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.logDeleteBranch = void 0;
+const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+function logDeleteBranch(refFull) {
+    const deleteBranch = `Branch: ${ansi_styles_1.default.redBright.open}${refFull}${ansi_styles_1.default.redBright.close} has been ${ansi_styles_1.default.redBright.open}deleted${ansi_styles_1.default.redBright.close}.`;
+    return deleteBranch;
+}
+exports.logDeleteBranch = logDeleteBranch;
 
 
 /***/ }),
