@@ -22,14 +22,13 @@ export async function run(): Promise<void> {
     // Assess Branches
     for (const branchToCheck of branches) {
       if (issueBudgetRemaining < 1) break
-      core.startGroup(`[${branchToCheck}]`)
       const lastCommitDate = await getRecentCommitDate(branchToCheck.commmitSha)
       const lastCommitLogin = await getRecentCommitLogin(branchToCheck.commmitSha)
       const currentDate = new Date().getTime()
       const commitDate = new Date(lastCommitDate).getTime()
       const commitAge = getDays(currentDate, commitDate)
       const branchName = branchToCheck.branchName
-
+      core.startGroup(`[${branchName}]`)
       //Create & Update issues for stale branches
       if (commitAge > daysBeforeStale) {
         const existingIssue = await getIssues()
