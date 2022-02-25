@@ -11,6 +11,7 @@ import {getRecentCommitDate} from './functions/get-commit-date'
 import {getRecentCommitLogin} from './functions/get-committer-login'
 import {logBranchGroupColor} from './functions/logging/log-branch-group-color'
 import {logLastCommitColor} from './functions/logging/log-last-commit-color'
+import {logMaxIssues} from './functions/logging/log-max-issues'
 import styles from 'ansi-styles'
 import {updateIssue} from './functions/update-issue'
 
@@ -45,7 +46,7 @@ export async function run(): Promise<void> {
           await createIssue(branchName, commitAge, lastCommitLogin)
           issueBudgetRemaining--
 
-          core.info(`[${styles.magenta.open}${issueBudgetRemaining}${styles.magenta.close}] max-issues budget remaining.`)
+          core.info(logMaxIssues(issueBudgetRemaining))
           outputStales.push(branchName)
         }
       }

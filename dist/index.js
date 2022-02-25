@@ -700,6 +700,33 @@ exports.logLastCommitColor = logLastCommitColor;
 
 /***/ }),
 
+/***/ 5487:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.logMaxIssues = void 0;
+const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+function logMaxIssues(issueBudgetRemaining) {
+    let maxIssues = `[${ansi_styles_1.default.magenta.open}${issueBudgetRemaining}${ansi_styles_1.default.magenta.close}] max-issues budget remaining.`;
+    //color group based on age of branch
+    if (issueBudgetRemaining < 1) {
+        maxIssues = `[${ansi_styles_1.default.redBright.open}${issueBudgetRemaining}${ansi_styles_1.default.redBright.close}] max-issues budget remaining.`;
+    }
+    else if (issueBudgetRemaining < 5) {
+        maxIssues = `[${ansi_styles_1.default.yellowBright.open}${issueBudgetRemaining}${ansi_styles_1.default.yellowBright.close}] max-issues budget remaining.`;
+    }
+    return maxIssues;
+}
+exports.logMaxIssues = logMaxIssues;
+
+
+/***/ }),
+
 /***/ 2344:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -861,6 +888,7 @@ const get_commit_date_1 = __nccwpck_require__(6267);
 const get_committer_login_1 = __nccwpck_require__(4764);
 const log_branch_group_color_1 = __nccwpck_require__(3839);
 const log_last_commit_color_1 = __nccwpck_require__(2965);
+const log_max_issues_1 = __nccwpck_require__(5487);
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 const update_issue_1 = __nccwpck_require__(2914);
 function run() {
@@ -889,7 +917,7 @@ function run() {
                     if (!existingIssue.data.find(findIssue => findIssue.title === `[${branchName}] is STALE`) && issueBudgetRemaining > 0) {
                         yield (0, create_issue_1.createIssue)(branchName, commitAge, lastCommitLogin);
                         issueBudgetRemaining--;
-                        core.info(`[${ansi_styles_1.default.magenta.open}${issueBudgetRemaining}${ansi_styles_1.default.magenta.close}] max-issues budget remaining.`);
+                        core.info((0, log_max_issues_1.logMaxIssues)(issueBudgetRemaining));
                         outputStales.push(branchName);
                     }
                 }
