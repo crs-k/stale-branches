@@ -3,7 +3,7 @@ import * as core from '@actions/core'
 import {github, maxIssues, owner, repo} from './get-context'
 // eslint-disable-next-line import/named
 import {GetResponseTypeFromEndpointMethod} from '@octokit/types'
-import styles from 'ansi-styles'
+import {logMaxIssues} from './logging/log-max-issues'
 
 type ListIssuesResponseDataType = GetResponseTypeFromEndpointMethod<typeof github.rest.issues.listForRepo>
 export async function getIssueBudget(): Promise<number> {
@@ -28,8 +28,6 @@ export async function getIssueBudget(): Promise<number> {
     core.setFailed(`Failed to calculate issue budget.`)
     issueBudgetRemaining = 0
   }
-  core.info(
-    `${styles.bold.open}[${styles.magenta.open}${issueBudgetRemaining}${styles.magenta.close}] ${styles.blueBright.open}max-issues budget remaining${styles.blueBright.close}.${styles.bold.close}`
-  )
+  core.info(logMaxIssues(issueBudgetRemaining))
   return issueBudgetRemaining
 }

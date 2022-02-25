@@ -557,15 +557,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getIssueBudget = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
-const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+const log_max_issues_1 = __nccwpck_require__(5487);
 function getIssueBudget() {
     return __awaiter(this, void 0, void 0, function* () {
         let issues;
@@ -590,7 +587,7 @@ function getIssueBudget() {
             core.setFailed(`Failed to calculate issue budget.`);
             issueBudgetRemaining = 0;
         }
-        core.info(`${ansi_styles_1.default.bold.open}[${ansi_styles_1.default.magenta.open}${issueBudgetRemaining}${ansi_styles_1.default.magenta.close}] ${ansi_styles_1.default.blueBright.open}max-issues budget remaining${ansi_styles_1.default.blueBright.close}.${ansi_styles_1.default.bold.close}`);
+        core.info((0, log_max_issues_1.logMaxIssues)(issueBudgetRemaining));
         return issueBudgetRemaining;
     });
 }
