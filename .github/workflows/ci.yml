@@ -51,7 +51,7 @@ jobs:
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
           days-before-stale: 2
-          max-issues: 28
+          max-issues: 4
           comment-updates: true
           tag-committer: true
 
