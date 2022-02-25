@@ -23,15 +23,18 @@ export async function run(): Promise<void> {
     // Assess Branches
     for (const branchToCheck of branches) {
       // if (issueBudgetRemaining < 1) break
+
       const lastCommitDate = await getRecentCommitDate(branchToCheck.commmitSha)
       const lastCommitLogin = await getRecentCommitLogin(branchToCheck.commmitSha)
       const currentDate = new Date().getTime()
       const commitDate = new Date(lastCommitDate).getTime()
       const commitAge = getDays(currentDate, commitDate)
       const branchName = branchToCheck.branchName
+
       core.startGroup(`[${styles.blue.open}${branchName}${styles.blue.close}]`)
       core.info(`Last Commit: ${styles.magenta.open}${commitAge.toString()}${styles.magenta.close} days ago.`)
-      //Create & Update issues for stale branches
+
+      //Create issues for stale branches
       if (commitAge > daysBeforeStale) {
         const existingIssue = await getIssues()
 
@@ -42,16 +45,6 @@ export async function run(): Promise<void> {
           core.info(`${styles.bold.open}New issue created:${styles.bold.close} ${styles.yellowBright.open}[${branchName}] is STALE${styles.yellowBright.close}.`)
           core.info(`[${styles.magenta.open}${issueBudgetRemaining}${styles.magenta.close}] max-issues budget remaining.`)
           outputStales.push(branchName)
-        }
-
-        //filter out issues that do not match this Action's title convention
-        const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`)
-        //Update existing issues
-        for (const issueToUpdate of filteredIssue) {
-          if (issueToUpdate.title === `[${branchName}] is STALE`) {
-            await updateIssue(issueToUpdate.number, branchName, commitAge, lastCommitLogin)
-            outputStales.push(branchName)
-          }
         }
       }
 
@@ -64,6 +57,20 @@ export async function run(): Promise<void> {
             core.info(`[${styles.blue.open}${branchName}${styles.blue.close}] has become active again.`)
             core.info(`Closing Issue ${styles.yellowBright.open}#${issueToClose.number}${styles.yellowBright.close}`)
             await closeIssue(issueToClose.number)
+          }
+        }
+      }
+
+      //Update existing issues
+      if (commitAge > daysBeforeStale) {
+        const existingIssue = await getIssues()
+        //filter out issues that do not match this Action's title convention
+        const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`)
+        //Update existing issues
+        for (const issueToUpdate of filteredIssue) {
+          if (issueToUpdate.title === `[${branchName}] is STALE`) {
+            await updateIssue(issueToUpdate.number, branchName, commitAge, lastCommitLogin)
+            outputStales.push(branchName)
           }
         }
       }

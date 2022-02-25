@@ -798,7 +798,7 @@ function run() {
                 const branchName = branchToCheck.branchName;
                 core.startGroup(`[${ansi_styles_1.default.blue.open}${branchName}${ansi_styles_1.default.blue.close}]`);
                 core.info(`Last Commit: ${ansi_styles_1.default.magenta.open}${commitAge.toString()}${ansi_styles_1.default.magenta.close} days ago.`);
-                //Create & Update issues for stale branches
+                //Create issues for stale branches
                 if (commitAge > get_context_1.daysBeforeStale) {
                     const existingIssue = yield (0, get_issues_1.getIssues)();
                     //Create new issue if existing issue is not found
@@ -808,15 +808,6 @@ function run() {
                         core.info(`${ansi_styles_1.default.bold.open}New issue created:${ansi_styles_1.default.bold.close} ${ansi_styles_1.default.yellowBright.open}[${branchName}] is STALE${ansi_styles_1.default.yellowBright.close}.`);
                         core.info(`[${ansi_styles_1.default.magenta.open}${issueBudgetRemaining}${ansi_styles_1.default.magenta.close}] max-issues budget remaining.`);
                         outputStales.push(branchName);
-                    }
-                    //filter out issues that do not match this Action's title convention
-                    const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
-                    //Update existing issues
-                    for (const issueToUpdate of filteredIssue) {
-                        if (issueToUpdate.title === `[${branchName}] is STALE`) {
-                            yield (0, update_issue_1.updateIssue)(issueToUpdate.number, branchName, commitAge, lastCommitLogin);
-                            outputStales.push(branchName);
-                        }
                     }
                 }
                 //Close issues if a branch becomes active again
@@ -828,6 +819,19 @@ function run() {
                             core.info(`[${ansi_styles_1.default.blue.open}${branchName}${ansi_styles_1.default.blue.close}] has become active again.`);
                             core.info(`Closing Issue ${ansi_styles_1.default.yellowBright.open}#${issueToClose.number}${ansi_styles_1.default.yellowBright.close}`);
                             yield (0, close_issue_1.closeIssue)(issueToClose.number);
+                        }
+                    }
+                }
+                //Update existing issues
+                if (commitAge > get_context_1.daysBeforeStale) {
+                    const existingIssue = yield (0, get_issues_1.getIssues)();
+                    //filter out issues that do not match this Action's title convention
+                    const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
+                    //Update existing issues
+                    for (const issueToUpdate of filteredIssue) {
+                        if (issueToUpdate.title === `[${branchName}] is STALE`) {
+                            yield (0, update_issue_1.updateIssue)(issueToUpdate.number, branchName, commitAge, lastCommitLogin);
+                            outputStales.push(branchName);
                         }
                     }
                 }
