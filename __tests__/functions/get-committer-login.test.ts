@@ -26,13 +26,13 @@ describe('Get Commits Function', () => {
   })
 
   test('Action fails elegantly', async () => {
-    core.warning = jest.fn()
+    core.info = jest.fn()
     assert.ok = jest.fn()
     assert.ok.mockImplementation(() => {
       throw new Error('Login cannot be empty.')
     })
 
     await getRecentCommitLogin(sha)
-    expect(core.warning).toHaveBeenCalledWith(`Failed to retrieve commit for 123 in repo. Error: Login cannot be empty.`)
+    expect(core.info).toHaveBeenCalledWith(`Failed to retrieve commit for 123 in repo. Error: Login cannot be empty.`)
   })
 })

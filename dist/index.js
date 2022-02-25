@@ -405,7 +405,7 @@ function getRecentCommitLogin(sha) {
         }
         catch (err) {
             if (err instanceof Error)
-                core.warning(`Failed to retrieve commit for ${sha} in ${get_context_1.repo}. Error: ${err.message}`);
+                core.info(`Failed to retrieve commit for ${sha} in ${get_context_1.repo}. Error: ${err.message}`);
             lastCommitter = '';
         }
         return lastCommitter;
@@ -987,7 +987,8 @@ function run() {
             let issueBudgetRemaining = yield (0, get_stale_issue_budget_1.getIssueBudget)();
             // Assess Branches
             for (const branchToCheck of branches) {
-                // if (issueBudgetRemaining < 1) break
+                if (issueBudgetRemaining < 1)
+                    break;
                 const lastCommitDate = yield (0, get_commit_date_1.getRecentCommitDate)(branchToCheck.commmitSha);
                 const lastCommitLogin = yield (0, get_committer_login_1.getRecentCommitLogin)(branchToCheck.commmitSha);
                 const currentDate = new Date().getTime();
@@ -1045,7 +1046,7 @@ function run() {
                 }
                 core.endGroup();
             }
-            core.notice(`Stale Branches:  ${JSON.stringify(outputStales)}`);
+            core.notice(`Stale Branches:  ${outputStales.length}`);
             core.notice(`Deleted Branches:  ${JSON.stringify(outputDeletes)}`);
             core.setOutput('stale-branches', JSON.stringify(outputStales));
             core.setOutput('deleted-branches', JSON.stringify(outputDeletes));

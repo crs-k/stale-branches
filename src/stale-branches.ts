@@ -25,7 +25,7 @@ export async function run(): Promise<void> {
 
     // Assess Branches
     for (const branchToCheck of branches) {
-      // if (issueBudgetRemaining < 1) break
+      if (issueBudgetRemaining < 1) break
 
       const lastCommitDate = await getRecentCommitDate(branchToCheck.commmitSha)
       const lastCommitLogin = await getRecentCommitLogin(branchToCheck.commmitSha)
@@ -91,7 +91,7 @@ export async function run(): Promise<void> {
       }
       core.endGroup()
     }
-    core.notice(`Stale Branches:  ${JSON.stringify(outputStales)}`)
+    core.notice(`Stale Branches:  ${outputStales.length}`)
     core.notice(`Deleted Branches:  ${JSON.stringify(outputDeletes)}`)
     core.setOutput('stale-branches', JSON.stringify(outputStales))
     core.setOutput('deleted-branches', JSON.stringify(outputDeletes))
