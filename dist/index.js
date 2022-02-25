@@ -794,7 +794,7 @@ function run() {
                 const commitAge = (0, get_time_1.getDays)(currentDate, commitDate);
                 const branchName = branchToCheck.branchName;
                 core.startGroup(`[${ansi_styles_1.default.blue.open}${branchName}${ansi_styles_1.default.blue.close}]`);
-                core.info(`Last Commit [${ansi_styles_1.default.magenta.open}${commitAge.toString()}${ansi_styles_1.default.magenta.close}] days ago.`);
+                core.info(`Last Commit: ${ansi_styles_1.default.magenta.open}${commitAge.toString()}${ansi_styles_1.default.magenta.close} days ago.`);
                 //Create & Update issues for stale branches
                 if (commitAge > get_context_1.daysBeforeStale) {
                     const existingIssue = yield (0, get_issues_1.getIssues)();
@@ -803,7 +803,7 @@ function run() {
                         yield (0, create_issue_1.createIssue)(branchName, commitAge, lastCommitLogin);
                         issueBudgetRemaining--;
                         core.info(`${ansi_styles_1.default.bold.open}New issue created:${ansi_styles_1.default.bold.close} ${ansi_styles_1.default.yellowBright.open}[${branchName}] is STALE${ansi_styles_1.default.yellowBright.close}.`);
-                        core.info(`[${ansi_styles_1.default.magenta.open}${issueBudgetRemaining}${ansi_styles_1.default.magenta.close}] issue budget remaining.`);
+                        core.info(`[${ansi_styles_1.default.magenta.open}${issueBudgetRemaining}${ansi_styles_1.default.magenta.close}] max-issues budget remaining.`);
                         outputStales.push(branchName);
                     }
                     //filter out issues that do not match this Action's title convention
@@ -822,8 +822,8 @@ function run() {
                     const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
                     for (const issueToClose of filteredIssue) {
                         if (issueToClose.title === `[${branchName}] is STALE`) {
-                            core.info(`${branchName} has become active again.`);
-                            core.info(` Closing Issue #${issueToClose.number}`);
+                            core.info(`[${ansi_styles_1.default.blue.open}${branchName}${ansi_styles_1.default.blue.close}] has become active again.`);
+                            core.info(`Closing Issue [${ansi_styles_1.default.yellowBright.open}#${issueToClose.number}${ansi_styles_1.default.yellowBright.close}]`);
                             yield (0, close_issue_1.closeIssue)(issueToClose.number);
                         }
                     }
@@ -842,8 +842,8 @@ function run() {
                 }
                 core.endGroup();
             }
-            core.notice(`Stale Branches:  ${JSON.stringify(outputStales)}`);
-            core.notice(`Deleted Branches:  ${JSON.stringify(outputDeletes)}`);
+            core.notice(`${ansi_styles_1.default.blue.open}Stale Branches${ansi_styles_1.default.blue.close}:  ${JSON.stringify(outputStales)}`);
+            core.notice(`${ansi_styles_1.default.blue.open}Deleted Branches${ansi_styles_1.default.blue.close}:  ${JSON.stringify(outputDeletes)}`);
             core.setOutput('stale-branches', JSON.stringify(outputStales));
             core.setOutput('deleted-branches', JSON.stringify(outputDeletes));
         }

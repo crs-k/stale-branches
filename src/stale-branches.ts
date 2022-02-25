@@ -30,7 +30,7 @@ export async function run(): Promise<void> {
       const commitAge = getDays(currentDate, commitDate)
       const branchName = branchToCheck.branchName
       core.startGroup(`[${styles.blue.open}${branchName}${styles.blue.close}]`)
-      core.info(`Last Commit [${styles.magenta.open}${commitAge.toString()}${styles.magenta.close}] days ago.`)
+      core.info(`Last Commit: ${styles.magenta.open}${commitAge.toString()}${styles.magenta.close} days ago.`)
       //Create & Update issues for stale branches
       if (commitAge > daysBeforeStale) {
         const existingIssue = await getIssues()
@@ -40,7 +40,7 @@ export async function run(): Promise<void> {
           await createIssue(branchName, commitAge, lastCommitLogin)
           issueBudgetRemaining--
           core.info(`${styles.bold.open}New issue created:${styles.bold.close} ${styles.yellowBright.open}[${branchName}] is STALE${styles.yellowBright.close}.`)
-          core.info(`[${styles.magenta.open}${issueBudgetRemaining}${styles.magenta.close}] issue budget remaining.`)
+          core.info(`[${styles.magenta.open}${issueBudgetRemaining}${styles.magenta.close}] max-issues budget remaining.`)
           outputStales.push(branchName)
         }
 
@@ -61,8 +61,8 @@ export async function run(): Promise<void> {
         const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`)
         for (const issueToClose of filteredIssue) {
           if (issueToClose.title === `[${branchName}] is STALE`) {
-            core.info(`${branchName} has become active again.`)
-            core.info(` Closing Issue #${issueToClose.number}`)
+            core.info(`[${styles.blue.open}${branchName}${styles.blue.close}] has become active again.`)
+            core.info(`Closing Issue [${styles.yellowBright.open}#${issueToClose.number}${styles.yellowBright.close}]`)
             await closeIssue(issueToClose.number)
           }
         }
@@ -82,8 +82,8 @@ export async function run(): Promise<void> {
       }
       core.endGroup()
     }
-    core.notice(`Stale Branches:  ${JSON.stringify(outputStales)}`)
-    core.notice(`Deleted Branches:  ${JSON.stringify(outputDeletes)}`)
+    core.notice(`${styles.blue.open}Stale Branches${styles.blue.close}:  ${JSON.stringify(outputStales)}`)
+    core.notice(`${styles.blue.open}Deleted Branches${styles.blue.close}:  ${JSON.stringify(outputDeletes)}`)
     core.setOutput('stale-branches', JSON.stringify(outputStales))
     core.setOutput('deleted-branches', JSON.stringify(outputDeletes))
   } catch (error) {
