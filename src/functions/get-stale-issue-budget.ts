@@ -29,7 +29,7 @@ export async function getIssueBudget(): Promise<number> {
     issueBudgetRemaining = 0
   }
   core.info(
-    `${styles.bold.open}[${styles.magenta.open}${issueBudgetRemaining}${styles.magenta.close}] ${styles.greenBright.open}max-issues budget remaining${styles.greenBright.close}.${styles.bold.close}`
+    `${styles.bold.open}[${styles.magenta.open}${issueBudgetRemaining}${styles.magenta.close}] ${styles.blueBright.open}max-issues budget remaining${styles.blueBright.close}.${styles.bold.close}`
   )
   return issueBudgetRemaining
 }

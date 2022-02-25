@@ -271,7 +271,7 @@ function getBranches() {
                 per_page: 100
             }, response => response.data.map(branch => ({ branchName: branch.name, commmitSha: branch.commit.sha })));
             branches = branchResponse;
-            core.info(`${ansi_styles_1.default.bold.open}[${ansi_styles_1.default.magenta.open}${branches.length}${ansi_styles_1.default.magenta.close}] ${ansi_styles_1.default.greenBright.open}branches found${ansi_styles_1.default.greenBright.close}.${ansi_styles_1.default.bold.close}`);
+            core.info(`${ansi_styles_1.default.bold.open}[${ansi_styles_1.default.magenta.open}${branches.length}${ansi_styles_1.default.magenta.close}] ${ansi_styles_1.default.blueBright.open}branches found${ansi_styles_1.default.blueBright.close}.${ansi_styles_1.default.bold.close}`);
             assert.ok(branches, 'Response cannot be empty.');
         }
         catch (err) {
@@ -593,7 +593,7 @@ function getIssueBudget() {
             core.setFailed(`Failed to calculate issue budget.`);
             issueBudgetRemaining = 0;
         }
-        core.info(`${ansi_styles_1.default.bold.open}[${ansi_styles_1.default.magenta.open}${issueBudgetRemaining}${ansi_styles_1.default.magenta.close}] ${ansi_styles_1.default.greenBright.open}max-issues budget remaining${ansi_styles_1.default.greenBright.close}.${ansi_styles_1.default.bold.close}`);
+        core.info(`${ansi_styles_1.default.bold.open}[${ansi_styles_1.default.magenta.open}${issueBudgetRemaining}${ansi_styles_1.default.magenta.close}] ${ansi_styles_1.default.blueBright.open}max-issues budget remaining${ansi_styles_1.default.blueBright.close}.${ansi_styles_1.default.bold.close}`);
         return issueBudgetRemaining;
     });
 }
@@ -659,7 +659,7 @@ function logBranchGroupColor(branchName, commitAge, daysBeforeStale, daysBeforeD
         groupColor = `[${ansi_styles_1.default.yellowBright.open}${branchName}${ansi_styles_1.default.yellowBright.close}]`;
     }
     else if (commitAge < daysBeforeStale) {
-        groupColor = `[${ansi_styles_1.default.blue.open}${branchName}${ansi_styles_1.default.blue.close}]`;
+        groupColor = `[${ansi_styles_1.default.greenBright.open}${branchName}${ansi_styles_1.default.greenBright.close}]`;
     }
     return groupColor;
 }
@@ -880,8 +880,8 @@ function run() {
                 }
                 core.endGroup();
             }
-            core.notice(`${ansi_styles_1.default.blue.open}Stale Branches${ansi_styles_1.default.blue.close}:  ${JSON.stringify(outputStales)}`);
-            core.notice(`${ansi_styles_1.default.blue.open}Deleted Branches${ansi_styles_1.default.blue.close}:  ${JSON.stringify(outputDeletes)}`);
+            core.notice(`${ansi_styles_1.default.yellowBright.open}Stale Branches${ansi_styles_1.default.yellowBright.close}:  ${JSON.stringify(outputStales)}`);
+            core.notice(`${ansi_styles_1.default.redBright.open}Deleted Branches${ansi_styles_1.default.redBright.close}:  ${JSON.stringify(outputDeletes)}`);
             core.setOutput('stale-branches', JSON.stringify(outputStales));
             core.setOutput('deleted-branches', JSON.stringify(outputDeletes));
         }

@@ -9,7 +9,7 @@ export function logBranchGroupColor(branchName, commitAge, daysBeforeStale, days
   } else if (commitAge > daysBeforeStale) {
     groupColor = `[${styles.yellowBright.open}${branchName}${styles.yellowBright.close}]`
   } else if (commitAge < daysBeforeStale) {
-    groupColor = `[${styles.blue.open}${branchName}${styles.blue.close}]`
+    groupColor = `[${styles.greenBright.open}${branchName}${styles.greenBright.close}]`
   }
 
   return groupColor

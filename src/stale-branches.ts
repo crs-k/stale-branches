@@ -90,8 +90,8 @@ export async function run(): Promise<void> {
       }
       core.endGroup()
     }
-    core.notice(`${styles.blue.open}Stale Branches${styles.blue.close}:  ${JSON.stringify(outputStales)}`)
-    core.notice(`${styles.blue.open}Deleted Branches${styles.blue.close}:  ${JSON.stringify(outputDeletes)}`)
+    core.notice(`${styles.yellowBright.open}Stale Branches${styles.yellowBright.close}:  ${JSON.stringify(outputStales)}`)
+    core.notice(`${styles.redBright.open}Deleted Branches${styles.redBright.close}:  ${JSON.stringify(outputDeletes)}`)
     core.setOutput('stale-branches', JSON.stringify(outputStales))
     core.setOutput('deleted-branches', JSON.stringify(outputDeletes))
   } catch (error) {

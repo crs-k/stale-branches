@@ -19,7 +19,7 @@ export async function getBranches(): Promise<BranchResponse[]> {
     )
     branches = branchResponse
 
-    core.info(`${styles.bold.open}[${styles.magenta.open}${branches.length}${styles.magenta.close}] ${styles.greenBright.open}branches found${styles.greenBright.close}.${styles.bold.close}`)
+    core.info(`${styles.bold.open}[${styles.magenta.open}${branches.length}${styles.magenta.close}] ${styles.blueBright.open}branches found${styles.blueBright.close}.${styles.bold.close}`)
     assert.ok(branches, 'Response cannot be empty.')
   } catch (err) {
     if (err instanceof Error) {
