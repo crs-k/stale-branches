@@ -267,7 +267,7 @@ function getBranches() {
                 per_page: 100
             }, response => response.data.map(branch => ({ branchName: branch.name, commmitSha: branch.commit.sha })));
             branches = branchResponse;
-            core.info(`[${ansi_styles_1.default.magenta.open}${branches.length}${ansi_styles_1.default.magenta.close}] branches found.`);
+            core.info(`${ansi_styles_1.default.bold.open}[${ansi_styles_1.default.magenta.open}${branches.length}${ansi_styles_1.default.magenta.close}] ${ansi_styles_1.default.greenBright.open}branches found${ansi_styles_1.default.greenBright.close}.${ansi_styles_1.default.bold.close}`);
             assert.ok(branches, 'Response cannot be empty.');
         }
         catch (err) {
