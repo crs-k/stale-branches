@@ -851,8 +851,7 @@ function run() {
             let issueBudgetRemaining = yield (0, get_stale_issue_budget_1.getIssueBudget)();
             // Assess Branches
             for (const branchToCheck of branches) {
-                if (issueBudgetRemaining < 1)
-                    break;
+                // if (issueBudgetRemaining < 1) break
                 const lastCommitDate = yield (0, get_commit_date_1.getRecentCommitDate)(branchToCheck.commmitSha);
                 const lastCommitLogin = yield (0, get_committer_login_1.getRecentCommitLogin)(branchToCheck.commmitSha);
                 const currentDate = new Date().getTime();
