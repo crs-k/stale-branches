@@ -1,12 +1,9 @@
 import * as assert from 'assert'
 import * as core from '@actions/core'
 import {daysBeforeDelete, github, owner, repo, tagLastCommitter} from './get-context'
+import {logNewIssue} from './logging/log-new-issue'
 
-export async function createIssue(
-  branch: string,
-  commitAge: number,
-  lastCommitter: string
-): Promise<number> {
+export async function createIssue(branch: string, commitAge: number, lastCommitter: string): Promise<number> {
   let issueId: number
   let bodyString: string
   const daysUntilDelete = Math.max(0, daysBeforeDelete - commitAge)
@@ -36,9 +33,9 @@ export async function createIssue(
     })
     issueId = issueResponse.data.id
     assert.ok(issueId, 'Issue ID cannot be empty')
+    core.info(logNewIssue(branch))
   } catch (err) {
-    if (err instanceof Error)
-      core.setFailed(`Failed to create issue for ${branch}. Error: ${err.message}`)
+    if (err instanceof Error) core.setFailed(`Failed to create issue for ${branch}. Error: ${err.message}`)
     issueId = 0
   }
 

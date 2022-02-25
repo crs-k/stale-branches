@@ -16,13 +16,9 @@ export const commentUpdates: boolean = true
 export const maxIssues: number = 20
 export const repoToken: string = '20'
 
-type ListIssuesResponseDataType = GetResponseTypeFromEndpointMethod<
-  typeof githubActual.github.rest.issues.listForRepo
->
+type ListIssuesResponseDataType = GetResponseTypeFromEndpointMethod<typeof githubActual.github.rest.issues.listForRepo>
 
-type ListBranchesResponseDataType = GetResponseTypeFromEndpointMethod<
-  typeof githubActual.github.rest.repos.listBranches
->
+type ListBranchesResponseDataType = GetResponseTypeFromEndpointMethod<typeof githubActual.github.rest.repos.listBranches>
 
 let branchesFiltered: BranchResponse[] = [
   {branchName: 'Branch 1', commmitSha: 'SHA 1'},

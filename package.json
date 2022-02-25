@@ -28,14 +28,14 @@
     "@octokit/plugin-paginate-rest": "2.17.0",
     "@octokit/types": "6.34.0",
     "@types/semver": "7.3.9",
-    "assert": "2.0.0",
-    "node-fetch": ">=3.1.1"
+    "assert": "2.0.0"
   },
   "devDependencies": {
     "@types/jest": "27.4.1",
     "@types/node": "17.0.21",
     "@typescript-eslint/parser": "5.12.1",
     "@vercel/ncc": "0.33.3",
+    "ansi-styles": "5.2.0",
     "eslint": "8.9.0",
     "eslint-plugin-github": "4.3.5",
     "eslint-plugin-jest": "26.1.1",

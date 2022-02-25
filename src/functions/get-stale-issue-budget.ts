@@ -3,10 +3,9 @@ import * as core from '@actions/core'
 import {github, maxIssues, owner, repo} from './get-context'
 // eslint-disable-next-line import/named
 import {GetResponseTypeFromEndpointMethod} from '@octokit/types'
+import {logMaxIssues} from './logging/log-max-issues'
 
-type ListIssuesResponseDataType = GetResponseTypeFromEndpointMethod<
-  typeof github.rest.issues.listForRepo
->
+type ListIssuesResponseDataType = GetResponseTypeFromEndpointMethod<typeof github.rest.issues.listForRepo>
 export async function getIssueBudget(): Promise<number> {
   let issues: ListIssuesResponseDataType
   let issueCount = 0
@@ -29,6 +28,6 @@ export async function getIssueBudget(): Promise<number> {
     core.setFailed(`Failed to calculate issue budget.`)
     issueBudgetRemaining = 0
   }
-  core.info(`Issue Budget Remaining: ${issueBudgetRemaining}.`)
+  core.info(logMaxIssues(issueBudgetRemaining))
   return issueBudgetRemaining
 }

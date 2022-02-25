@@ -33,8 +33,6 @@ describe('Get Commits Function', () => {
     })
 
     await getRecentCommitDate(sha)
-    expect(core.setFailed).toHaveBeenCalledWith(
-      `Failed to retrieve commit for 123 in repo. Error: Date cannot be empty.`
-    )
+    expect(core.setFailed).toHaveBeenCalledWith(`Failed to retrieve commit for 123 in repo. Error: Date cannot be empty.`)
   })
 })

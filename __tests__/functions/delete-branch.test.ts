@@ -24,8 +24,6 @@ describe('Delete Branch Function', () => {
     })
 
     await deleteBranch(branchName)
-    expect(core.error).toHaveBeenCalledWith(
-      `Failed to delete branch heads/test. Error: response cannot be empty`
-    )
+    expect(core.error).toHaveBeenCalledWith(`Failed to delete branch heads/test. Error: response cannot be empty`)
   })
 })

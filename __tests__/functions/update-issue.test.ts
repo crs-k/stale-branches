@@ -37,8 +37,6 @@ describe('Update Issue Function', () => {
     })
 
     await updateIssue(issueNumber, branchName, commitAge, lastCommitter)
-    expect(core.info).toHaveBeenCalledWith(
-      `No existing issue returned for issue number: 20. Error: Created At cannot be empty`
-    )
+    expect(core.info).toHaveBeenCalledWith(`No existing issue returned for issue number: 20. Error: Created At cannot be empty`)
   })
 })

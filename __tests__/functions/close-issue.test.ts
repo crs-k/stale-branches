@@ -7,8 +7,10 @@ const core = require('@actions/core')
 const assert = require('assert')
 import {closeIssue} from '../../src/functions/close-issue'
 import {github} from '../../src/functions/get-context'
+import {logCloseIssue} from '../../src/functions/logging/log-close-issue'
 
 let issueNumber = 1
+let state = 'closed'
 
 describe('Close Issue Function', () => {
   test('closeIssue endpoint is called', async () => {
@@ -27,7 +29,7 @@ describe('Close Issue Function', () => {
   test('Infos are set', async () => {
     core.info = jest.fn()
     await closeIssue(issueNumber)
-    expect(core.info).toHaveBeenCalledWith(`Issue #1's state was changed to closed.`)
+    expect(core.info).toHaveBeenCalledWith(logCloseIssue(issueNumber, state))
   })
 
   test('Action fails elegantly', async () => {
@@ -38,8 +40,6 @@ describe('Close Issue Function', () => {
     })
 
     await closeIssue(issueNumber)
-    expect(core.info).toHaveBeenCalledWith(
-      `No existing issue returned for issue number: 1. Description: State cannot be empty`
-    )
+    expect(core.info).toHaveBeenCalledWith(`No existing issue returned for issue number: 1. Description: State cannot be empty`)
   })
 })

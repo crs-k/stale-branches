@@ -34,8 +34,6 @@ describe('Create Issue Function', () => {
     })
 
     await createIssue(branchName, commitAge, lastCommitter)
-    expect(core.setFailed).toHaveBeenCalledWith(
-      `Failed to create issue for test. Error: Issue ID cannot be empty`
-    )
+    expect(core.setFailed).toHaveBeenCalledWith(`Failed to create issue for test. Error: Issue ID cannot be empty`)
   })
 })

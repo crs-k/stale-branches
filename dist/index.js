@@ -39,6 +39,7 @@ exports.closeIssue = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
+const log_close_issue_1 = __nccwpck_require__(3730);
 function closeIssue(issueNumber) {
     return __awaiter(this, void 0, void 0, function* () {
         let state;
@@ -51,7 +52,7 @@ function closeIssue(issueNumber) {
             });
             state = issueResponse.data.state;
             assert.ok(state, 'State cannot be empty');
-            core.info(`Issue #${issueNumber}'s state was changed to ${state}.`);
+            core.info((0, log_close_issue_1.logCloseIssue)(issueNumber, state));
         }
         catch (err) {
             if (err instanceof Error)
@@ -104,6 +105,7 @@ exports.createIssue = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
+const log_new_issue_1 = __nccwpck_require__(2344);
 function createIssue(branch, commitAge, lastCommitter) {
     return __awaiter(this, void 0, void 0, function* () {
         let issueId;
@@ -133,6 +135,7 @@ function createIssue(branch, commitAge, lastCommitter) {
             });
             issueId = issueResponse.data.id;
             assert.ok(issueId, 'Issue ID cannot be empty');
+            core.info((0, log_new_issue_1.logNewIssue)(branch));
         }
         catch (err) {
             if (err instanceof Error)
@@ -185,6 +188,7 @@ exports.deleteBranch = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
+const log_delete_branch_1 = __nccwpck_require__(4083);
 function deleteBranch(name) {
     return __awaiter(this, void 0, void 0, function* () {
         let confirm;
@@ -199,7 +203,7 @@ function deleteBranch(name) {
             });
             confirm = response.status;
             assert.ok(response, 'response cannot be empty');
-            core.info(`Branch: ${refFull} has been deleted.`);
+            core.info((0, log_delete_branch_1.logDeleteBranch)(refFull));
         }
         catch (err) {
             if (err instanceof Error)
@@ -252,6 +256,7 @@ exports.getBranches = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
+const log_get_branches_1 = __nccwpck_require__(2611);
 function getBranches() {
     return __awaiter(this, void 0, void 0, function* () {
         let branches;
@@ -263,9 +268,8 @@ function getBranches() {
                 per_page: 100
             }, response => response.data.map(branch => ({ branchName: branch.name, commmitSha: branch.commit.sha })));
             branches = branchResponse;
-            core.info(`${branches.length} branches found.`);
-            core.info(`${JSON.stringify(branches)}`);
             assert.ok(branches, 'Response cannot be empty.');
+            core.info((0, log_get_branches_1.logGetBranches)(branches.length));
         }
         catch (err) {
             if (err instanceof Error) {
@@ -401,7 +405,7 @@ function getRecentCommitLogin(sha) {
         }
         catch (err) {
             if (err instanceof Error)
-                core.warning(`Failed to retrieve commit for ${sha} in ${get_context_1.repo}. Error: ${err.message}`);
+                core.info(`Failed to retrieve commit for ${sha} in ${get_context_1.repo}. Error: ${err.message}`);
             lastCommitter = '';
         }
         return lastCommitter;
@@ -558,6 +562,7 @@ exports.getIssueBudget = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
+const log_max_issues_1 = __nccwpck_require__(5487);
 function getIssueBudget() {
     return __awaiter(this, void 0, void 0, function* () {
         let issues;
@@ -582,7 +587,7 @@ function getIssueBudget() {
             core.setFailed(`Failed to calculate issue budget.`);
             issueBudgetRemaining = 0;
         }
-        core.info(`Issue Budget Remaining: ${issueBudgetRemaining}.`);
+        core.info((0, log_max_issues_1.logMaxIssues)(issueBudgetRemaining));
         return issueBudgetRemaining;
     });
 }
@@ -627,6 +632,213 @@ export function getnSeconds(date1, date2): number {
 
 /***/ }),
 
+/***/ 1182:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.logActiveBranch = void 0;
+const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+function logActiveBranch(branchName) {
+    const closeIssue = `[${ansi_styles_1.default.green.open}${branchName}${ansi_styles_1.default.green.close}] has become active again.`;
+    return closeIssue;
+}
+exports.logActiveBranch = logActiveBranch;
+
+
+/***/ }),
+
+/***/ 3839:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.logBranchGroupColor = void 0;
+const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+function logBranchGroupColor(branchName, commitAge, daysBeforeStale, daysBeforeDelete) {
+    let groupColor = `[${ansi_styles_1.default.blue.open}${branchName}${ansi_styles_1.default.blue.close}]`;
+    //color group based on age of branch
+    if (commitAge > daysBeforeDelete) {
+        groupColor = `[${ansi_styles_1.default.redBright.open}${branchName}${ansi_styles_1.default.redBright.close}]`;
+    }
+    else if (commitAge > daysBeforeStale) {
+        groupColor = `[${ansi_styles_1.default.yellowBright.open}${branchName}${ansi_styles_1.default.yellowBright.close}]`;
+    }
+    else if (commitAge < daysBeforeStale) {
+        groupColor = `[${ansi_styles_1.default.greenBright.open}${branchName}${ansi_styles_1.default.greenBright.close}]`;
+    }
+    return groupColor;
+}
+exports.logBranchGroupColor = logBranchGroupColor;
+
+
+/***/ }),
+
+/***/ 3730:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.logCloseIssue = void 0;
+const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+function logCloseIssue(issueNumber, state) {
+    const closeIssue = `Issue ${ansi_styles_1.default.cyan.open}#${issueNumber}${ansi_styles_1.default.cyan.close}'s state was changed to ${ansi_styles_1.default.redBright.open}${state}${ansi_styles_1.default.redBright.close}.`;
+    return closeIssue;
+}
+exports.logCloseIssue = logCloseIssue;
+
+
+/***/ }),
+
+/***/ 4083:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.logDeleteBranch = void 0;
+const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+function logDeleteBranch(refFull) {
+    const deleteBranch = `Branch: ${ansi_styles_1.default.redBright.open}${refFull}${ansi_styles_1.default.redBright.close} has been ${ansi_styles_1.default.redBright.open}deleted${ansi_styles_1.default.redBright.close}.`;
+    return deleteBranch;
+}
+exports.logDeleteBranch = logDeleteBranch;
+
+
+/***/ }),
+
+/***/ 2611:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.logGetBranches = void 0;
+const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+function logGetBranches(branchLength) {
+    const getBranches = `${ansi_styles_1.default.bold.open}[${ansi_styles_1.default.magenta.open}${branchLength}${ansi_styles_1.default.magenta.close}] ${ansi_styles_1.default.blueBright.open}branches found${ansi_styles_1.default.blueBright.close}.${ansi_styles_1.default.bold.close}`;
+    return getBranches;
+}
+exports.logGetBranches = logGetBranches;
+
+
+/***/ }),
+
+/***/ 2965:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.logLastCommitColor = void 0;
+const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+function logLastCommitColor(commitAge, daysBeforeStale, daysBeforeDelete) {
+    let commitColor = `Last Commit: ${ansi_styles_1.default.magenta.open}${commitAge.toString()}${ansi_styles_1.default.magenta.close} days ago.`;
+    //color group based on age of branch
+    if (commitAge > daysBeforeDelete) {
+        commitColor = `Last Commit: ${ansi_styles_1.default.redBright.open}${commitAge.toString()}${ansi_styles_1.default.redBright.close} days ago.`;
+    }
+    else if (commitAge > daysBeforeStale) {
+        commitColor = `Last Commit: ${ansi_styles_1.default.yellowBright.open}${commitAge.toString()}${ansi_styles_1.default.yellowBright.close} days ago.`;
+    }
+    else if (commitAge < daysBeforeStale) {
+        commitColor = `Last Commit: ${ansi_styles_1.default.greenBright.open}${commitAge.toString()}${ansi_styles_1.default.greenBright.close} days ago.`;
+    }
+    return commitColor;
+}
+exports.logLastCommitColor = logLastCommitColor;
+
+
+/***/ }),
+
+/***/ 5487:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.logMaxIssues = void 0;
+const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+function logMaxIssues(issueBudgetRemaining) {
+    let maxIssues = `${ansi_styles_1.default.bold.open}[${ansi_styles_1.default.magenta.open}${issueBudgetRemaining}${ansi_styles_1.default.magenta.close}] ${ansi_styles_1.default.blueBright.open}max-issues budget remaining${ansi_styles_1.default.blueBright.close}.${ansi_styles_1.default.bold.close}`;
+    //color group based on age of branch
+    if (issueBudgetRemaining < 1) {
+        maxIssues = `[${ansi_styles_1.default.redBright.open}${issueBudgetRemaining}${ansi_styles_1.default.redBright.close}] max-issues budget remaining.`;
+    }
+    else if (issueBudgetRemaining < 5) {
+        maxIssues = `[${ansi_styles_1.default.yellowBright.open}${issueBudgetRemaining}${ansi_styles_1.default.yellowBright.close}] max-issues budget remaining.`;
+    }
+    return maxIssues;
+}
+exports.logMaxIssues = logMaxIssues;
+
+
+/***/ }),
+
+/***/ 2344:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.logNewIssue = void 0;
+const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+function logNewIssue(branchName) {
+    const newIssue = `${ansi_styles_1.default.bold.open}New issue created:${ansi_styles_1.default.bold.close} ${ansi_styles_1.default.magentaBright.open}[${branchName}] is STALE${ansi_styles_1.default.magentaBright.close}.`;
+    return newIssue;
+}
+exports.logNewIssue = logNewIssue;
+
+
+/***/ }),
+
+/***/ 8045:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.logUpdateIssue = void 0;
+const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+function logUpdateIssue(issueNumber, createdAt, commentUrl) {
+    const updateIssue = `Issue ${ansi_styles_1.default.cyan.open}#${issueNumber}${ansi_styles_1.default.cyan.close} comment was created at ${ansi_styles_1.default.magenta.open}${createdAt}${ansi_styles_1.default.magenta.close}. ${commentUrl}`;
+    return updateIssue;
+}
+exports.logUpdateIssue = logUpdateIssue;
+
+
+/***/ }),
+
 /***/ 2914:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -665,6 +877,7 @@ exports.updateIssue = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
+const log_update_issue_1 = __nccwpck_require__(8045);
 function updateIssue(issueNumber, branch, commitAge, lastCommitter) {
     return __awaiter(this, void 0, void 0, function* () {
         let createdAt = '';
@@ -697,7 +910,7 @@ function updateIssue(issueNumber, branch, commitAge, lastCommitter) {
                 createdAt = issueResponse.data.created_at;
                 commentUrl = issueResponse.data.html_url;
                 assert.ok(createdAt, 'Created At cannot be empty');
-                core.info(`Issue #${issueNumber}: comment was created at ${createdAt}. ${commentUrl}`);
+                core.info((0, log_update_issue_1.logUpdateIssue)(issueNumber, createdAt, commentUrl));
             }
             catch (err) {
                 if (err instanceof Error)
@@ -759,6 +972,10 @@ const get_stale_issue_budget_1 = __nccwpck_require__(7705);
 const get_issues_1 = __nccwpck_require__(4298);
 const get_commit_date_1 = __nccwpck_require__(6267);
 const get_committer_login_1 = __nccwpck_require__(4764);
+const log_active_branch_1 = __nccwpck_require__(1182);
+const log_branch_group_color_1 = __nccwpck_require__(3839);
+const log_last_commit_color_1 = __nccwpck_require__(2965);
+const log_max_issues_1 = __nccwpck_require__(5487);
 const update_issue_1 = __nccwpck_require__(2914);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -769,7 +986,6 @@ function run() {
             const branches = yield (0, get_branches_1.getBranches)();
             let issueBudgetRemaining = yield (0, get_stale_issue_budget_1.getIssueBudget)();
             // Assess Branches
-            core.startGroup('Identified Branches');
             for (const branchToCheck of branches) {
                 if (issueBudgetRemaining < 1)
                     break;
@@ -779,26 +995,17 @@ function run() {
                 const commitDate = new Date(lastCommitDate).getTime();
                 const commitAge = (0, get_time_1.getDays)(currentDate, commitDate);
                 const branchName = branchToCheck.branchName;
-                //Create & Update issues for stale branches
+                core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchName, commitAge, get_context_1.daysBeforeStale, get_context_1.daysBeforeDelete));
+                core.info((0, log_last_commit_color_1.logLastCommitColor)(commitAge, get_context_1.daysBeforeStale, get_context_1.daysBeforeDelete));
+                //Create issues for stale branches
                 if (commitAge > get_context_1.daysBeforeStale) {
                     const existingIssue = yield (0, get_issues_1.getIssues)();
-                    //Create new issue if existing issue is not found
-                    if (!existingIssue.data.find(findIssue => findIssue.title === `[${branchName}] is STALE`) &&
-                        issueBudgetRemaining > 0) {
+                    //Create new issue if existing issue is not found & issue budget is >0
+                    if (!existingIssue.data.find(findIssue => findIssue.title === `[${branchName}] is STALE`) && issueBudgetRemaining > 0) {
                         yield (0, create_issue_1.createIssue)(branchName, commitAge, lastCommitLogin);
                         issueBudgetRemaining--;
-                        core.info(`New issue created: [${branchName}] is STALE`);
-                        core.info(`Issue Budget Remaining: ${issueBudgetRemaining}`);
+                        core.info((0, log_max_issues_1.logMaxIssues)(issueBudgetRemaining));
                         outputStales.push(branchName);
-                    }
-                    //filter out issues that do not match this Action's title convention
-                    const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
-                    //Update existing issues
-                    for (const issueToUpdate of filteredIssue) {
-                        if (issueToUpdate.title === `[${branchName}] is STALE`) {
-                            yield (0, update_issue_1.updateIssue)(issueToUpdate.number, branchName, commitAge, lastCommitLogin);
-                            outputStales.push(branchName);
-                        }
                     }
                 }
                 //Close issues if a branch becomes active again
@@ -807,10 +1014,21 @@ function run() {
                     const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
                     for (const issueToClose of filteredIssue) {
                         if (issueToClose.title === `[${branchName}] is STALE`) {
-                            core.info(`${branchName} has become active again.`);
-                            core.info(` Last Commit: ${commitAge.toString()} days ago.`);
-                            core.info(` Closing Issue #${issueToClose.number}`);
+                            core.info((0, log_active_branch_1.logActiveBranch)(branchName));
                             yield (0, close_issue_1.closeIssue)(issueToClose.number);
+                        }
+                    }
+                }
+                //Update existing issues
+                if (commitAge > get_context_1.daysBeforeStale) {
+                    const existingIssue = yield (0, get_issues_1.getIssues)();
+                    //filter out issues that do not match this Action's title convention
+                    const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
+                    //Update existing issues
+                    for (const issueToUpdate of filteredIssue) {
+                        if (issueToUpdate.title === `[${branchName}] is STALE`) {
+                            yield (0, update_issue_1.updateIssue)(issueToUpdate.number, branchName, commitAge, lastCommitLogin);
+                            outputStales.push(branchName);
                         }
                     }
                 }
@@ -826,9 +1044,10 @@ function run() {
                         }
                     }
                 }
+                core.endGroup();
             }
-            core.notice(`Stale Branches:  ${JSON.stringify(outputStales)}`);
-            core.notice(`Deleted Branches:  ${JSON.stringify(outputDeletes)}`);
+            core.notice(`Stale Branches:  ${outputStales.length}`);
+            core.notice(`Deleted Branches:  ${outputDeletes.length}`);
             core.setOutput('stale-branches', JSON.stringify(outputStales));
             core.setOutput('deleted-branches', JSON.stringify(outputDeletes));
         }
@@ -4456,10 +4675,10 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var endpoint = __nccwpck_require__(9440);
 var universalUserAgent = __nccwpck_require__(5030);
 var isPlainObject = __nccwpck_require__(3287);
-var nodeFetch = _interopDefault(__nccwpck_require__(1768));
+var nodeFetch = _interopDefault(__nccwpck_require__(467));
 var requestError = __nccwpck_require__(537);
 
-const VERSION = "5.6.2";
+const VERSION = "5.6.3";
 
 function getBufferResponse(response) {
   return response.arrayBuffer();
@@ -4628,7 +4847,431 @@ exports.request = request;
 
 /***/ }),
 
-/***/ 1768:
+/***/ 2068:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+/* module decorator */ module = __nccwpck_require__.nmd(module);
+
+
+const ANSI_BACKGROUND_OFFSET = 10;
+
+const wrapAnsi256 = (offset = 0) => code => `\u001B[${38 + offset};5;${code}m`;
+
+const wrapAnsi16m = (offset = 0) => (red, green, blue) => `\u001B[${38 + offset};2;${red};${green};${blue}m`;
+
+function assembleStyles() {
+	const codes = new Map();
+	const styles = {
+		modifier: {
+			reset: [0, 0],
+			// 21 isn't widely supported and 22 does the same thing
+			bold: [1, 22],
+			dim: [2, 22],
+			italic: [3, 23],
+			underline: [4, 24],
+			overline: [53, 55],
+			inverse: [7, 27],
+			hidden: [8, 28],
+			strikethrough: [9, 29]
+		},
+		color: {
+			black: [30, 39],
+			red: [31, 39],
+			green: [32, 39],
+			yellow: [33, 39],
+			blue: [34, 39],
+			magenta: [35, 39],
+			cyan: [36, 39],
+			white: [37, 39],
+
+			// Bright color
+			blackBright: [90, 39],
+			redBright: [91, 39],
+			greenBright: [92, 39],
+			yellowBright: [93, 39],
+			blueBright: [94, 39],
+			magentaBright: [95, 39],
+			cyanBright: [96, 39],
+			whiteBright: [97, 39]
+		},
+		bgColor: {
+			bgBlack: [40, 49],
+			bgRed: [41, 49],
+			bgGreen: [42, 49],
+			bgYellow: [43, 49],
+			bgBlue: [44, 49],
+			bgMagenta: [45, 49],
+			bgCyan: [46, 49],
+			bgWhite: [47, 49],
+
+			// Bright color
+			bgBlackBright: [100, 49],
+			bgRedBright: [101, 49],
+			bgGreenBright: [102, 49],
+			bgYellowBright: [103, 49],
+			bgBlueBright: [104, 49],
+			bgMagentaBright: [105, 49],
+			bgCyanBright: [106, 49],
+			bgWhiteBright: [107, 49]
+		}
+	};
+
+	// Alias bright black as gray (and grey)
+	styles.color.gray = styles.color.blackBright;
+	styles.bgColor.bgGray = styles.bgColor.bgBlackBright;
+	styles.color.grey = styles.color.blackBright;
+	styles.bgColor.bgGrey = styles.bgColor.bgBlackBright;
+
+	for (const [groupName, group] of Object.entries(styles)) {
+		for (const [styleName, style] of Object.entries(group)) {
+			styles[styleName] = {
+				open: `\u001B[${style[0]}m`,
+				close: `\u001B[${style[1]}m`
+			};
+
+			group[styleName] = styles[styleName];
+
+			codes.set(style[0], style[1]);
+		}
+
+		Object.defineProperty(styles, groupName, {
+			value: group,
+			enumerable: false
+		});
+	}
+
+	Object.defineProperty(styles, 'codes', {
+		value: codes,
+		enumerable: false
+	});
+
+	styles.color.close = '\u001B[39m';
+	styles.bgColor.close = '\u001B[49m';
+
+	styles.color.ansi256 = wrapAnsi256();
+	styles.color.ansi16m = wrapAnsi16m();
+	styles.bgColor.ansi256 = wrapAnsi256(ANSI_BACKGROUND_OFFSET);
+	styles.bgColor.ansi16m = wrapAnsi16m(ANSI_BACKGROUND_OFFSET);
+
+	// From https://github.com/Qix-/color-convert/blob/3f0e0d4e92e235796ccb17f6e85c72094a651f49/conversions.js
+	Object.defineProperties(styles, {
+		rgbToAnsi256: {
+			value: (red, green, blue) => {
+				// We use the extended greyscale palette here, with the exception of
+				// black and white. normal palette only has 4 greyscale shades.
+				if (red === green && green === blue) {
+					if (red < 8) {
+						return 16;
+					}
+
+					if (red > 248) {
+						return 231;
+					}
+
+					return Math.round(((red - 8) / 247) * 24) + 232;
+				}
+
+				return 16 +
+					(36 * Math.round(red / 255 * 5)) +
+					(6 * Math.round(green / 255 * 5)) +
+					Math.round(blue / 255 * 5);
+			},
+			enumerable: false
+		},
+		hexToRgb: {
+			value: hex => {
+				const matches = /(?<colorString>[a-f\d]{6}|[a-f\d]{3})/i.exec(hex.toString(16));
+				if (!matches) {
+					return [0, 0, 0];
+				}
+
+				let {colorString} = matches.groups;
+
+				if (colorString.length === 3) {
+					colorString = colorString.split('').map(character => character + character).join('');
+				}
+
+				const integer = Number.parseInt(colorString, 16);
+
+				return [
+					(integer >> 16) & 0xFF,
+					(integer >> 8) & 0xFF,
+					integer & 0xFF
+				];
+			},
+			enumerable: false
+		},
+		hexToAnsi256: {
+			value: hex => styles.rgbToAnsi256(...styles.hexToRgb(hex)),
+			enumerable: false
+		}
+	});
+
+	return styles;
+}
+
+// Make the export immutable
+Object.defineProperty(module, 'exports', {
+	enumerable: true,
+	get: assembleStyles
+});
+
+
+/***/ }),
+
+/***/ 3682:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var register = __nccwpck_require__(4670)
+var addHook = __nccwpck_require__(5549)
+var removeHook = __nccwpck_require__(6819)
+
+// bind with array of arguments: https://stackoverflow.com/a/21792913
+var bind = Function.bind
+var bindable = bind.bind(bind)
+
+function bindApi (hook, state, name) {
+  var removeHookRef = bindable(removeHook, null).apply(null, name ? [state, name] : [state])
+  hook.api = { remove: removeHookRef }
+  hook.remove = removeHookRef
+
+  ;['before', 'error', 'after', 'wrap'].forEach(function (kind) {
+    var args = name ? [state, kind, name] : [state, kind]
+    hook[kind] = hook.api[kind] = bindable(addHook, null).apply(null, args)
+  })
+}
+
+function HookSingular () {
+  var singularHookName = 'h'
+  var singularHookState = {
+    registry: {}
+  }
+  var singularHook = register.bind(null, singularHookState, singularHookName)
+  bindApi(singularHook, singularHookState, singularHookName)
+  return singularHook
+}
+
+function HookCollection () {
+  var state = {
+    registry: {}
+  }
+
+  var hook = register.bind(null, state)
+  bindApi(hook, state)
+
+  return hook
+}
+
+var collectionHookDeprecationMessageDisplayed = false
+function Hook () {
+  if (!collectionHookDeprecationMessageDisplayed) {
+    console.warn('[before-after-hook]: "Hook()" repurposing warning, use "Hook.Collection()". Read more: https://git.io/upgrade-before-after-hook-to-1.4')
+    collectionHookDeprecationMessageDisplayed = true
+  }
+  return HookCollection()
+}
+
+Hook.Singular = HookSingular.bind()
+Hook.Collection = HookCollection.bind()
+
+module.exports = Hook
+// expose constructors as a named property for TypeScript
+module.exports.Hook = Hook
+module.exports.Singular = Hook.Singular
+module.exports.Collection = Hook.Collection
+
+
+/***/ }),
+
+/***/ 5549:
+/***/ ((module) => {
+
+module.exports = addHook;
+
+function addHook(state, kind, name, hook) {
+  var orig = hook;
+  if (!state.registry[name]) {
+    state.registry[name] = [];
+  }
+
+  if (kind === "before") {
+    hook = function (method, options) {
+      return Promise.resolve()
+        .then(orig.bind(null, options))
+        .then(method.bind(null, options));
+    };
+  }
+
+  if (kind === "after") {
+    hook = function (method, options) {
+      var result;
+      return Promise.resolve()
+        .then(method.bind(null, options))
+        .then(function (result_) {
+          result = result_;
+          return orig(result, options);
+        })
+        .then(function () {
+          return result;
+        });
+    };
+  }
+
+  if (kind === "error") {
+    hook = function (method, options) {
+      return Promise.resolve()
+        .then(method.bind(null, options))
+        .catch(function (error) {
+          return orig(error, options);
+        });
+    };
+  }
+
+  state.registry[name].push({
+    hook: hook,
+    orig: orig,
+  });
+}
+
+
+/***/ }),
+
+/***/ 4670:
+/***/ ((module) => {
+
+module.exports = register;
+
+function register(state, name, method, options) {
+  if (typeof method !== "function") {
+    throw new Error("method for before hook must be a function");
+  }
+
+  if (!options) {
+    options = {};
+  }
+
+  if (Array.isArray(name)) {
+    return name.reverse().reduce(function (callback, name) {
+      return register.bind(null, state, name, callback, options);
+    }, method)();
+  }
+
+  return Promise.resolve().then(function () {
+    if (!state.registry[name]) {
+      return method(options);
+    }
+
+    return state.registry[name].reduce(function (method, registered) {
+      return registered.hook.bind(null, method, options);
+    }, method)();
+  });
+}
+
+
+/***/ }),
+
+/***/ 6819:
+/***/ ((module) => {
+
+module.exports = removeHook;
+
+function removeHook(state, name, method) {
+  if (!state.registry[name]) {
+    return;
+  }
+
+  var index = state.registry[name]
+    .map(function (registered) {
+      return registered.orig;
+    })
+    .indexOf(method);
+
+  if (index === -1) {
+    return;
+  }
+
+  state.registry[name].splice(index, 1);
+}
+
+
+/***/ }),
+
+/***/ 8932:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+
+class Deprecation extends Error {
+  constructor(message) {
+    super(message); // Maintains proper stack trace (only available on V8)
+
+    /* istanbul ignore next */
+
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(this, this.constructor);
+    }
+
+    this.name = 'Deprecation';
+  }
+
+}
+
+exports.Deprecation = Deprecation;
+
+
+/***/ }),
+
+/***/ 3287:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+
+/*!
+ * is-plain-object <https://github.com/jonschlinkert/is-plain-object>
+ *
+ * Copyright (c) 2014-2017, Jon Schlinkert.
+ * Released under the MIT License.
+ */
+
+function isObject(o) {
+  return Object.prototype.toString.call(o) === '[object Object]';
+}
+
+function isPlainObject(o) {
+  var ctor,prot;
+
+  if (isObject(o) === false) return false;
+
+  // If has modified constructor
+  ctor = o.constructor;
+  if (ctor === undefined) return true;
+
+  // If has modified prototype
+  prot = ctor.prototype;
+  if (isObject(prot) === false) return false;
+
+  // If constructor does not have an Object-specific method
+  if (prot.hasOwnProperty('isPrototypeOf') === false) {
+    return false;
+  }
+
+  // Most likely a plain Object
+  return true;
+}
+
+exports.isPlainObject = isPlainObject;
+
+
+/***/ }),
+
+/***/ 467:
 /***/ ((module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -4641,7 +5284,7 @@ function _interopDefault (ex) { return (ex && (typeof ex === 'object') && 'defau
 var Stream = _interopDefault(__nccwpck_require__(2781));
 var http = _interopDefault(__nccwpck_require__(3685));
 var Url = _interopDefault(__nccwpck_require__(7310));
-var whatwgUrl = _interopDefault(__nccwpck_require__(301));
+var whatwgUrl = _interopDefault(__nccwpck_require__(3323));
 var https = _interopDefault(__nccwpck_require__(5687));
 var zlib = _interopDefault(__nccwpck_require__(9796));
 
@@ -6333,14 +6976,14 @@ exports.FetchError = FetchError;
 
 /***/ }),
 
-/***/ 3039:
+/***/ 2299:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
 var punycode = __nccwpck_require__(5477);
-var mappingTable = __nccwpck_require__(6492);
+var mappingTable = __nccwpck_require__(1907);
 
 var PROCESSING_OPTIONS = {
   TRANSITIONAL: 0,
@@ -6534,7 +7177,7 @@ module.exports.PROCESSING_OPTIONS = PROCESSING_OPTIONS;
 
 /***/ }),
 
-/***/ 6542:
+/***/ 5871:
 /***/ ((module) => {
 
 "use strict";
@@ -6731,12 +7374,12 @@ conversions["RegExp"] = function (V, opts) {
 
 /***/ }),
 
-/***/ 394:
+/***/ 8262:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
-const usm = __nccwpck_require__(1234);
+const usm = __nccwpck_require__(33);
 
 exports.implementation = class URLImpl {
   constructor(constructorArgs) {
@@ -6939,15 +7582,15 @@ exports.implementation = class URLImpl {
 
 /***/ }),
 
-/***/ 2047:
+/***/ 653:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-const conversions = __nccwpck_require__(6542);
-const utils = __nccwpck_require__(3387);
-const Impl = __nccwpck_require__(394);
+const conversions = __nccwpck_require__(5871);
+const utils = __nccwpck_require__(276);
+const Impl = __nccwpck_require__(8262);
 
 const impl = utils.implSymbol;
 
@@ -7143,32 +7786,32 @@ module.exports = {
 
 /***/ }),
 
-/***/ 301:
+/***/ 3323:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-exports.URL = __nccwpck_require__(2047)["interface"];
-exports.serializeURL = __nccwpck_require__(1234).serializeURL;
-exports.serializeURLOrigin = __nccwpck_require__(1234).serializeURLOrigin;
-exports.basicURLParse = __nccwpck_require__(1234).basicURLParse;
-exports.setTheUsername = __nccwpck_require__(1234).setTheUsername;
-exports.setThePassword = __nccwpck_require__(1234).setThePassword;
-exports.serializeHost = __nccwpck_require__(1234).serializeHost;
-exports.serializeInteger = __nccwpck_require__(1234).serializeInteger;
-exports.parseURL = __nccwpck_require__(1234).parseURL;
+exports.URL = __nccwpck_require__(653)["interface"];
+exports.serializeURL = __nccwpck_require__(33).serializeURL;
+exports.serializeURLOrigin = __nccwpck_require__(33).serializeURLOrigin;
+exports.basicURLParse = __nccwpck_require__(33).basicURLParse;
+exports.setTheUsername = __nccwpck_require__(33).setTheUsername;
+exports.setThePassword = __nccwpck_require__(33).setThePassword;
+exports.serializeHost = __nccwpck_require__(33).serializeHost;
+exports.serializeInteger = __nccwpck_require__(33).serializeInteger;
+exports.parseURL = __nccwpck_require__(33).parseURL;
 
 
 /***/ }),
 
-/***/ 1234:
+/***/ 33:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 const punycode = __nccwpck_require__(5477);
-const tr46 = __nccwpck_require__(3039);
+const tr46 = __nccwpck_require__(2299);
 
 const specialSchemes = {
   ftp: 21,
@@ -8467,7 +9110,7 @@ module.exports.parseURL = function (input, options) {
 
 /***/ }),
 
-/***/ 3387:
+/***/ 276:
 /***/ ((module) => {
 
 "use strict";
@@ -8491,257 +9134,6 @@ module.exports.implForWrapper = function (wrapper) {
   return wrapper[module.exports.implSymbol];
 };
 
-
-
-/***/ }),
-
-/***/ 3682:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
-
-var register = __nccwpck_require__(4670)
-var addHook = __nccwpck_require__(5549)
-var removeHook = __nccwpck_require__(6819)
-
-// bind with array of arguments: https://stackoverflow.com/a/21792913
-var bind = Function.bind
-var bindable = bind.bind(bind)
-
-function bindApi (hook, state, name) {
-  var removeHookRef = bindable(removeHook, null).apply(null, name ? [state, name] : [state])
-  hook.api = { remove: removeHookRef }
-  hook.remove = removeHookRef
-
-  ;['before', 'error', 'after', 'wrap'].forEach(function (kind) {
-    var args = name ? [state, kind, name] : [state, kind]
-    hook[kind] = hook.api[kind] = bindable(addHook, null).apply(null, args)
-  })
-}
-
-function HookSingular () {
-  var singularHookName = 'h'
-  var singularHookState = {
-    registry: {}
-  }
-  var singularHook = register.bind(null, singularHookState, singularHookName)
-  bindApi(singularHook, singularHookState, singularHookName)
-  return singularHook
-}
-
-function HookCollection () {
-  var state = {
-    registry: {}
-  }
-
-  var hook = register.bind(null, state)
-  bindApi(hook, state)
-
-  return hook
-}
-
-var collectionHookDeprecationMessageDisplayed = false
-function Hook () {
-  if (!collectionHookDeprecationMessageDisplayed) {
-    console.warn('[before-after-hook]: "Hook()" repurposing warning, use "Hook.Collection()". Read more: https://git.io/upgrade-before-after-hook-to-1.4')
-    collectionHookDeprecationMessageDisplayed = true
-  }
-  return HookCollection()
-}
-
-Hook.Singular = HookSingular.bind()
-Hook.Collection = HookCollection.bind()
-
-module.exports = Hook
-// expose constructors as a named property for TypeScript
-module.exports.Hook = Hook
-module.exports.Singular = Hook.Singular
-module.exports.Collection = Hook.Collection
-
-
-/***/ }),
-
-/***/ 5549:
-/***/ ((module) => {
-
-module.exports = addHook;
-
-function addHook(state, kind, name, hook) {
-  var orig = hook;
-  if (!state.registry[name]) {
-    state.registry[name] = [];
-  }
-
-  if (kind === "before") {
-    hook = function (method, options) {
-      return Promise.resolve()
-        .then(orig.bind(null, options))
-        .then(method.bind(null, options));
-    };
-  }
-
-  if (kind === "after") {
-    hook = function (method, options) {
-      var result;
-      return Promise.resolve()
-        .then(method.bind(null, options))
-        .then(function (result_) {
-          result = result_;
-          return orig(result, options);
-        })
-        .then(function () {
-          return result;
-        });
-    };
-  }
-
-  if (kind === "error") {
-    hook = function (method, options) {
-      return Promise.resolve()
-        .then(method.bind(null, options))
-        .catch(function (error) {
-          return orig(error, options);
-        });
-    };
-  }
-
-  state.registry[name].push({
-    hook: hook,
-    orig: orig,
-  });
-}
-
-
-/***/ }),
-
-/***/ 4670:
-/***/ ((module) => {
-
-module.exports = register;
-
-function register(state, name, method, options) {
-  if (typeof method !== "function") {
-    throw new Error("method for before hook must be a function");
-  }
-
-  if (!options) {
-    options = {};
-  }
-
-  if (Array.isArray(name)) {
-    return name.reverse().reduce(function (callback, name) {
-      return register.bind(null, state, name, callback, options);
-    }, method)();
-  }
-
-  return Promise.resolve().then(function () {
-    if (!state.registry[name]) {
-      return method(options);
-    }
-
-    return state.registry[name].reduce(function (method, registered) {
-      return registered.hook.bind(null, method, options);
-    }, method)();
-  });
-}
-
-
-/***/ }),
-
-/***/ 6819:
-/***/ ((module) => {
-
-module.exports = removeHook;
-
-function removeHook(state, name, method) {
-  if (!state.registry[name]) {
-    return;
-  }
-
-  var index = state.registry[name]
-    .map(function (registered) {
-      return registered.orig;
-    })
-    .indexOf(method);
-
-  if (index === -1) {
-    return;
-  }
-
-  state.registry[name].splice(index, 1);
-}
-
-
-/***/ }),
-
-/***/ 8932:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-
-class Deprecation extends Error {
-  constructor(message) {
-    super(message); // Maintains proper stack trace (only available on V8)
-
-    /* istanbul ignore next */
-
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(this, this.constructor);
-    }
-
-    this.name = 'Deprecation';
-  }
-
-}
-
-exports.Deprecation = Deprecation;
-
-
-/***/ }),
-
-/***/ 3287:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-
-/*!
- * is-plain-object <https://github.com/jonschlinkert/is-plain-object>
- *
- * Copyright (c) 2014-2017, Jon Schlinkert.
- * Released under the MIT License.
- */
-
-function isObject(o) {
-  return Object.prototype.toString.call(o) === '[object Object]';
-}
-
-function isPlainObject(o) {
-  var ctor,prot;
-
-  if (isObject(o) === false) return false;
-
-  // If has modified constructor
-  ctor = o.constructor;
-  if (ctor === undefined) return true;
-
-  // If has modified prototype
-  prot = ctor.prototype;
-  if (isObject(prot) === false) return false;
-
-  // If constructor does not have an Object-specific method
-  if (prot.hasOwnProperty('isPrototypeOf') === false) {
-    return false;
-  }
-
-  // Most likely a plain Object
-  return true;
-}
-
-exports.isPlainObject = isPlainObject;
 
 
 /***/ }),
@@ -9261,7 +9653,7 @@ module.exports = require("zlib");
 
 /***/ }),
 
-/***/ 6492:
+/***/ 1907:
 /***/ ((module) => {
 
 "use strict";
@@ -9283,8 +9675,8 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 /******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			// no module.id needed
-/******/ 			// no module.loaded needed
+/******/ 			id: moduleId,
+/******/ 			loaded: false,
 /******/ 			exports: {}
 /******/ 		};
 /******/ 	
@@ -9297,11 +9689,23 @@ module.exports = JSON.parse('[[[0,44],"disallowed_STD3_valid"],[[45,46],"valid"]
 /******/ 			if(threw) delete __webpack_module_cache__[moduleId];
 /******/ 		}
 /******/ 	
+/******/ 		// Flag the module as loaded
+/******/ 		module.loaded = true;
+/******/ 	
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
 /******/ 	
 /************************************************************************/
+/******/ 	/* webpack/runtime/node module decorator */
+/******/ 	(() => {
+/******/ 		__nccwpck_require__.nmd = (module) => {
+/******/ 			module.paths = [];
+/******/ 			if (!module.children) module.children = [];
+/******/ 			return module;
+/******/ 		};
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/compat */
 /******/ 	
 /******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";

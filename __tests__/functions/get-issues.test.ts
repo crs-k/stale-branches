@@ -31,9 +31,7 @@ describe('Get Issues Function', () => {
     })
 
     await getIssues()
-    expect(core.setFailed).toHaveBeenCalledWith(
-      `Failed to locate issues. Error: Issue ID cannot be empty`
-    )
+    expect(core.setFailed).toHaveBeenCalledWith(`Failed to locate issues. Error: Issue ID cannot be empty`)
     expect(core.setFailed).toHaveBeenCalledWith(`Failed to locate issues.`)
   })
 })
