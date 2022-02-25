@@ -251,15 +251,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getBranches = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
-const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+const log_get_branches_1 = __nccwpck_require__(2611);
 function getBranches() {
     return __awaiter(this, void 0, void 0, function* () {
         let branches;
@@ -271,7 +268,7 @@ function getBranches() {
                 per_page: 100
             }, response => response.data.map(branch => ({ branchName: branch.name, commmitSha: branch.commit.sha })));
             branches = branchResponse;
-            core.info(`${ansi_styles_1.default.bold.open}[${ansi_styles_1.default.magenta.open}${branches.length}${ansi_styles_1.default.magenta.close}] ${ansi_styles_1.default.blueBright.open}branches found${ansi_styles_1.default.blueBright.close}.${ansi_styles_1.default.bold.close}`);
+            core.info((0, log_get_branches_1.logGetBranches)(branches.length));
             assert.ok(branches, 'Response cannot be empty.');
         }
         catch (err) {
@@ -724,6 +721,26 @@ function logDeleteBranch(refFull) {
     return deleteBranch;
 }
 exports.logDeleteBranch = logDeleteBranch;
+
+
+/***/ }),
+
+/***/ 2611:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.logGetBranches = void 0;
+const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+function logGetBranches(branchLength) {
+    const getBranches = `${ansi_styles_1.default.bold.open}[${ansi_styles_1.default.magenta.open}${branchLength}${ansi_styles_1.default.magenta.close}] ${ansi_styles_1.default.blueBright.open}branches found${ansi_styles_1.default.blueBright.close}.${ansi_styles_1.default.bold.close}`;
+    return getBranches;
+}
+exports.logGetBranches = logGetBranches;
 
 
 /***/ }),
