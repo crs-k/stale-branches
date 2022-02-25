@@ -708,7 +708,7 @@ function updateIssue(issueNumber, branch, commitAge, lastCommitter) {
                 createdAt = issueResponse.data.created_at;
                 commentUrl = issueResponse.data.html_url;
                 assert.ok(createdAt, 'Created At cannot be empty');
-                core.info(`[${ansi_styles_1.default.blue.open}${branch}${ansi_styles_1.default.blue.close}] - Issue [${ansi_styles_1.default.magenta.open}#${issueNumber}${ansi_styles_1.default.magenta.close}] comment was created at ${ansi_styles_1.default.magenta.open}${createdAt}${ansi_styles_1.default.magenta.close}. ${commentUrl}`);
+                core.info(`[${ansi_styles_1.default.blue.open}${branch}${ansi_styles_1.default.blue.close}] - Issue ${ansi_styles_1.default.yellowBright.open}#${issueNumber}${ansi_styles_1.default.yellowBright.close} comment was created at ${ansi_styles_1.default.magenta.open}${createdAt}${ansi_styles_1.default.magenta.close}. ${commentUrl}`);
             }
             catch (err) {
                 if (err instanceof Error)
