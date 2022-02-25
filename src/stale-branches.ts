@@ -19,6 +19,9 @@ export async function run(): Promise<void> {
     //Collect Branches & budget
     const branches = await getBranches()
     let issueBudgetRemaining = await getIssueBudget()
+    core.info(
+      `Issue Budget Remaining: ${styles.magenta.open}${issueBudgetRemaining}${styles.magenta.close}.`
+    )
 
     // Assess Branches
     for (const branchToCheck of branches) {
@@ -47,7 +50,9 @@ export async function run(): Promise<void> {
           await createIssue(branchName, commitAge, lastCommitLogin)
           issueBudgetRemaining--
           core.info(`New issue created: [${branchName}] is STALE`)
-          core.info(`Issue Budget Remaining: ${issueBudgetRemaining}`)
+          core.info(
+            `Issue Budget Remaining: ${styles.magenta.open}${issueBudgetRemaining}${styles.magenta.close}.`
+          )
           outputStales.push(branchName)
         }
 

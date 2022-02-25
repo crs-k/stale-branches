@@ -585,7 +585,6 @@ function getIssueBudget() {
             core.setFailed(`Failed to calculate issue budget.`);
             issueBudgetRemaining = 0;
         }
-        core.info(`Issue Budget Remaining: ${issueBudgetRemaining}.`);
         return issueBudgetRemaining;
     });
 }
@@ -775,6 +774,7 @@ function run() {
             //Collect Branches & budget
             const branches = yield (0, get_branches_1.getBranches)();
             let issueBudgetRemaining = yield (0, get_stale_issue_budget_1.getIssueBudget)();
+            core.info(`Issue Budget Remaining: ${ansi_styles_1.default.magenta.open}${issueBudgetRemaining}${ansi_styles_1.default.magenta.close}.`);
             // Assess Branches
             for (const branchToCheck of branches) {
                 if (issueBudgetRemaining < 1)
@@ -796,7 +796,7 @@ function run() {
                         yield (0, create_issue_1.createIssue)(branchName, commitAge, lastCommitLogin);
                         issueBudgetRemaining--;
                         core.info(`New issue created: [${branchName}] is STALE`);
-                        core.info(`Issue Budget Remaining: ${issueBudgetRemaining}`);
+                        core.info(`Issue Budget Remaining: ${ansi_styles_1.default.magenta.open}${issueBudgetRemaining}${ansi_styles_1.default.magenta.close}.`);
                         outputStales.push(branchName);
                     }
                     //filter out issues that do not match this Action's title convention
