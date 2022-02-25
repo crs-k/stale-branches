@@ -784,7 +784,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.logMaxIssues = void 0;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logMaxIssues(issueBudgetRemaining) {
-    let maxIssues = `[${ansi_styles_1.default.magenta.open}${issueBudgetRemaining}${ansi_styles_1.default.magenta.close}] max-issues budget remaining.`;
+    let maxIssues = `${ansi_styles_1.default.bold.open}[${ansi_styles_1.default.magenta.open}${issueBudgetRemaining}${ansi_styles_1.default.magenta.close}] ${ansi_styles_1.default.blueBright.open}max-issues budget remaining${ansi_styles_1.default.blueBright.close}.${ansi_styles_1.default.bold.close}`;
     //color group based on age of branch
     if (issueBudgetRemaining < 1) {
         maxIssues = `[${ansi_styles_1.default.redBright.open}${issueBudgetRemaining}${ansi_styles_1.default.redBright.close}] max-issues budget remaining.`;
