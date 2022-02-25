@@ -556,11 +556,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getIssueBudget = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
+const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function getIssueBudget() {
     return __awaiter(this, void 0, void 0, function* () {
         let issues;
@@ -585,6 +589,7 @@ function getIssueBudget() {
             core.setFailed(`Failed to calculate issue budget.`);
             issueBudgetRemaining = 0;
         }
+        core.info(`${ansi_styles_1.default.bold.open}[${ansi_styles_1.default.magenta.open}${issueBudgetRemaining}${ansi_styles_1.default.magenta.close}] ${ansi_styles_1.default.greenBright.open}${ansi_styles_1.default.greenBright.close}.${ansi_styles_1.default.bold.close}`);
         return issueBudgetRemaining;
     });
 }
@@ -774,7 +779,6 @@ function run() {
             //Collect Branches & budget
             const branches = yield (0, get_branches_1.getBranches)();
             let issueBudgetRemaining = yield (0, get_stale_issue_budget_1.getIssueBudget)();
-            core.info(`[${ansi_styles_1.default.magenta.open}${issueBudgetRemaining}${ansi_styles_1.default.magenta.close}] issue budget remaining.`);
             // Assess Branches
             for (const branchToCheck of branches) {
                 if (issueBudgetRemaining < 1)

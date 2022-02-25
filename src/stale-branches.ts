@@ -19,7 +19,6 @@ export async function run(): Promise<void> {
     //Collect Branches & budget
     const branches = await getBranches()
     let issueBudgetRemaining = await getIssueBudget()
-    core.info(`[${styles.magenta.open}${issueBudgetRemaining}${styles.magenta.close}] issue budget remaining.`)
 
     // Assess Branches
     for (const branchToCheck of branches) {
