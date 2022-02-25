@@ -784,6 +784,26 @@ exports.logNewIssue = logNewIssue;
 
 /***/ }),
 
+/***/ 8045:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.logUpdateIssue = void 0;
+const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+function logUpdateIssue(issueNumber, createdAt, commentUrl) {
+    const updateIssue = `Issue ${ansi_styles_1.default.cyan.open}#${issueNumber}${ansi_styles_1.default.cyan.close} comment was created at ${ansi_styles_1.default.magenta.open}${createdAt}${ansi_styles_1.default.magenta.close}. ${commentUrl}`;
+    return updateIssue;
+}
+exports.logUpdateIssue = logUpdateIssue;
+
+
+/***/ }),
+
 /***/ 2914:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -817,15 +837,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.updateIssue = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
-const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+const log_update_issue_1 = __nccwpck_require__(8045);
 function updateIssue(issueNumber, branch, commitAge, lastCommitter) {
     return __awaiter(this, void 0, void 0, function* () {
         let createdAt = '';
@@ -858,7 +875,7 @@ function updateIssue(issueNumber, branch, commitAge, lastCommitter) {
                 createdAt = issueResponse.data.created_at;
                 commentUrl = issueResponse.data.html_url;
                 assert.ok(createdAt, 'Created At cannot be empty');
-                core.info(`Issue ${ansi_styles_1.default.yellowBright.open}#${issueNumber}${ansi_styles_1.default.yellowBright.close} comment was created at ${ansi_styles_1.default.magenta.open}${createdAt}${ansi_styles_1.default.magenta.close}. ${commentUrl}`);
+                core.info((0, log_update_issue_1.logUpdateIssue)(issueNumber, createdAt, commentUrl));
             }
             catch (err) {
                 if (err instanceof Error)
