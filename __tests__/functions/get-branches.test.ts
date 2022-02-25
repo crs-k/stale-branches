@@ -16,9 +16,7 @@ describe('Get Branches Function', () => {
     await getBranches()
 
     expect(github.paginate).toHaveBeenCalled()
-    expect(core.info).toHaveBeenCalledWith(
-      `[${styles.magenta.open}6${styles.magenta.close}] branches found.`
-    )
+    expect(core.info).toHaveBeenCalledWith(`[${styles.magenta.open}6${styles.magenta.close}] branches found.`)
     expect(assert.ok).toHaveBeenCalled()
   })
 
@@ -30,9 +28,7 @@ describe('Get Branches Function', () => {
     })
 
     await getBranches()
-    expect(core.setFailed).toHaveBeenCalledWith(
-      `Failed to retrieve branches for repo. Error: Response cannot be empty.`
-    )
+    expect(core.setFailed).toHaveBeenCalledWith(`Failed to retrieve branches for repo. Error: Response cannot be empty.`)
     expect(core.setFailed).toHaveBeenCalledWith(`Failed to retrieve branches for repo.`)
   })
 })

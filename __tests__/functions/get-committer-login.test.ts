@@ -33,8 +33,6 @@ describe('Get Commits Function', () => {
     })
 
     await getRecentCommitLogin(sha)
-    expect(core.warning).toHaveBeenCalledWith(
-      `Failed to retrieve commit for 123 in repo. Error: Login cannot be empty.`
-    )
+    expect(core.warning).toHaveBeenCalledWith(`Failed to retrieve commit for 123 in repo. Error: Login cannot be empty.`)
   })
 })

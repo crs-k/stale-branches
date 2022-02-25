@@ -4,9 +4,7 @@ import {github, owner, repo} from './get-context'
 // eslint-disable-next-line import/named
 import {GetResponseTypeFromEndpointMethod} from '@octokit/types'
 
-type ListIssuesResponseDataType = GetResponseTypeFromEndpointMethod<
-  typeof github.rest.issues.listForRepo
->
+type ListIssuesResponseDataType = GetResponseTypeFromEndpointMethod<typeof github.rest.issues.listForRepo>
 export async function getIssues(): Promise<ListIssuesResponseDataType> {
   let issues: ListIssuesResponseDataType
 

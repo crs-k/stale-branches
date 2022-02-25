@@ -1,20 +1,8 @@
 import * as assert from 'assert'
 import * as core from '@actions/core'
-import {
-  commentUpdates,
-  daysBeforeDelete,
-  github,
-  owner,
-  repo,
-  tagLastCommitter
-} from './get-context'
+import {commentUpdates, daysBeforeDelete, github, owner, repo, tagLastCommitter} from './get-context'
 
-export async function updateIssue(
-  issueNumber: number,
-  branch: string,
-  commitAge: number,
-  lastCommitter: string
-): Promise<string> {
+export async function updateIssue(issueNumber: number, branch: string, commitAge: number, lastCommitter: string): Promise<string> {
   let createdAt = ''
   let commentUrl: string
   let bodyString: string
@@ -50,10 +38,7 @@ export async function updateIssue(
       assert.ok(createdAt, 'Created At cannot be empty')
       core.info(`Issue #${issueNumber}: comment was created at ${createdAt}. ${commentUrl}`)
     } catch (err) {
-      if (err instanceof Error)
-        core.info(
-          `No existing issue returned for issue number: ${issueNumber}. Error: ${err.message}`
-        )
+      if (err instanceof Error) core.info(`No existing issue returned for issue number: ${issueNumber}. Error: ${err.message}`)
       createdAt = ''
     }
   }

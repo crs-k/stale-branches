@@ -38,8 +38,6 @@ describe('Close Issue Function', () => {
     })
 
     await closeIssue(issueNumber)
-    expect(core.info).toHaveBeenCalledWith(
-      `No existing issue returned for issue number: 1. Description: State cannot be empty`
-    )
+    expect(core.info).toHaveBeenCalledWith(`No existing issue returned for issue number: 1. Description: State cannot be empty`)
   })
 })

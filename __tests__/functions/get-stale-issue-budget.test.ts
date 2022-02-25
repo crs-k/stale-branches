@@ -31,9 +31,7 @@ describe('Get Stale Issue Budget Function', () => {
     })
 
     await getIssueBudget()
-    expect(core.setFailed).toHaveBeenCalledWith(
-      `Failed to calculate issue budget. Error: Issue ID cannot be empty`
-    )
+    expect(core.setFailed).toHaveBeenCalledWith(`Failed to calculate issue budget. Error: Issue ID cannot be empty`)
     expect(core.setFailed).toHaveBeenCalledWith(`Failed to calculate issue budget.`)
   })
 })
