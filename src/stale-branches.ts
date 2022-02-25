@@ -35,11 +35,10 @@ export async function run(): Promise<void> {
       const commitAge = getDays(currentDate, commitDate)
       const branchName = branchToCheck.branchName
       const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`)
-      core.info(JSON.stringify(filteredIssue))
 
       core.startGroup(logBranchGroupColor(branchName, commitAge, daysBeforeStale, daysBeforeDelete))
       core.info(logLastCommitColor(commitAge, daysBeforeStale, daysBeforeDelete))
-
+      core.info(JSON.stringify(filteredIssue.at(10)))
       //Create issues for stale branches
       if (commitAge > daysBeforeStale) {
         //Create new issue if existing issue is not found & issue budget is >0
