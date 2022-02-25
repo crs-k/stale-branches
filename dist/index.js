@@ -781,8 +781,8 @@ function run() {
                 const commitDate = new Date(lastCommitDate).getTime();
                 const commitAge = (0, get_time_1.getDays)(currentDate, commitDate);
                 const branchName = branchToCheck.branchName;
-                core.startGroup(`[${ansi_styles_1.default.green.open}${branchName}${ansi_styles_1.default.green.close}]`);
-                core.info(`[${ansi_styles_1.default.green.open}${branchName}${ansi_styles_1.default.green.close}] - Last Commit: ${commitAge.toString()} days ago.`);
+                core.startGroup(`[${ansi_styles_1.default.blue.open}${branchName}${ansi_styles_1.default.blue.close}]`);
+                core.info(`[${ansi_styles_1.default.blue.open}${branchName}${ansi_styles_1.default.blue.close}] - Last Commit: ${commitAge.toString()} days ago.`);
                 //Create & Update issues for stale branches
                 if (commitAge > get_context_1.daysBeforeStale) {
                     const existingIssue = yield (0, get_issues_1.getIssues)();

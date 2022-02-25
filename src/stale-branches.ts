@@ -29,10 +29,10 @@ export async function run(): Promise<void> {
       const commitDate = new Date(lastCommitDate).getTime()
       const commitAge = getDays(currentDate, commitDate)
       const branchName = branchToCheck.branchName
-      core.startGroup(`[${styles.green.open}${branchName}${styles.green.close}]`)
+      core.startGroup(`[${styles.blue.open}${branchName}${styles.blue.close}]`)
       core.info(
-        `[${styles.green.open}${branchName}${
-          styles.green.close
+        `[${styles.blue.open}${branchName}${
+          styles.blue.close
         }] - Last Commit: ${commitAge.toString()} days ago.`
       )
       //Create & Update issues for stale branches
