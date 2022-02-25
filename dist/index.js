@@ -999,7 +999,6 @@ function run() {
                 const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
                 core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchName, commitAge, get_context_1.daysBeforeStale, get_context_1.daysBeforeDelete));
                 core.info((0, log_last_commit_color_1.logLastCommitColor)(commitAge, get_context_1.daysBeforeStale, get_context_1.daysBeforeDelete));
-                core.info(JSON.stringify(filteredIssue));
                 //Create issues for stale branches
                 if (commitAge > get_context_1.daysBeforeStale) {
                     //Create new issue if existing issue is not found & issue budget is >0
