@@ -19,8 +19,8 @@ export async function getBranches(): Promise<BranchResponse[]> {
     )
     branches = branchResponse
 
-    core.info(logGetBranches(branches.length))
     assert.ok(branches, 'Response cannot be empty.')
+    core.info(logGetBranches(branches.length))
   } catch (err) {
     if (err instanceof Error) {
       core.setFailed(`Failed to retrieve branches for ${repo}. Error: ${err.message}`)

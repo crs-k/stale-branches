@@ -268,8 +268,8 @@ function getBranches() {
                 per_page: 100
             }, response => response.data.map(branch => ({ branchName: branch.name, commmitSha: branch.commit.sha })));
             branches = branchResponse;
-            core.info((0, log_get_branches_1.logGetBranches)(branches.length));
             assert.ok(branches, 'Response cannot be empty.');
+            core.info((0, log_get_branches_1.logGetBranches)(branches.length));
         }
         catch (err) {
             if (err instanceof Error) {
