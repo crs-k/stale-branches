@@ -699,7 +699,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.logCloseIssue = void 0;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logCloseIssue(issueNumber, state) {
-    const closeIssue = `Issue ${ansi_styles_1.default.cyanBright.open}#${issueNumber}${ansi_styles_1.default.cyanBright.close}'s state was changed to ${ansi_styles_1.default.redBright.open}${state}${ansi_styles_1.default.redBright.close}.`;
+    const closeIssue = `Issue ${ansi_styles_1.default.cyan.open}#${issueNumber}${ansi_styles_1.default.cyan.close}'s state was changed to ${ansi_styles_1.default.redBright.open}${state}${ansi_styles_1.default.redBright.close}.`;
     return closeIssue;
 }
 exports.logCloseIssue = logCloseIssue;
