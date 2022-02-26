@@ -45,6 +45,7 @@ jobs:
   Test-Action: # make sure the action works on a clean machine without building
     name: Test - Action
     runs-on: ubuntu-latest
+    if: ${{ github.actor != 'dependabot[bot]' }}
     steps:
       - uses: actions/checkout@v2
       - uses: ./
