@@ -1040,14 +1040,14 @@ function run() {
                 // Start output group for current branch assessment
                 core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchName, commitAge, get_context_1.daysBeforeStale, get_context_1.daysBeforeDelete));
                 core.info((0, log_last_commit_color_1.logLastCommitColor)(commitAge, get_context_1.daysBeforeStale, get_context_1.daysBeforeDelete));
+                core.info(filteredIssue.toString());
                 // Skip looking for last commit's login if input is set to false
                 let lastCommitLogin = 'Unknown';
                 if (get_context_1.tagLastCommitter === true) {
                     lastCommitLogin = yield (0, get_committer_login_1.getRecentCommitLogin)(branchToCheck.commmitSha);
                 }
-                //Create issues for stale branches
+                //Create new issue if branch is stale & existing issue is not found & issue budget is >0
                 if (commitAge > get_context_1.daysBeforeStale) {
-                    //Create new issue if existing issue is not found & issue budget is >0
                     if (!filteredIssue.find(findIssue => findIssue.title === `[${branchName}] is STALE`) && issueBudgetRemaining > 0) {
                         yield (0, create_issue_1.createIssue)(branchName, commitAge, lastCommitLogin);
                         issueBudgetRemaining--;

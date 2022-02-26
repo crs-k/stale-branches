@@ -39,6 +39,7 @@ export async function run(): Promise<void> {
       // Start output group for current branch assessment
       core.startGroup(logBranchGroupColor(branchName, commitAge, daysBeforeStale, daysBeforeDelete))
       core.info(logLastCommitColor(commitAge, daysBeforeStale, daysBeforeDelete))
+      core.info(filteredIssue.toString())
 
       // Skip looking for last commit's login if input is set to false
       let lastCommitLogin = 'Unknown'
@@ -46,9 +47,8 @@ export async function run(): Promise<void> {
         lastCommitLogin = await getRecentCommitLogin(branchToCheck.commmitSha)
       }
 
-      //Create issues for stale branches
+      //Create new issue if branch is stale & existing issue is not found & issue budget is >0
       if (commitAge > daysBeforeStale) {
-        //Create new issue if existing issue is not found & issue budget is >0
         if (!filteredIssue.find(findIssue => findIssue.title === `[${branchName}] is STALE`) && issueBudgetRemaining > 0) {
           await createIssue(branchName, commitAge, lastCommitLogin)
           issueBudgetRemaining--
