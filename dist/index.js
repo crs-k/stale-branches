@@ -664,7 +664,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.logBranchGroupColor = void 0;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logBranchGroupColor(branchName, commitAge, daysBeforeStale, daysBeforeDelete) {
-    let groupColor = `[${ansi_styles_1.default.blue.open}${branchName}${ansi_styles_1.default.blue.close}]`;
+    let groupColor = `[${ansi_styles_1.default.greenBright.open}${branchName}${ansi_styles_1.default.greenBright.close}]`;
     //color group based on age of branch
     if (commitAge > daysBeforeDelete) {
         groupColor = `[${ansi_styles_1.default.redBright.open}${branchName}${ansi_styles_1.default.redBright.close}]`;
@@ -976,7 +976,6 @@ const log_active_branch_1 = __nccwpck_require__(1182);
 const log_branch_group_color_1 = __nccwpck_require__(3839);
 const log_last_commit_color_1 = __nccwpck_require__(2965);
 const log_max_issues_1 = __nccwpck_require__(5487);
-const remove_element_from_array_1 = __nccwpck_require__(405);
 const update_issue_1 = __nccwpck_require__(2914);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -990,7 +989,6 @@ function run() {
             // Assess Branches
             for (const branchToCheck of branches) {
                 const lastCommitDate = yield (0, get_commit_date_1.getRecentCommitDate)(branchToCheck.commmitSha);
-                const lastCommitLogin = yield (0, get_committer_login_1.getRecentCommitLogin)(branchToCheck.commmitSha);
                 const currentDate = new Date().getTime();
                 const commitDate = new Date(lastCommitDate).getTime();
                 const commitAge = (0, get_time_1.getDays)(currentDate, commitDate);
@@ -998,6 +996,7 @@ function run() {
                 const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
                 core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchName, commitAge, get_context_1.daysBeforeStale, get_context_1.daysBeforeDelete));
                 core.info((0, log_last_commit_color_1.logLastCommitColor)(commitAge, get_context_1.daysBeforeStale, get_context_1.daysBeforeDelete));
+                const lastCommitLogin = yield (0, get_committer_login_1.getRecentCommitLogin)(branchToCheck.commmitSha);
                 //Create issues for stale branches
                 if (commitAge > get_context_1.daysBeforeStale) {
                     //Create new issue if existing issue is not found & issue budget is >0
@@ -1036,10 +1035,7 @@ function run() {
                         if (issueToDelete.title === `[${branchName}] is STALE`) {
                             yield (0, delete_branch_1.deleteBranch)(branchName);
                             yield (0, close_issue_1.closeIssue)(issueToDelete.number);
-                            if (outputDeletes.includes(branchName) === false) {
-                                outputDeletes.push(branchName);
-                                (0, remove_element_from_array_1.removeElementFromStringArray)(outputStales, branchName);
-                            }
+                            outputDeletes.push(branchName);
                         }
                     }
                 }
@@ -1057,52 +1053,6 @@ function run() {
     });
 }
 exports.run = run;
-
-
-/***/ }),
-
-/***/ 405:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.removeElementFromStringArray = void 0;
-const core = __importStar(__nccwpck_require__(2186));
-function removeElementFromStringArray(stringArray, element) {
-    try {
-        let index = 0;
-        for (const value of stringArray) {
-            if (value === element)
-                index = stringArray.indexOf(value);
-            stringArray.splice(index, 1);
-        }
-    }
-    catch (err) {
-        if (err instanceof Error)
-            core.info(`Error: ${err.message}`);
-    }
-}
-exports.removeElementFromStringArray = removeElementFromStringArray;
 
 
 /***/ }),
