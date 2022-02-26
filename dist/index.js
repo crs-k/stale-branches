@@ -1046,9 +1046,9 @@ function run() {
                 }
                 core.endGroup();
             }
-            core.notice(`Total Branches:  ${outputTotal}`);
-            core.notice(`Stale Branches:  ${outputStales.length}`);
-            core.notice(`Deleted Branches:  ${outputDeletes.length}`);
+            core.info(`Total Branches: ${outputTotal}`);
+            core.info(`Stale Branches: ${outputStales.length}`);
+            core.info(`Deleted Branches: ${outputDeletes.length}`);
             core.setOutput('stale-branches', JSON.stringify(outputStales));
             core.setOutput('deleted-branches', JSON.stringify(outputDeletes));
         }
