@@ -21,7 +21,7 @@ export async function run(): Promise<void> {
   const outputDeletes: string[] = []
   const outputStales: string[] = []
   try {
-    //Collect Branches & budget
+    //Collect Branches, Issue Budget, and Existing Issues
     const branches = await getBranches()
     const outputTotal = branches.length
     let issueBudgetRemaining = await getIssueBudget()
@@ -36,8 +36,11 @@ export async function run(): Promise<void> {
       const branchName = branchToCheck.branchName
       const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`)
 
+      // Start output group for current branch assessment
       core.startGroup(logBranchGroupColor(branchName, commitAge, daysBeforeStale, daysBeforeDelete))
       core.info(logLastCommitColor(commitAge, daysBeforeStale, daysBeforeDelete))
+
+      // Skip looking for last commit's login if input is set to false
       let lastCommitLogin = 'Unknown'
       if (tagLastCommitter === true) {
         lastCommitLogin = await getRecentCommitLogin(branchToCheck.commmitSha)
@@ -46,7 +49,7 @@ export async function run(): Promise<void> {
       //Create issues for stale branches
       if (commitAge > daysBeforeStale) {
         //Create new issue if existing issue is not found & issue budget is >0
-        if (!existingIssue.data.find(findIssue => findIssue.title === `[${branchName}] is STALE`) && issueBudgetRemaining > 0) {
+        if (!filteredIssue.find(findIssue => findIssue.title === `[${branchName}] is STALE`) && issueBudgetRemaining > 0) {
           await createIssue(branchName, commitAge, lastCommitLogin)
           issueBudgetRemaining--
           core.info(logMaxIssues(issueBudgetRemaining))
