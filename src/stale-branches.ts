@@ -28,7 +28,6 @@ export async function run(): Promise<void> {
     // Assess Branches
     for (const branchToCheck of branches) {
       const lastCommitDate = await getRecentCommitDate(branchToCheck.commmitSha)
-      const lastCommitLogin = await getRecentCommitLogin(branchToCheck.commmitSha)
       const currentDate = new Date().getTime()
       const commitDate = new Date(lastCommitDate).getTime()
       const commitAge = getDays(currentDate, commitDate)
@@ -37,6 +36,7 @@ export async function run(): Promise<void> {
 
       core.startGroup(logBranchGroupColor(branchName, commitAge, daysBeforeStale, daysBeforeDelete))
       core.info(logLastCommitColor(commitAge, daysBeforeStale, daysBeforeDelete))
+      const lastCommitLogin = await getRecentCommitLogin(branchToCheck.commmitSha)
 
       //Create issues for stale branches
       if (commitAge > daysBeforeStale) {
