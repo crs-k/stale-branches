@@ -39,7 +39,6 @@ export async function run(): Promise<void> {
       // Start output group for current branch assessment
       core.startGroup(logBranchGroupColor(branchName, commitAge, daysBeforeStale, daysBeforeDelete))
       core.info(logLastCommitColor(commitAge, daysBeforeStale, daysBeforeDelete))
-      core.info(JSON.stringify(filteredIssue))
 
       // Skip looking for last commit's login if input is set to false
       let lastCommitLogin = 'Unknown'
