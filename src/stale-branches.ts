@@ -22,7 +22,6 @@ export async function run(): Promise<void> {
   try {
     //Collect Branches & budget
     const branches = await getBranches()
-    const outputTotal = branches.length
     let issueBudgetRemaining = await getIssueBudget()
     const existingIssue = await getIssues()
 
@@ -91,11 +90,10 @@ export async function run(): Promise<void> {
       }
       core.endGroup()
     }
-    core.info(`Total Branches: ${outputTotal}`)
-    core.info(`Stale Branches: ${outputStales.length}`)
-    core.info(`Deleted Branches: ${outputDeletes.length}`)
     core.setOutput('stale-branches', JSON.stringify(outputStales))
     core.setOutput('deleted-branches', JSON.stringify(outputDeletes))
+    core.info(`Stale Branches: ${outputStales.length}`)
+    core.info(`Deleted Branches: ${outputDeletes.length}`)
   } catch (error) {
     if (error instanceof Error) core.setFailed(`Action failed. Error: ${error.message}`)
   }
