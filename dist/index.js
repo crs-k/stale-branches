@@ -831,7 +831,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.logTotalAssessed = void 0;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logTotalAssessed(outputStales, outputTotal) {
-    const totalAssessed = `${ansi_styles_1.default.bold.open}${ansi_styles_1.default.blueBright.open}Stale Branches Assessed${ansi_styles_1.default.blueBright.close}: [${ansi_styles_1.default.yellowBright.open}${outputStales}${ansi_styles_1.default.yellowBright.close}/${ansi_styles_1.default.greenBright.open}${outputTotal}${ansi_styles_1.default.greenBright.close}]${ansi_styles_1.default.bold.close}`;
+    const totalAssessed = `${ansi_styles_1.default.bold.open}${ansi_styles_1.default.blueBright.open}Stale Branches Assessed${ansi_styles_1.default.blueBright.close}: [${ansi_styles_1.default.yellowBright.open}${outputStales}${ansi_styles_1.default.yellowBright.close}/${ansi_styles_1.default.magenta.open}${outputTotal}${ansi_styles_1.default.magenta.close}]${ansi_styles_1.default.bold.close}`;
     return totalAssessed;
 }
 exports.logTotalAssessed = logTotalAssessed;
