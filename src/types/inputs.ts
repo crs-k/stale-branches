@@ -30,7 +30,7 @@ export interface Inputs {
   commentUpdates: boolean
 
   /**
-   * This dictates the number of stale branch 🗑️ issues that can exist. It also limits the number of branches that can be deleted per run.
+   * This dictates the number of stale branch issues that can exist. It also limits the number of branches that can be deleted per run.
    */
   maxIssues: number
 

@@ -1,6 +1,6 @@
 import * as assert from 'assert'
 import * as core from '@actions/core'
-import {daysBeforeDelete, github, owner, repo, tagLastCommitter} from './get-context'
+import {daysBeforeDelete, github, owner, repo, staleBranchLabel, tagLastCommitter} from './get-context'
 import {logNewIssue} from './logging/log-new-issue'
 
 export async function createIssue(branch: string, commitAge: number, lastCommitter: string): Promise<number> {
@@ -25,7 +25,7 @@ export async function createIssue(branch: string, commitAge: number, lastCommitt
       body: bodyString,
       labels: [
         {
-          name: 'stale branch 🗑️',
+          name: staleBranchLabel,
           color: 'B60205',
           description: 'Used by Stale Branches Action to label issues'
         }
