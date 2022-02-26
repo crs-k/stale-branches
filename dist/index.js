@@ -1040,7 +1040,7 @@ function run() {
                 // Start output group for current branch assessment
                 core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchName, commitAge, get_context_1.daysBeforeStale, get_context_1.daysBeforeDelete));
                 core.info((0, log_last_commit_color_1.logLastCommitColor)(commitAge, get_context_1.daysBeforeStale, get_context_1.daysBeforeDelete));
-                core.info(filteredIssue.toString());
+                core.info(JSON.stringify(filteredIssue));
                 // Skip looking for last commit's login if input is set to false
                 let lastCommitLogin = 'Unknown';
                 if (get_context_1.tagLastCommitter === true) {
