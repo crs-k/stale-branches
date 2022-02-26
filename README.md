@@ -67,7 +67,7 @@ jobs:
     - name: Stale Branches
       uses: crs-k/stale-branches@v1.3.2
       with:
-        repo-token: "${{ secrets.GITHUB_TOKEN }}"
+        repo-token: '${{ secrets.GITHUB_TOKEN }}'
 ```
 ### With Inputs
 ```yaml
@@ -90,13 +90,13 @@ jobs:
     - name: Stale Branches
       uses: crs-k/stale-branches@v1.3.2
       with:
-        repo-token: "${{ secrets.GITHUB_TOKEN }}"
+        repo-token: '${{ secrets.GITHUB_TOKEN }}'
         days-before-stale: 120
         days-before-delete: 180
         comment-updates: false
         max-issues: 20
         tag-committer: false
-        stale-branch-label: "stale branch 🗑️"
+        stale-branch-label: 'stale branch 🗑️'
 
 ```
 
