@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import {daysBeforeDelete, daysBeforeStale} from './functions/get-context'
+import {daysBeforeDelete, daysBeforeStale, tagLastCommitter} from './functions/get-context'
 import {closeIssue} from './functions/close-issue'
 import {createIssue} from './functions/create-issue'
 import {deleteBranch} from './functions/delete-branch'
@@ -38,7 +38,10 @@ export async function run(): Promise<void> {
 
       core.startGroup(logBranchGroupColor(branchName, commitAge, daysBeforeStale, daysBeforeDelete))
       core.info(logLastCommitColor(commitAge, daysBeforeStale, daysBeforeDelete))
-      const lastCommitLogin = await getRecentCommitLogin(branchToCheck.commmitSha)
+      let lastCommitLogin = 'Unknown'
+      if (tagLastCommitter === true) {
+        lastCommitLogin = await getRecentCommitLogin(branchToCheck.commmitSha)
+      }
 
       //Create issues for stale branches
       if (commitAge > daysBeforeStale) {
