@@ -13,7 +13,6 @@ import {logActiveBranch} from './functions/logging/log-active-branch'
 import {logBranchGroupColor} from './functions/logging/log-branch-group-color'
 import {logLastCommitColor} from './functions/logging/log-last-commit-color'
 import {logMaxIssues} from './functions/logging/log-max-issues'
-import {removeElementFromStringArray} from './utils/remove-element-from-array'
 import {updateIssue} from './functions/update-issue'
 
 export async function run(): Promise<void> {
@@ -79,10 +78,7 @@ export async function run(): Promise<void> {
           if (issueToDelete.title === `[${branchName}] is STALE`) {
             await deleteBranch(branchName)
             await closeIssue(issueToDelete.number)
-            if (outputDeletes.includes(branchName) === false) {
-              outputDeletes.push(branchName)
-              removeElementFromStringArray(outputStales, branchName)
-            }
+            outputDeletes.push(branchName)
           }
         }
       }
