@@ -15,6 +15,7 @@ export const daysBeforeDelete: number = 180
 export const commentUpdates: boolean = true
 export const maxIssues: number = 20
 export const repoToken: string = '20'
+export const staleBranchLabel: string = 'stale branch 🗑️'
 
 type ListIssuesResponseDataType = GetResponseTypeFromEndpointMethod<typeof githubActual.github.rest.issues.listForRepo>
 

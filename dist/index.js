@@ -127,7 +127,7 @@ function createIssue(branch, commitAge, lastCommitter) {
                 body: bodyString,
                 labels: [
                     {
-                        name: 'stale branch 🗑️',
+                        name: get_context_1.staleBranchLabel,
                         color: 'B60205',
                         description: 'Used by Stale Branches Action to label issues'
                     }
@@ -442,18 +442,19 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.tagLastCommitter = exports.maxIssues = exports.commentUpdates = exports.daysBeforeDelete = exports.daysBeforeStale = exports.repo = exports.owner = exports.github = void 0;
+exports.staleBranchLabel = exports.tagLastCommitter = exports.maxIssues = exports.commentUpdates = exports.daysBeforeDelete = exports.daysBeforeStale = exports.repo = exports.owner = exports.github = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github_1 = __nccwpck_require__(5438);
 const repoToken = core.getInput('repo-token', { required: true });
 core.setSecret(repoToken);
 exports.github = (0, github_1.getOctokit)(repoToken);
 _a = github_1.context.repo, exports.owner = _a.owner, exports.repo = _a.repo;
-exports.daysBeforeStale = Number(core.getInput('days-before-stale', { required: false }));
-exports.daysBeforeDelete = Number(core.getInput('days-before-delete', { required: false }));
-exports.commentUpdates = core.getBooleanInput('comment-updates', { required: false });
-exports.maxIssues = Number(core.getInput('max-issues', { required: false }));
-exports.tagLastCommitter = core.getBooleanInput('tag-committer', { required: false });
+exports.daysBeforeStale = Number(core.getInput('days-before-stale'));
+exports.daysBeforeDelete = Number(core.getInput('days-before-delete'));
+exports.commentUpdates = core.getBooleanInput('comment-updates');
+exports.maxIssues = Number(core.getInput('max-issues'));
+exports.tagLastCommitter = core.getBooleanInput('tag-committer');
+exports.staleBranchLabel = String(core.getInput('stale-branch-label'));
 
 
 /***/ }),
@@ -500,12 +501,13 @@ function getIssues() {
     return __awaiter(this, void 0, void 0, function* () {
         let issues;
         try {
-            const issueResponse = yield get_context_1.github.rest.issues.listForRepo({
+            const issueResponse = yield get_context_1.github.paginate(get_context_1.github.rest.issues.listForRepo, {
                 owner: get_context_1.owner,
                 repo: get_context_1.repo,
                 state: 'open',
-                labels: 'stale branch 🗑️'
-            });
+                labels: get_context_1.staleBranchLabel,
+                per_page: 100
+            }, response => response.data.map(issue => ({ issueTitle: issue.title, issueNumber: issue.number })));
             issues = issueResponse;
             assert.ok(issues, 'Issue ID cannot be empty');
         }
@@ -514,7 +516,7 @@ function getIssues() {
                 core.setFailed(`Failed to locate issues. Error: ${err.message}`);
             }
             core.setFailed(`Failed to locate issues.`);
-            issues = {};
+            issues = [{ issueTitle: '', issueNumber: -1 }];
         }
         return issues;
     });
@@ -569,14 +571,15 @@ function getIssueBudget() {
         let issueCount = 0;
         let issueBudgetRemaining;
         try {
-            const issueResponse = yield get_context_1.github.rest.issues.listForRepo({
+            const issueResponse = yield get_context_1.github.paginate(get_context_1.github.rest.issues.listForRepo, {
                 owner: get_context_1.owner,
                 repo: get_context_1.repo,
                 state: 'open',
-                labels: 'stale branch 🗑️'
-            });
+                labels: get_context_1.staleBranchLabel,
+                per_page: 100
+            }, response => response.data.map(issue => ({ issueTitle: issue.title, issueNumber: issue.number })));
             issues = issueResponse;
-            issueCount = new Set(issues.data.map(filteredIssues => filteredIssues.number)).size;
+            issueCount = new Set(issues.map(filteredIssues => filteredIssues.issueNumber)).size;
             issueBudgetRemaining = Math.max(0, get_context_1.maxIssues - issueCount);
             assert.ok(issues, 'Issue ID cannot be empty');
         }
@@ -941,7 +944,7 @@ function updateIssue(issueNumber, branch, commitAge, lastCommitter) {
                     body: bodyString,
                     labels: [
                         {
-                            name: 'stale branch 🗑️',
+                            name: get_context_1.staleBranchLabel,
                             color: 'B60205',
                             description: 'Used by Stale Branches Action to label issues'
                         }
@@ -1036,7 +1039,7 @@ function run() {
                 const commitDate = new Date(lastCommitDate).getTime();
                 const commitAge = (0, get_time_1.getDays)(currentDate, commitDate);
                 const branchName = branchToCheck.branchName;
-                const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
+                const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === `[${branchName}] is STALE`);
                 // Start output group for current branch assessment
                 core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchName, commitAge, get_context_1.daysBeforeStale, get_context_1.daysBeforeDelete));
                 core.info((0, log_last_commit_color_1.logLastCommitColor)(commitAge, get_context_1.daysBeforeStale, get_context_1.daysBeforeDelete));
@@ -1047,7 +1050,7 @@ function run() {
                 }
                 //Create new issue if branch is stale & existing issue is not found & issue budget is >0
                 if (commitAge > get_context_1.daysBeforeStale) {
-                    if (!filteredIssue.find(findIssue => findIssue.title === `[${branchName}] is STALE`) && issueBudgetRemaining > 0) {
+                    if (!filteredIssue.find(findIssue => findIssue.issueTitle === `[${branchName}] is STALE`) && issueBudgetRemaining > 0) {
                         yield (0, create_issue_1.createIssue)(branchName, commitAge, lastCommitLogin);
                         issueBudgetRemaining--;
                         core.info((0, log_max_issues_1.logMaxIssues)(issueBudgetRemaining));
@@ -1059,17 +1062,17 @@ function run() {
                 //Close issues if a branch becomes active again
                 if (commitAge < get_context_1.daysBeforeStale) {
                     for (const issueToClose of filteredIssue) {
-                        if (issueToClose.title === `[${branchName}] is STALE`) {
+                        if (issueToClose.issueTitle === `[${branchName}] is STALE`) {
                             core.info((0, log_active_branch_1.logActiveBranch)(branchName));
-                            yield (0, close_issue_1.closeIssue)(issueToClose.number);
+                            yield (0, close_issue_1.closeIssue)(issueToClose.issueNumber);
                         }
                     }
                 }
                 //Update existing issues
                 if (commitAge > get_context_1.daysBeforeStale) {
                     for (const issueToUpdate of filteredIssue) {
-                        if (issueToUpdate.title === `[${branchName}] is STALE`) {
-                            yield (0, update_issue_1.updateIssue)(issueToUpdate.number, branchName, commitAge, lastCommitLogin);
+                        if (issueToUpdate.issueTitle === `[${branchName}] is STALE`) {
+                            yield (0, update_issue_1.updateIssue)(issueToUpdate.issueNumber, branchName, commitAge, lastCommitLogin);
                             if (outputStales.includes(branchName) === false) {
                                 outputStales.push(branchName);
                             }
@@ -1079,9 +1082,9 @@ function run() {
                 //Delete expired branches
                 if (commitAge > get_context_1.daysBeforeDelete) {
                     for (const issueToDelete of filteredIssue) {
-                        if (issueToDelete.title === `[${branchName}] is STALE`) {
+                        if (issueToDelete.issueTitle === `[${branchName}] is STALE`) {
                             yield (0, delete_branch_1.deleteBranch)(branchName);
-                            yield (0, close_issue_1.closeIssue)(issueToDelete.number);
+                            yield (0, close_issue_1.closeIssue)(issueToDelete.issueNumber);
                             outputDeletes.push(branchName);
                         }
                     }

@@ -12,15 +12,13 @@ describe('Get Issues Function', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
-  test('getIssues endpoint is called', async () => {
+  test('github.paginate endpoint is called', async () => {
+    core.info = jest.fn()
+    assert.ok = jest.fn()
     await getIssues()
 
-    expect(github.rest.issues.listForRepo).toHaveBeenCalledWith({
-      owner: 'owner',
-      repo: 'repo',
-      state: 'open',
-      labels: 'stale branch 🗑️'
-    })
+    expect(github.paginate).toHaveBeenCalled()
+    expect(assert.ok).toHaveBeenCalled()
   })
 
   test('Action fails elegantly', async () => {

@@ -13,28 +13,22 @@ describe('Get Stale Issue Budget Function', () => {
   test('getIssueBudget - 5 max issues', async () => {
     Object.defineProperty(context, 'maxIssues', {value: 5})
     core.info = jest.fn()
+    assert.ok = jest.fn()
     await getIssueBudget()
 
-    expect(github.rest.issues.listForRepo).toHaveBeenCalledWith({
-      owner: 'owner',
-      repo: 'repo',
-      state: 'open',
-      labels: 'stale branch 🗑️'
-    })
+    expect(github.paginate).toHaveBeenCalled()
+    expect(assert.ok).toHaveBeenCalled()
     expect(core.info).toHaveBeenCalled()
   })
 
   test('getIssueBudget - <1 max issues', async () => {
     Object.defineProperty(context, 'maxIssues', {value: 0})
     core.info = jest.fn()
+    assert.ok = jest.fn()
     await getIssueBudget()
 
-    expect(github.rest.issues.listForRepo).toHaveBeenCalledWith({
-      owner: 'owner',
-      repo: 'repo',
-      state: 'open',
-      labels: 'stale branch 🗑️'
-    })
+    expect(github.paginate).toHaveBeenCalled()
+    expect(assert.ok).toHaveBeenCalled()
     expect(core.info).toHaveBeenCalled()
   })
 
