@@ -1024,7 +1024,7 @@ function run() {
         const outputDeletes = [];
         const outputStales = [];
         try {
-            //Collect Branches & budget
+            //Collect Branches, Issue Budget, and Existing Issues
             const branches = yield (0, get_branches_1.getBranches)();
             const outputTotal = branches.length;
             let issueBudgetRemaining = yield (0, get_stale_issue_budget_1.getIssueBudget)();
@@ -1037,16 +1037,17 @@ function run() {
                 const commitAge = (0, get_time_1.getDays)(currentDate, commitDate);
                 const branchName = branchToCheck.branchName;
                 const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
+                // Start output group for current branch assessment
                 core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchName, commitAge, get_context_1.daysBeforeStale, get_context_1.daysBeforeDelete));
                 core.info((0, log_last_commit_color_1.logLastCommitColor)(commitAge, get_context_1.daysBeforeStale, get_context_1.daysBeforeDelete));
+                // Skip looking for last commit's login if input is set to false
                 let lastCommitLogin = 'Unknown';
                 if (get_context_1.tagLastCommitter === true) {
                     lastCommitLogin = yield (0, get_committer_login_1.getRecentCommitLogin)(branchToCheck.commmitSha);
                 }
-                //Create issues for stale branches
+                //Create new issue if branch is stale & existing issue is not found & issue budget is >0
                 if (commitAge > get_context_1.daysBeforeStale) {
-                    //Create new issue if existing issue is not found & issue budget is >0
-                    if (!existingIssue.data.find(findIssue => findIssue.title === `[${branchName}] is STALE`) && issueBudgetRemaining > 0) {
+                    if (!filteredIssue.find(findIssue => findIssue.title === `[${branchName}] is STALE`) && issueBudgetRemaining > 0) {
                         yield (0, create_issue_1.createIssue)(branchName, commitAge, lastCommitLogin);
                         issueBudgetRemaining--;
                         core.info((0, log_max_issues_1.logMaxIssues)(issueBudgetRemaining));
