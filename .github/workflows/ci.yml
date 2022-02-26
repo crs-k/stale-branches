@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Print GitHub event action
         run: |
-          echo "${{ github.event.action }}"
+          echo '${{ github.event.action }}'
       - name: Checkout Repo
         uses: actions/checkout@v2
 
@@ -32,7 +32,7 @@ jobs:
     steps:
       - name: Print GitHub event action
         run: |
-          echo "${{ github.event.action }}"
+          echo '${{ github.event.action }}'
       - name: Checkout Repo
         uses: actions/checkout@v2
 
@@ -50,13 +50,13 @@ jobs:
       - uses: actions/checkout@v2
       - uses: ./
         with:
-          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          repo-token: '${{ secrets.GITHUB_TOKEN }}'
           days-before-stale: 120
           days-before-delete: 180
           comment-updates: false
           max-issues: 20
           tag-committer: false
-          stale-branch-label: "stale branch 🗑️"
+          stale-branch-label: 'stale branch 🗑️'
 
 
   Build:
@@ -66,7 +66,7 @@ jobs:
     steps:
       - name: Print GitHub event action
         run: |
-          echo "${{ github.event.action }}"
+          echo '${{ github.event.action }}'
 
       - name: Checkout Repo
         uses: actions/checkout@v2
