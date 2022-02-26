@@ -26,7 +26,7 @@ export async function run(): Promise<void> {
     const outputTotal = branches.length
     let issueBudgetRemaining = await getIssueBudget()
     const existingIssue = await getIssues()
-    core.info(issueBudgetRemaining.toString())
+
     // Assess Branches
     for (const branchToCheck of branches) {
       const lastCommitDate = await getRecentCommitDate(branchToCheck.commmitSha)
@@ -39,7 +39,7 @@ export async function run(): Promise<void> {
       // Start output group for current branch assessment
       core.startGroup(logBranchGroupColor(branchName, commitAge, daysBeforeStale, daysBeforeDelete))
       core.info(logLastCommitColor(commitAge, daysBeforeStale, daysBeforeDelete))
-      core.info(issueBudgetRemaining.toString())
+
       // Skip looking for last commit's login if input is set to false
       let lastCommitLogin = 'Unknown'
       if (tagLastCommitter === true) {

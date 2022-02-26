@@ -1032,7 +1032,6 @@ function run() {
             const outputTotal = branches.length;
             let issueBudgetRemaining = yield (0, get_stale_issue_budget_1.getIssueBudget)();
             const existingIssue = yield (0, get_issues_1.getIssues)();
-            core.info(issueBudgetRemaining.toString());
             // Assess Branches
             for (const branchToCheck of branches) {
                 const lastCommitDate = yield (0, get_commit_date_1.getRecentCommitDate)(branchToCheck.commmitSha);
@@ -1044,7 +1043,6 @@ function run() {
                 // Start output group for current branch assessment
                 core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchName, commitAge, get_context_1.daysBeforeStale, get_context_1.daysBeforeDelete));
                 core.info((0, log_last_commit_color_1.logLastCommitColor)(commitAge, get_context_1.daysBeforeStale, get_context_1.daysBeforeDelete));
-                core.info(issueBudgetRemaining.toString());
                 // Skip looking for last commit's login if input is set to false
                 let lastCommitLogin = 'Unknown';
                 if (get_context_1.tagLastCommitter === true) {
