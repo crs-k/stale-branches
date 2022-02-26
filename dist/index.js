@@ -127,7 +127,7 @@ function createIssue(branch, commitAge, lastCommitter) {
                 body: bodyString,
                 labels: [
                     {
-                        name: 'stale branch 🗑️',
+                        name: get_context_1.staleBranchLabel,
                         color: 'B60205',
                         description: 'Used by Stale Branches Action to label issues'
                     }
@@ -442,7 +442,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.tagLastCommitter = exports.maxIssues = exports.commentUpdates = exports.daysBeforeDelete = exports.daysBeforeStale = exports.repo = exports.owner = exports.github = void 0;
+exports.staleBranchLabel = exports.tagLastCommitter = exports.maxIssues = exports.commentUpdates = exports.daysBeforeDelete = exports.daysBeforeStale = exports.repo = exports.owner = exports.github = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github_1 = __nccwpck_require__(5438);
 const repoToken = core.getInput('repo-token', { required: true });
@@ -454,6 +454,7 @@ exports.daysBeforeDelete = Number(core.getInput('days-before-delete'));
 exports.commentUpdates = core.getBooleanInput('comment-updates');
 exports.maxIssues = Number(core.getInput('max-issues'));
 exports.tagLastCommitter = core.getBooleanInput('tag-committer');
+exports.staleBranchLabel = String(core.getInput('stale-branch-label'));
 
 
 /***/ }),
@@ -504,7 +505,7 @@ function getIssues() {
                 owner: get_context_1.owner,
                 repo: get_context_1.repo,
                 state: 'open',
-                labels: 'stale branch 🗑️',
+                labels: get_context_1.staleBranchLabel,
                 per_page: 100
             }, response => response.data.map(issue => ({ issueTitle: issue.title, issueNumber: issue.number })));
             issues = issueResponse;
@@ -570,14 +571,15 @@ function getIssueBudget() {
         let issueCount = 0;
         let issueBudgetRemaining;
         try {
-            const issueResponse = yield get_context_1.github.rest.issues.listForRepo({
+            const issueResponse = yield get_context_1.github.paginate(get_context_1.github.rest.issues.listForRepo, {
                 owner: get_context_1.owner,
                 repo: get_context_1.repo,
                 state: 'open',
-                labels: 'stale branch 🗑️'
-            });
+                labels: get_context_1.staleBranchLabel,
+                per_page: 100
+            }, response => response.data.map(issue => ({ issueTitle: issue.title, issueNumber: issue.number })));
             issues = issueResponse;
-            issueCount = new Set(issues.data.map(filteredIssues => filteredIssues.number)).size;
+            issueCount = new Set(issues.map(filteredIssues => filteredIssues.issueNumber)).size;
             issueBudgetRemaining = Math.max(0, get_context_1.maxIssues - issueCount);
             assert.ok(issues, 'Issue ID cannot be empty');
         }
@@ -942,7 +944,7 @@ function updateIssue(issueNumber, branch, commitAge, lastCommitter) {
                     body: bodyString,
                     labels: [
                         {
-                            name: 'stale branch 🗑️',
+                            name: get_context_1.staleBranchLabel,
                             color: 'B60205',
                             description: 'Used by Stale Branches Action to label issues'
                         }

@@ -24,6 +24,10 @@ inputs:
     description: 'When an issue is opened, this will tag the stale branchs last committer in the comments.'
     required: false
     default: false
+  stale-branch-label:
+    description: 'Label to be applied to issues created for stale branches.'
+    required: false
+    default: 'stale branch 🗑️'
 outputs:
   deleted-branches:
     description: 'List of all deleted branches.'
