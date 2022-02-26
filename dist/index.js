@@ -976,6 +976,7 @@ const log_active_branch_1 = __nccwpck_require__(1182);
 const log_branch_group_color_1 = __nccwpck_require__(3839);
 const log_last_commit_color_1 = __nccwpck_require__(2965);
 const log_max_issues_1 = __nccwpck_require__(5487);
+const remove_element_from_array_1 = __nccwpck_require__(405);
 const update_issue_1 = __nccwpck_require__(2914);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -1040,6 +1041,7 @@ function run() {
                             yield (0, close_issue_1.closeIssue)(issueToDelete.number);
                             if (outputDeletes.includes(branchName) === false) {
                                 outputDeletes.push(branchName);
+                                (0, remove_element_from_array_1.removeElementFromStringArray)(outputStales, branchName);
                             }
                         }
                     }
@@ -1059,6 +1061,52 @@ function run() {
     });
 }
 exports.run = run;
+
+
+/***/ }),
+
+/***/ 405:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.removeElementFromStringArray = void 0;
+const core = __importStar(__nccwpck_require__(2186));
+function removeElementFromStringArray(stringArray, element) {
+    try {
+        let index = 0;
+        for (const value of stringArray) {
+            if (value === element)
+                index = stringArray.indexOf(value);
+            stringArray.splice(index, 1);
+        }
+    }
+    catch (err) {
+        if (err instanceof Error)
+            core.info(`Error: ${err.message}`);
+    }
+}
+exports.removeElementFromStringArray = removeElementFromStringArray;
 
 
 /***/ }),
