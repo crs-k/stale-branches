@@ -13,6 +13,8 @@ import {logActiveBranch} from './functions/logging/log-active-branch'
 import {logBranchGroupColor} from './functions/logging/log-branch-group-color'
 import {logLastCommitColor} from './functions/logging/log-last-commit-color'
 import {logMaxIssues} from './functions/logging/log-max-issues'
+import {logTotalAssessed} from './functions/logging/log-total-assessed'
+import {logTotalDeleted} from './functions/logging/log-total-deleted'
 import {updateIssue} from './functions/update-issue'
 
 export async function run(): Promise<void> {
@@ -21,6 +23,7 @@ export async function run(): Promise<void> {
   try {
     //Collect Branches & budget
     const branches = await getBranches()
+    const outputTotal = branches.length
     let issueBudgetRemaining = await getIssueBudget()
     const existingIssue = await getIssues()
 
@@ -86,8 +89,8 @@ export async function run(): Promise<void> {
     }
     core.setOutput('stale-branches', JSON.stringify(outputStales))
     core.setOutput('deleted-branches', JSON.stringify(outputDeletes))
-    core.info(`Stale Branches: ${outputStales.length}`)
-    core.info(`Deleted Branches: ${outputDeletes.length}`)
+    core.info(logTotalAssessed(outputStales.length, outputTotal))
+    core.info(logTotalDeleted(outputDeletes.length, outputStales.length))
   } catch (error) {
     if (error instanceof Error) core.setFailed(`Action failed. Error: ${error.message}`)
   }

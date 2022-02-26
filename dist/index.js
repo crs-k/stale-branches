@@ -787,10 +787,10 @@ function logMaxIssues(issueBudgetRemaining) {
     let maxIssues = `${ansi_styles_1.default.bold.open}[${ansi_styles_1.default.magenta.open}${issueBudgetRemaining}${ansi_styles_1.default.magenta.close}] ${ansi_styles_1.default.blueBright.open}max-issues budget remaining${ansi_styles_1.default.blueBright.close}.${ansi_styles_1.default.bold.close}`;
     //color group based on age of branch
     if (issueBudgetRemaining < 1) {
-        maxIssues = `[${ansi_styles_1.default.redBright.open}${issueBudgetRemaining}${ansi_styles_1.default.redBright.close}] max-issues budget remaining.`;
+        maxIssues = `${ansi_styles_1.default.bold.open}[${ansi_styles_1.default.redBright.open}${issueBudgetRemaining}${ansi_styles_1.default.redBright.close}] ${ansi_styles_1.default.blueBright.open}max-issues budget remaining${ansi_styles_1.default.blueBright.close}.${ansi_styles_1.default.bold.close}`;
     }
     else if (issueBudgetRemaining < 5) {
-        maxIssues = `[${ansi_styles_1.default.yellowBright.open}${issueBudgetRemaining}${ansi_styles_1.default.yellowBright.close}] max-issues budget remaining.`;
+        maxIssues = `${ansi_styles_1.default.bold.open}[${ansi_styles_1.default.yellowBright.open}${issueBudgetRemaining}${ansi_styles_1.default.yellowBright.close}] ${ansi_styles_1.default.blueBright.open}max-issues budget remaining${ansi_styles_1.default.blueBright.close}.${ansi_styles_1.default.bold.close}`;
     }
     return maxIssues;
 }
@@ -815,6 +815,46 @@ function logNewIssue(branchName) {
     return newIssue;
 }
 exports.logNewIssue = logNewIssue;
+
+
+/***/ }),
+
+/***/ 2673:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.logTotalAssessed = void 0;
+const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+function logTotalAssessed(outputStales, outputTotal) {
+    const totalAssessed = `${ansi_styles_1.default.bold.open}${ansi_styles_1.default.blueBright.open}Stale Branches Assessed${ansi_styles_1.default.blueBright.close}: [${ansi_styles_1.default.yellowBright.open}${outputStales}${ansi_styles_1.default.yellowBright.close}/${ansi_styles_1.default.greenBright.open}${outputTotal}${ansi_styles_1.default.greenBright.close}]${ansi_styles_1.default.bold.close}`;
+    return totalAssessed;
+}
+exports.logTotalAssessed = logTotalAssessed;
+
+
+/***/ }),
+
+/***/ 4888:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.logTotalDeleted = void 0;
+const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+function logTotalDeleted(outputDeletes, outputStales) {
+    const totalDeleted = `${ansi_styles_1.default.bold.open}${ansi_styles_1.default.blueBright.open}Stale Branches Assessed${ansi_styles_1.default.blueBright.close}: [${ansi_styles_1.default.redBright.open}${outputDeletes}${ansi_styles_1.default.redBright.close}/${ansi_styles_1.default.yellowBright.open}${outputStales}${ansi_styles_1.default.yellowBright.close}]${ansi_styles_1.default.bold.close}`;
+    return totalDeleted;
+}
+exports.logTotalDeleted = logTotalDeleted;
 
 
 /***/ }),
@@ -976,6 +1016,8 @@ const log_active_branch_1 = __nccwpck_require__(1182);
 const log_branch_group_color_1 = __nccwpck_require__(3839);
 const log_last_commit_color_1 = __nccwpck_require__(2965);
 const log_max_issues_1 = __nccwpck_require__(5487);
+const log_total_assessed_1 = __nccwpck_require__(2673);
+const log_total_deleted_1 = __nccwpck_require__(4888);
 const update_issue_1 = __nccwpck_require__(2914);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -984,6 +1026,7 @@ function run() {
         try {
             //Collect Branches & budget
             const branches = yield (0, get_branches_1.getBranches)();
+            const outputTotal = branches.length;
             let issueBudgetRemaining = yield (0, get_stale_issue_budget_1.getIssueBudget)();
             const existingIssue = yield (0, get_issues_1.getIssues)();
             // Assess Branches
@@ -1043,8 +1086,8 @@ function run() {
             }
             core.setOutput('stale-branches', JSON.stringify(outputStales));
             core.setOutput('deleted-branches', JSON.stringify(outputDeletes));
-            core.info(`Stale Branches: ${outputStales.length}`);
-            core.info(`Deleted Branches: ${outputDeletes.length}`);
+            core.info((0, log_total_assessed_1.logTotalAssessed)(outputStales.length, outputTotal));
+            core.info((0, log_total_deleted_1.logTotalDeleted)(outputDeletes.length, outputStales.length));
         }
         catch (error) {
             if (error instanceof Error)
