@@ -1030,6 +1030,7 @@ function run() {
             const outputTotal = branches.length;
             let issueBudgetRemaining = yield (0, get_stale_issue_budget_1.getIssueBudget)();
             const existingIssue = yield (0, get_issues_1.getIssues)();
+            core.info(JSON.stringify(existingIssue));
             // Assess Branches
             for (const branchToCheck of branches) {
                 const lastCommitDate = yield (0, get_commit_date_1.getRecentCommitDate)(branchToCheck.commmitSha);

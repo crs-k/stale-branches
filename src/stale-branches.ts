@@ -26,7 +26,7 @@ export async function run(): Promise<void> {
     const outputTotal = branches.length
     let issueBudgetRemaining = await getIssueBudget()
     const existingIssue = await getIssues()
-
+    core.info(JSON.stringify(existingIssue))
     // Assess Branches
     for (const branchToCheck of branches) {
       const lastCommitDate = await getRecentCommitDate(branchToCheck.commmitSha)
