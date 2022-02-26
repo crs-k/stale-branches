@@ -976,6 +976,7 @@ const log_active_branch_1 = __nccwpck_require__(1182);
 const log_branch_group_color_1 = __nccwpck_require__(3839);
 const log_last_commit_color_1 = __nccwpck_require__(2965);
 const log_max_issues_1 = __nccwpck_require__(5487);
+const remove_element_from_array_1 = __nccwpck_require__(405);
 const update_issue_1 = __nccwpck_require__(2914);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -985,33 +986,32 @@ function run() {
             //Collect Branches & budget
             const branches = yield (0, get_branches_1.getBranches)();
             let issueBudgetRemaining = yield (0, get_stale_issue_budget_1.getIssueBudget)();
+            const existingIssue = yield (0, get_issues_1.getIssues)();
             // Assess Branches
             for (const branchToCheck of branches) {
-                if (issueBudgetRemaining < 1)
-                    break;
                 const lastCommitDate = yield (0, get_commit_date_1.getRecentCommitDate)(branchToCheck.commmitSha);
                 const lastCommitLogin = yield (0, get_committer_login_1.getRecentCommitLogin)(branchToCheck.commmitSha);
                 const currentDate = new Date().getTime();
                 const commitDate = new Date(lastCommitDate).getTime();
                 const commitAge = (0, get_time_1.getDays)(currentDate, commitDate);
                 const branchName = branchToCheck.branchName;
+                const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
                 core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchName, commitAge, get_context_1.daysBeforeStale, get_context_1.daysBeforeDelete));
                 core.info((0, log_last_commit_color_1.logLastCommitColor)(commitAge, get_context_1.daysBeforeStale, get_context_1.daysBeforeDelete));
                 //Create issues for stale branches
                 if (commitAge > get_context_1.daysBeforeStale) {
-                    const existingIssue = yield (0, get_issues_1.getIssues)();
                     //Create new issue if existing issue is not found & issue budget is >0
                     if (!existingIssue.data.find(findIssue => findIssue.title === `[${branchName}] is STALE`) && issueBudgetRemaining > 0) {
                         yield (0, create_issue_1.createIssue)(branchName, commitAge, lastCommitLogin);
                         issueBudgetRemaining--;
                         core.info((0, log_max_issues_1.logMaxIssues)(issueBudgetRemaining));
-                        outputStales.push(branchName);
+                        if (outputStales.includes(branchName) === false) {
+                            outputStales.push(branchName);
+                        }
                     }
                 }
                 //Close issues if a branch becomes active again
                 if (commitAge < get_context_1.daysBeforeStale) {
-                    const existingIssue = yield (0, get_issues_1.getIssues)();
-                    const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
                     for (const issueToClose of filteredIssue) {
                         if (issueToClose.title === `[${branchName}] is STALE`) {
                             core.info((0, log_active_branch_1.logActiveBranch)(branchName));
@@ -1021,35 +1021,34 @@ function run() {
                 }
                 //Update existing issues
                 if (commitAge > get_context_1.daysBeforeStale) {
-                    const existingIssue = yield (0, get_issues_1.getIssues)();
-                    //filter out issues that do not match this Action's title convention
-                    const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
-                    //Update existing issues
                     for (const issueToUpdate of filteredIssue) {
                         if (issueToUpdate.title === `[${branchName}] is STALE`) {
                             yield (0, update_issue_1.updateIssue)(issueToUpdate.number, branchName, commitAge, lastCommitLogin);
-                            outputStales.push(branchName);
+                            if (outputStales.includes(branchName) === false) {
+                                outputStales.push(branchName);
+                            }
                         }
                     }
                 }
                 //Delete expired branches
                 if (commitAge > get_context_1.daysBeforeDelete) {
-                    const existingIssue = yield (0, get_issues_1.getIssues)();
-                    const filteredIssue = existingIssue.data.filter(branchIssue => branchIssue.title === `[${branchName}] is STALE`);
                     for (const issueToDelete of filteredIssue) {
                         if (issueToDelete.title === `[${branchName}] is STALE`) {
                             yield (0, delete_branch_1.deleteBranch)(branchName);
                             yield (0, close_issue_1.closeIssue)(issueToDelete.number);
-                            outputDeletes.push(branchName);
+                            if (outputDeletes.includes(branchName) === false) {
+                                outputDeletes.push(branchName);
+                                (0, remove_element_from_array_1.removeElementFromStringArray)(outputStales, branchName);
+                            }
                         }
                     }
                 }
                 core.endGroup();
             }
-            core.notice(`Stale Branches:  ${outputStales.length}`);
-            core.notice(`Deleted Branches:  ${outputDeletes.length}`);
             core.setOutput('stale-branches', JSON.stringify(outputStales));
             core.setOutput('deleted-branches', JSON.stringify(outputDeletes));
+            core.info(`Stale Branches: ${outputStales.length}`);
+            core.info(`Deleted Branches: ${outputDeletes.length}`);
         }
         catch (error) {
             if (error instanceof Error)
@@ -1058,6 +1057,52 @@ function run() {
     });
 }
 exports.run = run;
+
+
+/***/ }),
+
+/***/ 405:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.removeElementFromStringArray = void 0;
+const core = __importStar(__nccwpck_require__(2186));
+function removeElementFromStringArray(stringArray, element) {
+    try {
+        let index = 0;
+        for (const value of stringArray) {
+            if (value === element)
+                index = stringArray.indexOf(value);
+            stringArray.splice(index, 1);
+        }
+    }
+    catch (err) {
+        if (err instanceof Error)
+            core.info(`Error: ${err.message}`);
+    }
+}
+exports.removeElementFromStringArray = removeElementFromStringArray;
 
 
 /***/ }),
