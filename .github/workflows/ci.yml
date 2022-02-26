@@ -51,7 +51,7 @@ jobs:
       - uses: ./
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
-          days-before-stale: 0
+          days-before-stale: w
           days-before-delete: 60
           max-issues: 60
           comment-updates: true
