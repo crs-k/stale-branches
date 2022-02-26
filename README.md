@@ -46,6 +46,7 @@ Outputs are defined in [`action.yml`](action.yml):
 
 ## Example workflow
 
+### With defaults
 ```yaml
 # .github/workflows/stale-branches.yml
 
@@ -67,6 +68,36 @@ jobs:
       uses: crs-k/stale-branches@v1.3.2
       with:
         repo-token: "${{ secrets.GITHUB_TOKEN }}"
+```
+### With Inputs
+```yaml
+# .github/workflows/stale-branches.yml
+
+name: Stale Branches
+
+on:
+  schedule:
+    - cron: '0 6 * * 1-5'
+    
+permissions:
+  issues: write
+  contents: write
+
+jobs:
+  stale_branches:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Stale Branches
+      uses: crs-k/stale-branches@v1.3.2
+      with:
+        repo-token: "${{ secrets.GITHUB_TOKEN }}"
+        days-before-stale: 120
+        days-before-delete: 180
+        comment-updates: false
+        max-issues: 20
+        tag-committer: false
+        stale-branch-label: "stale branch 🗑️"
+
 ```
 
 ## Contributing
