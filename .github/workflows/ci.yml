@@ -54,7 +54,6 @@ jobs:
           days-before-delete: 60
           max-issues: 60
           comment-updates: true
-          tag-committer: true
 
 
   Build:
