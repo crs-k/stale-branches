@@ -50,6 +50,7 @@ export async function run(): Promise<void> {
           core.info(logMaxIssues(issueBudgetRemaining))
           if (outputStales.includes(branchName) === false) {
             outputStales.push(branchName)
+            removeElementFromStringArray(outputStales, branchName)
           }
         }
       }
@@ -71,6 +72,7 @@ export async function run(): Promise<void> {
             await updateIssue(issueToUpdate.number, branchName, commitAge, lastCommitLogin)
             if (outputStales.includes(branchName) === false) {
               outputStales.push(branchName)
+              removeElementFromStringArray(outputStales, branchName)
             }
           }
         }

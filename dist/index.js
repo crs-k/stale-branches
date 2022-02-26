@@ -1010,6 +1010,7 @@ function run() {
                         core.info((0, log_max_issues_1.logMaxIssues)(issueBudgetRemaining));
                         if (outputStales.includes(branchName) === false) {
                             outputStales.push(branchName);
+                            (0, remove_element_from_array_1.removeElementFromStringArray)(outputStales, branchName);
                         }
                     }
                 }
@@ -1029,6 +1030,7 @@ function run() {
                             yield (0, update_issue_1.updateIssue)(issueToUpdate.number, branchName, commitAge, lastCommitLogin);
                             if (outputStales.includes(branchName) === false) {
                                 outputStales.push(branchName);
+                                (0, remove_element_from_array_1.removeElementFromStringArray)(outputStales, branchName);
                             }
                         }
                     }
