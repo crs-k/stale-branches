@@ -69,7 +69,11 @@ export async function validateInputs(): Promise<Inputs> {
   result.tagLastCommitter = inputTagLastCommitter
 
   const inputStaleBranchLabel = String(core.getInput('stale-branch-label'))
+  if (inputStaleBranchLabel.length > 50) {
+    core.setFailed('stale-branch-label must be 50 characters or less')
+    throw new Error('stale-branch-label must be 50 characters or less')
+  }
   result.staleBranchLabel = inputStaleBranchLabel
-
+  core.info(JSON.stringify(result))
   return result
 }
