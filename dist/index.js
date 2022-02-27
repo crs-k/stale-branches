@@ -508,7 +508,7 @@ function validateInputs() {
             }
             result.maxIssues = inputMaxIssues;
             //Validate and assign tag-committer
-            const inputTagLastCommitter = core.getBooleanInput('tag-committer');
+            const inputTagLastCommitter = Boolean(core.getInput('tag-committer'));
             result.tagLastCommitter = inputTagLastCommitter;
             //Validate and assign stale-branch-label
             const inputStaleBranchLabel = String(core.getInput('stale-branch-label'));

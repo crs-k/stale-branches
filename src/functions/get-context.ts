@@ -68,7 +68,7 @@ export async function validateInputs(): Promise<Inputs> {
     result.maxIssues = inputMaxIssues
 
     //Validate and assign tag-committer
-    const inputTagLastCommitter = core.getBooleanInput('tag-committer')
+    const inputTagLastCommitter = Boolean(core.getInput('tag-committer'))
     result.tagLastCommitter = inputTagLastCommitter
 
     //Validate and assign stale-branch-label
