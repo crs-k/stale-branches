@@ -19,6 +19,8 @@ export async function validateInputs(): Promise<Inputs> {
   const inputDaysBeforeStale = Number(core.getInput('days-before-stale'))
   const inputDaysBeforeDelete = Number(core.getInput('days-before-delete'))
 
+  core.info(inputDaysBeforeDelete.toString())
+
   if (inputDaysBeforeStale >= inputDaysBeforeDelete) {
     core.setFailed('days-before-stale cannot be greater than or equal to days-before-delete')
     throw new Error('days-before-stale cannot be greater than or equal to days-before-delete')
