@@ -474,7 +474,7 @@ function validateInputs() {
             core.setFailed('days-before-stale cannot be greater than or equal to days-before-delete');
             throw new Error('days-before-stale cannot be greater than or equal to days-before-delete');
         }
-        if (typeof inputDaysBeforeStale != 'number') {
+        if (typeof inputDaysBeforeStale != 'number' || inputDaysBeforeDelete.toString() === 'NaN') {
             core.setFailed('days-before-stale must be a number');
             throw new Error('days-before-stale must be a number');
         }
