@@ -56,7 +56,7 @@ jobs:
           comment-updates: false
           max-issues: 30
           tag-committer: true
-          stale-branch-label: 'stale branch 🗑️'
+          stale-branch-label: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
 
 
   Build:
