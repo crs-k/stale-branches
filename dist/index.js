@@ -522,6 +522,9 @@ function validateInputs() {
             if (err instanceof Error) {
                 core.setFailed(`Failed to validate inputs. Error: ${err.message}`);
             }
+            if (err instanceof TypeError) {
+                core.setFailed(`Failed to validate inputs. Error: ${err.message}`);
+            }
             if (typeof err === 'string') {
                 core.setFailed(`Failed to validate inputs. Error: ${err}`);
             }
