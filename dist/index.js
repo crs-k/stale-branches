@@ -440,9 +440,18 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.staleBranchLabel = exports.tagLastCommitter = exports.maxIssues = exports.commentUpdates = exports.daysBeforeDelete = exports.daysBeforeStale = exports.repo = exports.owner = exports.github = void 0;
+exports.validateInputs = exports.staleBranchLabel = exports.tagLastCommitter = exports.maxIssues = exports.commentUpdates = exports.daysBeforeDelete = exports.daysBeforeStale = exports.repo = exports.owner = exports.github = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github_1 = __nccwpck_require__(5438);
 const repoToken = core.getInput('repo-token', { required: true });
@@ -455,6 +464,43 @@ exports.commentUpdates = core.getBooleanInput('comment-updates');
 exports.maxIssues = Number(core.getInput('max-issues'));
 exports.tagLastCommitter = core.getBooleanInput('tag-committer');
 exports.staleBranchLabel = String(core.getInput('stale-branch-label'));
+function validateInputs() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const result = {};
+        const inputDaysBeforeStale = Number(core.getInput('days-before-stale'));
+        const inputDaysBeforeDelete = Number(core.getInput('days-before-delete'));
+        if (inputDaysBeforeStale >= inputDaysBeforeDelete) {
+            throw new Error('days-before-stale cannot be greater than or equal to days-before-delete');
+        }
+        if (typeof inputDaysBeforeStale != 'number') {
+            throw new Error('days-before-stale must be a number');
+        }
+        if (typeof inputDaysBeforeDelete != 'number') {
+            throw new Error('days-before-delete must be a number');
+        }
+        if (inputDaysBeforeStale < 0) {
+            throw new Error('days-before-stale must be greater than zero');
+        }
+        if (inputDaysBeforeDelete < 0) {
+            throw new Error('days-before-delete must be greater than zero');
+        }
+        result.daysBeforeStale = inputDaysBeforeStale;
+        result.daysBeforeDelete = inputDaysBeforeDelete;
+        const inputCommentUpdates = core.getBooleanInput('comment-updates');
+        result.commentUpdates = inputCommentUpdates;
+        const inputMaxIssues = Number(core.getInput('max-issues'));
+        if (inputMaxIssues < 0) {
+            throw new Error('days-before-delete must be greater than zero');
+        }
+        result.maxIssues = inputMaxIssues;
+        const inputTagLastCommitter = core.getBooleanInput('tag-committer');
+        result.tagLastCommitter = inputTagLastCommitter;
+        const inputStaleBranchLabel = String(core.getInput('stale-branch-label'));
+        result.staleBranchLabel = inputStaleBranchLabel;
+        return result;
+    });
+}
+exports.validateInputs = validateInputs;
 
 
 /***/ }),
@@ -1026,6 +1072,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         const outputDeletes = [];
         const outputStales = [];
+        yield (0, get_context_1.validateInputs)();
         try {
             //Collect Branches, Issue Budget, and Existing Issues
             const branches = yield (0, get_branches_1.getBranches)();

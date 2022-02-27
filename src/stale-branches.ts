@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import {daysBeforeDelete, daysBeforeStale, tagLastCommitter} from './functions/get-context'
+import {daysBeforeDelete, daysBeforeStale, tagLastCommitter, validateInputs} from './functions/get-context'
 import {closeIssue} from './functions/close-issue'
 import {createIssue} from './functions/create-issue'
 import {deleteBranch} from './functions/delete-branch'
@@ -20,6 +20,9 @@ import {updateIssue} from './functions/update-issue'
 export async function run(): Promise<void> {
   const outputDeletes: string[] = []
   const outputStales: string[] = []
+
+  await validateInputs()
+
   try {
     //Collect Branches, Issue Budget, and Existing Issues
     const branches = await getBranches()

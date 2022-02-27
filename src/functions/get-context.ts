@@ -1,5 +1,6 @@
 import * as core from '@actions/core'
 import {context, getOctokit} from '@actions/github'
+import {Inputs} from '../types/inputs'
 
 const repoToken = core.getInput('repo-token', {required: true})
 core.setSecret(repoToken)
@@ -11,3 +12,52 @@ export const commentUpdates = core.getBooleanInput('comment-updates')
 export const maxIssues = Number(core.getInput('max-issues'))
 export const tagLastCommitter = core.getBooleanInput('tag-committer')
 export const staleBranchLabel = String(core.getInput('stale-branch-label'))
+
+export async function validateInputs(): Promise<Inputs> {
+  const result = {} as unknown as Inputs
+
+  const inputDaysBeforeStale = Number(core.getInput('days-before-stale'))
+  const inputDaysBeforeDelete = Number(core.getInput('days-before-delete'))
+
+  if (inputDaysBeforeStale >= inputDaysBeforeDelete) {
+    throw new Error('days-before-stale cannot be greater than or equal to days-before-delete')
+  }
+
+  if (typeof inputDaysBeforeStale != 'number') {
+    throw new Error('days-before-stale must be a number')
+  }
+
+  if (typeof inputDaysBeforeDelete != 'number') {
+    throw new Error('days-before-delete must be a number')
+  }
+
+  if (inputDaysBeforeStale < 0) {
+    throw new Error('days-before-stale must be greater than zero')
+  }
+
+  if (inputDaysBeforeDelete < 0) {
+    throw new Error('days-before-delete must be greater than zero')
+  }
+
+  result.daysBeforeStale = inputDaysBeforeStale
+  result.daysBeforeDelete = inputDaysBeforeDelete
+
+  const inputCommentUpdates = core.getBooleanInput('comment-updates')
+  result.commentUpdates = inputCommentUpdates
+
+  const inputMaxIssues = Number(core.getInput('max-issues'))
+
+  if (inputMaxIssues < 0) {
+    throw new Error('days-before-delete must be greater than zero')
+  }
+
+  result.maxIssues = inputMaxIssues
+
+  const inputTagLastCommitter = core.getBooleanInput('tag-committer')
+  result.tagLastCommitter = inputTagLastCommitter
+
+  const inputStaleBranchLabel = String(core.getInput('stale-branch-label'))
+  result.staleBranchLabel = inputStaleBranchLabel
+
+  return result
+}

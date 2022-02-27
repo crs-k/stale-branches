@@ -1,20 +1,5 @@
 export interface Inputs {
   /**
-   * Token to use to authenticate with GitHub API.
-   */
-  repoToken: string
-
-  /**
-   * Repository Owner
-   */
-  owner: string
-
-  /**
-   * Repository
-   */
-  repo: string
-
-  /**
    * Number of days a branch has been inactive before it is considered stale.
    */
   daysBeforeStale: number
@@ -38,4 +23,9 @@ export interface Inputs {
    * When an issue is opened, this will tag the stale branchs last committer in the comments.
    */
   tagLastCommitter: boolean
+
+  /**
+   * Label to be applied to issues created for stale branches.
+   */
+  staleBranchLabel: string
 }
