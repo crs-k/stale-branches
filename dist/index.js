@@ -468,6 +468,7 @@ function validateInputs() {
     return __awaiter(this, void 0, void 0, function* () {
         const result = {};
         try {
+            //Validate and assign days-before-stale & days-before-delete
             const inputDaysBeforeStale = Number(core.getInput('days-before-stale'));
             const inputDaysBeforeDelete = Number(core.getInput('days-before-delete'));
             if (inputDaysBeforeStale >= inputDaysBeforeDelete) {
@@ -492,8 +493,10 @@ function validateInputs() {
             }
             result.daysBeforeStale = inputDaysBeforeStale;
             result.daysBeforeDelete = inputDaysBeforeDelete;
+            //Validate and assign comment-updates
             const inputCommentUpdates = core.getBooleanInput('comment-updates');
             result.commentUpdates = inputCommentUpdates;
+            //Validate and assign max-issues
             const inputMaxIssues = Number(core.getInput('max-issues'));
             if (inputMaxIssues.toString() === 'NaN') {
                 core.setFailed('max-issues must be a number');
@@ -504,19 +507,23 @@ function validateInputs() {
                 throw new Error('max-issues must be greater than zero');
             }
             result.maxIssues = inputMaxIssues;
+            //Validate and assign tag-committer
             const inputTagLastCommitter = core.getBooleanInput('tag-committer');
             result.tagLastCommitter = inputTagLastCommitter;
+            //Validate and assign stale-branch-label
             const inputStaleBranchLabel = String(core.getInput('stale-branch-label'));
             if (inputStaleBranchLabel.length > 50) {
                 core.setFailed('stale-branch-label must be 50 characters or less');
                 throw new Error('stale-branch-label must be 50 characters or less');
             }
             result.staleBranchLabel = inputStaleBranchLabel;
-            core.info(JSON.stringify(result));
         }
         catch (err) {
             if (err instanceof Error) {
                 core.setFailed(`Failed to validate inputs. Error: ${err.message}`);
+            }
+            if (typeof err === 'string') {
+                core.setFailed(`Failed to validate inputs. Error: ${err}`);
             }
         }
         return result;

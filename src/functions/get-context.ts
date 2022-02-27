@@ -16,6 +16,7 @@ export const staleBranchLabel = String(core.getInput('stale-branch-label'))
 export async function validateInputs(): Promise<Inputs> {
   const result = {} as unknown as Inputs
   try {
+    //Validate and assign days-before-stale & days-before-delete
     const inputDaysBeforeStale = Number(core.getInput('days-before-stale'))
     const inputDaysBeforeDelete = Number(core.getInput('days-before-delete'))
 
@@ -47,9 +48,11 @@ export async function validateInputs(): Promise<Inputs> {
     result.daysBeforeStale = inputDaysBeforeStale
     result.daysBeforeDelete = inputDaysBeforeDelete
 
+    //Validate and assign comment-updates
     const inputCommentUpdates = core.getBooleanInput('comment-updates')
     result.commentUpdates = inputCommentUpdates
 
+    //Validate and assign max-issues
     const inputMaxIssues = Number(core.getInput('max-issues'))
 
     if (inputMaxIssues.toString() === 'NaN') {
@@ -64,19 +67,23 @@ export async function validateInputs(): Promise<Inputs> {
 
     result.maxIssues = inputMaxIssues
 
+    //Validate and assign tag-committer
     const inputTagLastCommitter = core.getBooleanInput('tag-committer')
     result.tagLastCommitter = inputTagLastCommitter
 
+    //Validate and assign stale-branch-label
     const inputStaleBranchLabel = String(core.getInput('stale-branch-label'))
     if (inputStaleBranchLabel.length > 50) {
       core.setFailed('stale-branch-label must be 50 characters or less')
       throw new Error('stale-branch-label must be 50 characters or less')
     }
     result.staleBranchLabel = inputStaleBranchLabel
-    core.info(JSON.stringify(result))
-  } catch (err) {
+  } catch (err: unknown) {
     if (err instanceof Error) {
       core.setFailed(`Failed to validate inputs. Error: ${err.message}`)
+    }
+    if (typeof err === 'string') {
+      core.setFailed(`Failed to validate inputs. Error: ${err}`)
     }
   }
   return result
