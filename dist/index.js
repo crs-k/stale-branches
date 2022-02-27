@@ -494,8 +494,15 @@ function validateInputs() {
             result.daysBeforeStale = inputDaysBeforeStale;
             result.daysBeforeDelete = inputDaysBeforeDelete;
             //Validate and assign comment-updates
-            const inputCommentUpdates = core.getBooleanInput('comment-updates');
-            result.commentUpdates = inputCommentUpdates;
+            try {
+                const inputCommentUpdates = core.getBooleanInput('comment-updates');
+                result.commentUpdates = inputCommentUpdates;
+            }
+            catch (err) {
+                if (err instanceof TypeError) {
+                    core.setFailed(`Failed to asdasdasdvalidate inputs. Error: ${err.message}`);
+                }
+            }
             //Validate and assign max-issues
             const inputMaxIssues = Number(core.getInput('max-issues'));
             if (inputMaxIssues.toString() === 'NaN') {

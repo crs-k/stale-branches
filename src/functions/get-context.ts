@@ -49,8 +49,14 @@ export async function validateInputs(): Promise<Inputs> {
     result.daysBeforeDelete = inputDaysBeforeDelete
 
     //Validate and assign comment-updates
-    const inputCommentUpdates = core.getBooleanInput('comment-updates')
-    result.commentUpdates = inputCommentUpdates
+    try {
+      const inputCommentUpdates = core.getBooleanInput('comment-updates')
+      result.commentUpdates = inputCommentUpdates
+    } catch (err: unknown) {
+      if (err instanceof TypeError) {
+        core.setFailed(`Failed to asdasdasdvalidate inputs. Error: ${err.message}`)
+      }
+    }
 
     //Validate and assign max-issues
     const inputMaxIssues = Number(core.getInput('max-issues'))
