@@ -69,6 +69,10 @@ export async function validateInputs(): Promise<Inputs> {
 
     //Validate and assign tag-committer
     const inputTagLastCommitter = Boolean(core.getInput('tag-committer'))
+    if (inputTagLastCommitter !== true) {
+      core.setFailed('tag-committer must be in list: true | True | TRUE | false | False | FALSE')
+      throw new Error('tag-committer must be in list: true | True | TRUE | false | False | FALSE')
+    }
     result.tagLastCommitter = inputTagLastCommitter
 
     //Validate and assign stale-branch-label
