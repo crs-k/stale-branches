@@ -8,9 +8,9 @@ export const github = getOctokit(repoToken)
 export const {owner: owner, repo: repo} = context.repo
 export const daysBeforeStale = Number(core.getInput('days-before-stale'))
 export const daysBeforeDelete = Number(core.getInput('days-before-delete'))
-export const commentUpdates = Boolean(core.getInput('comment-updates'))
+export const commentUpdates = core.getBooleanInput('comment-updates')
 export const maxIssues = Number(core.getInput('max-issues'))
-export const tagLastCommitter = Boolean(core.getInput('tag-committer'))
+export const tagLastCommitter = core.getBooleanInput('tag-committer')
 export const staleBranchLabel = String(core.getInput('stale-branch-label'))
 
 export async function validateInputs(): Promise<Inputs> {
@@ -68,11 +68,7 @@ export async function validateInputs(): Promise<Inputs> {
     result.maxIssues = inputMaxIssues
 
     //Validate and assign tag-committer
-    const inputTagLastCommitter = Boolean(core.getInput('tag-committer'))
-    if (inputTagLastCommitter !== true) {
-      core.setFailed('tag-committer must be in list: true | True | TRUE | false | False | FALSE')
-      throw new Error('tag-committer must be in list: true | True | TRUE | false | False | FALSE')
-    }
+    const inputTagLastCommitter = core.getBooleanInput('tag-committer')
     result.tagLastCommitter = inputTagLastCommitter
 
     //Validate and assign stale-branch-label

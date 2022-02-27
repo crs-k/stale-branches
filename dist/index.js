@@ -460,9 +460,9 @@ exports.github = (0, github_1.getOctokit)(repoToken);
 _a = github_1.context.repo, exports.owner = _a.owner, exports.repo = _a.repo;
 exports.daysBeforeStale = Number(core.getInput('days-before-stale'));
 exports.daysBeforeDelete = Number(core.getInput('days-before-delete'));
-exports.commentUpdates = Boolean(core.getInput('comment-updates'));
+exports.commentUpdates = core.getBooleanInput('comment-updates');
 exports.maxIssues = Number(core.getInput('max-issues'));
-exports.tagLastCommitter = Boolean(core.getInput('tag-committer'));
+exports.tagLastCommitter = core.getBooleanInput('tag-committer');
 exports.staleBranchLabel = String(core.getInput('stale-branch-label'));
 function validateInputs() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -508,11 +508,7 @@ function validateInputs() {
             }
             result.maxIssues = inputMaxIssues;
             //Validate and assign tag-committer
-            const inputTagLastCommitter = Boolean(core.getInput('tag-committer'));
-            if (inputTagLastCommitter !== true) {
-                core.setFailed('tag-committer must be in list: true | True | TRUE | false | False | FALSE');
-                throw new Error('tag-committer must be in list: true | True | TRUE | false | False | FALSE');
-            }
+            const inputTagLastCommitter = core.getBooleanInput('tag-committer');
             result.tagLastCommitter = inputTagLastCommitter;
             //Validate and assign stale-branch-label
             const inputStaleBranchLabel = String(core.getInput('stale-branch-label'));
