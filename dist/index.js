@@ -471,18 +471,22 @@ function validateInputs() {
         const inputDaysBeforeDelete = Number(core.getInput('days-before-delete'));
         if (inputDaysBeforeStale >= inputDaysBeforeDelete) {
             core.setFailed('days-before-stale cannot be greater than or equal to days-before-delete');
-            //throw new Error('days-before-stale cannot be greater than or equal to days-before-delete')
+            throw new Error('days-before-stale cannot be greater than or equal to days-before-delete');
         }
         if (typeof inputDaysBeforeStale != 'number') {
+            core.setFailed('days-before-stale must be a number');
             throw new Error('days-before-stale must be a number');
         }
         if (typeof inputDaysBeforeDelete != 'number') {
+            core.setFailed('days-before-delete must be a number');
             throw new Error('days-before-delete must be a number');
         }
         if (inputDaysBeforeStale < 0) {
+            core.setFailed('days-before-stale must be greater than zero');
             throw new Error('days-before-stale must be greater than zero');
         }
         if (inputDaysBeforeDelete < 0) {
+            core.setFailed('days-before-delete must be greater than zero');
             throw new Error('days-before-delete must be greater than zero');
         }
         result.daysBeforeStale = inputDaysBeforeStale;
@@ -491,7 +495,8 @@ function validateInputs() {
         result.commentUpdates = inputCommentUpdates;
         const inputMaxIssues = Number(core.getInput('max-issues'));
         if (inputMaxIssues < 0) {
-            throw new Error('days-before-delete must be greater than zero');
+            core.setFailed('max-issues must be greater than zero');
+            throw new Error('max-issues must be greater than zero');
         }
         result.maxIssues = inputMaxIssues;
         const inputTagLastCommitter = core.getBooleanInput('tag-committer');
