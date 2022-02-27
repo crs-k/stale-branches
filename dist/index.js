@@ -467,52 +467,58 @@ exports.staleBranchLabel = String(core.getInput('stale-branch-label'));
 function validateInputs() {
     return __awaiter(this, void 0, void 0, function* () {
         const result = {};
-        const inputDaysBeforeStale = Number(core.getInput('days-before-stale'));
-        const inputDaysBeforeDelete = Number(core.getInput('days-before-delete'));
-        if (inputDaysBeforeStale >= inputDaysBeforeDelete) {
-            core.setFailed('days-before-stale cannot be greater than or equal to days-before-delete');
-            throw new Error('days-before-stale cannot be greater than or equal to days-before-delete');
+        try {
+            const inputDaysBeforeStale = Number(core.getInput('days-before-stale'));
+            const inputDaysBeforeDelete = Number(core.getInput('days-before-delete'));
+            if (inputDaysBeforeStale >= inputDaysBeforeDelete) {
+                core.setFailed('days-before-stale cannot be greater than or equal to days-before-delete');
+                throw new Error('days-before-stale cannot be greater than or equal to days-before-delete');
+            }
+            if (inputDaysBeforeStale.toString() === 'NaN') {
+                core.setFailed('days-before-stale must be a number');
+                throw new Error('days-before-stale must be a number');
+            }
+            if (inputDaysBeforeDelete.toString() === 'NaN') {
+                core.setFailed('days-before-delete must be a number');
+                throw new Error('days-before-delete must be a number');
+            }
+            if (inputDaysBeforeStale < 0) {
+                core.setFailed('days-before-stale must be greater than zero');
+                throw new Error('days-before-stale must be greater than zero');
+            }
+            if (inputDaysBeforeDelete < 0) {
+                core.setFailed('days-before-delete must be greater than zero');
+                throw new Error('days-before-delete must be greater than zero');
+            }
+            result.daysBeforeStale = inputDaysBeforeStale;
+            result.daysBeforeDelete = inputDaysBeforeDelete;
+            const inputCommentUpdates = core.getBooleanInput('comment-updates');
+            result.commentUpdates = inputCommentUpdates;
+            const inputMaxIssues = Number(core.getInput('max-issues'));
+            if (inputMaxIssues.toString() === 'NaN') {
+                core.setFailed('max-issues must be a number');
+                throw new Error('max-issues must be a number');
+            }
+            if (inputMaxIssues < 0) {
+                core.setFailed('max-issues must be greater than zero');
+                throw new Error('max-issues must be greater than zero');
+            }
+            result.maxIssues = inputMaxIssues;
+            const inputTagLastCommitter = core.getBooleanInput('tag-committer');
+            result.tagLastCommitter = inputTagLastCommitter;
+            const inputStaleBranchLabel = String(core.getInput('stale-branch-label'));
+            if (inputStaleBranchLabel.length > 50) {
+                core.setFailed('stale-branch-label must be 50 characters or less');
+                throw new Error('stale-branch-label must be 50 characters or less');
+            }
+            result.staleBranchLabel = inputStaleBranchLabel;
+            core.info(JSON.stringify(result));
         }
-        if (inputDaysBeforeStale.toString() === 'NaN') {
-            core.setFailed('days-before-stale must be a number');
-            throw new Error('days-before-stale must be a number');
+        catch (err) {
+            if (err instanceof Error) {
+                core.setFailed(`Failed to validate inputs. Error: ${err.message}`);
+            }
         }
-        if (inputDaysBeforeDelete.toString() === 'NaN') {
-            core.setFailed('days-before-delete must be a number');
-            throw new Error('days-before-delete must be a number');
-        }
-        if (inputDaysBeforeStale < 0) {
-            core.setFailed('days-before-stale must be greater than zero');
-            throw new Error('days-before-stale must be greater than zero');
-        }
-        if (inputDaysBeforeDelete < 0) {
-            core.setFailed('days-before-delete must be greater than zero');
-            throw new Error('days-before-delete must be greater than zero');
-        }
-        result.daysBeforeStale = inputDaysBeforeStale;
-        result.daysBeforeDelete = inputDaysBeforeDelete;
-        const inputCommentUpdates = core.getBooleanInput('comment-updates');
-        result.commentUpdates = inputCommentUpdates;
-        const inputMaxIssues = Number(core.getInput('max-issues'));
-        if (inputMaxIssues.toString() === 'NaN') {
-            core.setFailed('max-issues must be a number');
-            throw new Error('max-issues must be a number');
-        }
-        if (inputMaxIssues < 0) {
-            core.setFailed('max-issues must be greater than zero');
-            throw new Error('max-issues must be greater than zero');
-        }
-        result.maxIssues = inputMaxIssues;
-        const inputTagLastCommitter = core.getBooleanInput('tag-committer');
-        core.info(inputTagLastCommitter.valueOf.toString());
-        result.tagLastCommitter = inputTagLastCommitter;
-        const inputStaleBranchLabel = String(core.getInput('stale-branch-label'));
-        if (inputStaleBranchLabel.length > 50) {
-            core.setFailed('stale-branch-label must be 50 characters or less');
-            throw new Error('stale-branch-label must be 50 characters or less');
-        }
-        result.staleBranchLabel = inputStaleBranchLabel;
-        core.info(JSON.stringify(result));
         return result;
     });
 }

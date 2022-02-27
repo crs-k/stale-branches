@@ -55,8 +55,8 @@ jobs:
           days-before-delete: '150'
           comment-updates: false
           max-issues: 30
-          tag-committer: true
-          stale-branch-label: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+          tag-committer: a
+          stale-branch-label: 'stale branch 🗑️'
 
 
   Build:
