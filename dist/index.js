@@ -504,6 +504,7 @@ function validateInputs() {
         }
         result.maxIssues = inputMaxIssues;
         const inputTagLastCommitter = core.getBooleanInput('tag-committer');
+        core.info(inputTagLastCommitter.valueOf.toString());
         result.tagLastCommitter = inputTagLastCommitter;
         const inputStaleBranchLabel = String(core.getInput('stale-branch-label'));
         result.staleBranchLabel = inputStaleBranchLabel;
