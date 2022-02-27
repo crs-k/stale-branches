@@ -469,16 +469,15 @@ function validateInputs() {
         const result = {};
         const inputDaysBeforeStale = Number(core.getInput('days-before-stale'));
         const inputDaysBeforeDelete = Number(core.getInput('days-before-delete'));
-        core.info(inputDaysBeforeDelete.toString());
         if (inputDaysBeforeStale >= inputDaysBeforeDelete) {
             core.setFailed('days-before-stale cannot be greater than or equal to days-before-delete');
             throw new Error('days-before-stale cannot be greater than or equal to days-before-delete');
         }
-        if (typeof inputDaysBeforeStale != 'number' || inputDaysBeforeDelete.toString() === 'NaN') {
+        if (inputDaysBeforeStale.toString() === 'NaN') {
             core.setFailed('days-before-stale must be a number');
             throw new Error('days-before-stale must be a number');
         }
-        if (typeof inputDaysBeforeDelete != 'number') {
+        if (inputDaysBeforeDelete.toString() === 'NaN') {
             core.setFailed('days-before-delete must be a number');
             throw new Error('days-before-delete must be a number');
         }
@@ -495,6 +494,10 @@ function validateInputs() {
         const inputCommentUpdates = core.getBooleanInput('comment-updates');
         result.commentUpdates = inputCommentUpdates;
         const inputMaxIssues = Number(core.getInput('max-issues'));
+        if (inputMaxIssues.toString() === 'NaN') {
+            core.setFailed('max-issues must be a number');
+            throw new Error('max-issues must be a number');
+        }
         if (inputMaxIssues < 0) {
             core.setFailed('max-issues must be greater than zero');
             throw new Error('max-issues must be greater than zero');
