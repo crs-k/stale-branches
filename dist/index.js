@@ -470,7 +470,8 @@ function validateInputs() {
         const inputDaysBeforeStale = Number(core.getInput('days-before-stale'));
         const inputDaysBeforeDelete = Number(core.getInput('days-before-delete'));
         if (inputDaysBeforeStale >= inputDaysBeforeDelete) {
-            throw new Error('days-before-stale cannot be greater than or equal to days-before-delete');
+            core.setFailed('days-before-stale cannot be greater than or equal to days-before-delete');
+            //throw new Error('days-before-stale cannot be greater than or equal to days-before-delete')
         }
         if (typeof inputDaysBeforeStale != 'number') {
             throw new Error('days-before-stale must be a number');
