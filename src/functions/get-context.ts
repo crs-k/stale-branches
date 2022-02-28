@@ -2,7 +2,7 @@ import * as core from '@actions/core'
 import {context, getOctokit} from '@actions/github'
 import {Inputs} from '../types/inputs'
 
-const repoToken = core.getInput('repo-token', {required: true})
+const repoToken = core.getInput('repo-token')
 core.setSecret(repoToken)
 export const github = getOctokit(repoToken)
 export const {owner: owner, repo: repo} = context.repo

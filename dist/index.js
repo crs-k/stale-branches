@@ -454,7 +454,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.validateInputs = exports.staleBranchLabel = exports.tagLastCommitter = exports.maxIssues = exports.commentUpdates = exports.daysBeforeDelete = exports.daysBeforeStale = exports.repo = exports.owner = exports.github = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github_1 = __nccwpck_require__(5438);
-const repoToken = core.getInput('repo-token', { required: true });
+const repoToken = core.getInput('repo-token');
 core.setSecret(repoToken);
 exports.github = (0, github_1.getOctokit)(repoToken);
 _a = github_1.context.repo, exports.owner = _a.owner, exports.repo = _a.repo;
