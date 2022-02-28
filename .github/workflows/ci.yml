@@ -53,7 +53,7 @@ jobs:
           repo-token: '${{ secrets.GITHUB_TOKEN }}'
           days-before-stale: 1
           days-before-delete: '150'
-          comment-updates: a
+          comment-updates: true
           max-issues: 30
           tag-committer: true
           stale-branch-label: 'stale branch 🗑️'
