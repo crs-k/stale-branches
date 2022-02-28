@@ -458,13 +458,6 @@ const repoToken = core.getInput('repo-token');
 core.setSecret(repoToken);
 exports.github = (0, github_1.getOctokit)(repoToken);
 _a = github_1.context.repo, exports.owner = _a.owner, exports.repo = _a.repo;
-/* export const daysBeforeStale = Number(core.getInput('days-before-stale'))
-export const daysBeforeDelete = Number(core.getInput('days-before-delete'))
-export const commentUpdates = core.getBooleanInput('comment-updates')
-export const maxIssues = Number(core.getInput('max-issues'))
-export const tagLastCommitter = core.getBooleanInput('tag-committer')
-export const staleBranchLabel = String(core.getInput('stale-branch-label'))
- */
 function validateInputs() {
     return __awaiter(this, void 0, void 0, function* () {
         const result = {};
