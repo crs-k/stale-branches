@@ -29,8 +29,8 @@ export async function run(): Promise<void> {
     //Collect Branches, Issue Budget, and Existing Issues
     const branches = await getBranches()
     const outputTotal = branches.length
-    let issueBudgetRemaining = await getIssueBudget()
-    const existingIssue = await getIssues()
+    let issueBudgetRemaining = await getIssueBudget(validInputs.maxIssues, validInputs.staleBranchLabel)
+    const existingIssue = await getIssues(validInputs.staleBranchLabel)
 
     // Assess Branches
     for (const branchToCheck of branches) {
@@ -54,7 +54,7 @@ export async function run(): Promise<void> {
       //Create new issue if branch is stale & existing issue is not found & issue budget is >0
       if (commitAge > validInputs.daysBeforeStale) {
         if (!filteredIssue.find(findIssue => findIssue.issueTitle === `[${branchName}] is STALE`) && issueBudgetRemaining > 0) {
-          await createIssue(branchName, commitAge, lastCommitLogin)
+          await createIssue(branchName, commitAge, lastCommitLogin, validInputs.daysBeforeDelete, validInputs.staleBranchLabel, validInputs.tagLastCommitter)
           issueBudgetRemaining--
           core.info(logMaxIssues(issueBudgetRemaining))
           if (outputStales.includes(branchName) === false) {
@@ -77,7 +77,16 @@ export async function run(): Promise<void> {
       if (commitAge > validInputs.daysBeforeStale) {
         for (const issueToUpdate of filteredIssue) {
           if (issueToUpdate.issueTitle === `[${branchName}] is STALE`) {
-            await updateIssue(issueToUpdate.issueNumber, branchName, commitAge, lastCommitLogin)
+            await updateIssue(
+              issueToUpdate.issueNumber,
+              branchName,
+              commitAge,
+              lastCommitLogin,
+              validInputs.commentUpdates,
+              validInputs.daysBeforeDelete,
+              validInputs.staleBranchLabel,
+              validInputs.tagLastCommitter
+            )
             if (outputStales.includes(branchName) === false) {
               outputStales.push(branchName)
             }
