@@ -5,9 +5,9 @@
 
 # Stale Branches
 
-This Action automatically deletes stale branches. 
+Creates issues for branches that have become stale. By default it aligns with [this](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-branches-in-your-repository/viewing-branches-in-your-repository) definition, but can be configured for other use cases.
 
-When a branch has been inactive for the configured `days-before-stale` input, an issue is opened with the title `[branch-name] is STALE`. A branch will be deleted once it has been inactive longer than `days-before-delete`, which is assessed independently of `days-before-stale`.
+When a branch has been inactive for more than the `days-before-stale` input, an issue is opened with the title `[branch-name] is STALE`. The branch will be deleted once it has been inactive longer than `days-before-delete`.
 
 * By default, a stale branch is defined as a branch that:
   * has had no commits in the last 120 days.
@@ -17,23 +17,27 @@ When a branch has been inactive for the configured `days-before-stale` input, an
   * See [inputs](https://github.com/crs-k/stale-branches#inputs) for more info.
 * See [example workflow](https://github.com/crs-k/stale-branches#example-workflow).
 
+## Workflow Output
+![image](https://user-images.githubusercontent.com/26232872/155919116-50a2ded9-2839-4957-aaa2-caa9c40c91c9.png)
+
+
 ## Usage
 
 ### Pre-requisites
 Create a workflow `.yml` file in your repository's `.github/workflows` directory. An [example workflow](#example-workflow) is available below. For more information, reference the GitHub Help Documentation for [Creating a workflow file](https://help.github.com/en/articles/configuring-a-workflow#creating-a-workflow-file).
 
 ### Inputs
-Inputs are defined in [`action.yml`](action.yml):
+Inputs are defined in [`action.yml`](action.yml). None are required.:
 
-| Name | Required | Description | Default |
-| ---- | -------- | ----------- | ------- |
-| `repo-token` | `No`| Token to use to authenticate with GitHub API. [GITHUB_TOKEN](https://docs.github.com/en/actions/security-guides/automatic-token-authentication#about-the-github_token-secret) suggested. | `${{ secrets.GITHUB_TOKEN }}` |
-| `days-before-stale` | `No` | Number of days a branch has been inactive before it is considered stale. | 120 days |
-| `days-before-delete` | `No` | Number of days a branch has been inactive before it is deleted. | 180 days |
-| `comment-updates` | `No` | If this is enabled, a comment with updated information will be added to existing issues each workflow run. | false |
-| `max-issues` | `No` | This dictates the number of `stale branch 🗑️` issues that can exist. It also limits the number of branches that can be deleted per run. | 20 |
-| `tag-committer` | `No` | When an issue is opened, this will tag the stale branchs last committer in the comments. | false |
-| `stale-branch-label` | `No` | Label to be applied to issues created for stale branches. | `stale branch 🗑️` |
+| Name | Description | Default |
+| --------------- | ---- | --- |
+| `repo-token` | Token used to authenticate with GitHub's API. Can be passed in using [`${{ secrets.GITHUB_TOKEN }}`](https://docs.github.com/en/actions/security-guides/automatic-token-authentication#about-the-github_token-secret). | [`${{ github.token }}`](https://docs.github.com/en/actions/learn-github-actions/contexts#github-context) |
+| `days-before-stale` | Number of days a branch has been inactive before it is stale. | 120 days |
+| `days-before-delete` | Number of days a branch has been inactive before it is deleted. | 180 days |
+| `comment-updates` | A comment with updated information will be added to existing issues each workflow run. | false |
+| `max-issues` | This dictates the number of `stale branch 🗑️` issues that can exist. Also, the max number of branches that can be deleted per run. | 20 |
+| `tag-committer` | When an issue is opened, the last committer will be tagged in the comments. | false |
+| `stale-branch-label` | Label to be applied to issues created for stale branches. | `stale branch 🗑️` |
 
 ### Outputs
 Outputs are defined in [`action.yml`](action.yml):
@@ -65,7 +69,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Stale Branches
-      uses: crs-k/stale-branches@v1.4.0
+      uses: crs-k/stale-branches@v1.5.0
 ```
 ### With Inputs
 ```yaml
@@ -86,7 +90,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Stale Branches
-      uses: crs-k/stale-branches@v1.4.0
+      uses: crs-k/stale-branches@v1.5.0
       with:
         repo-token: '${{ secrets.GITHUB_TOKEN }}'
         days-before-stale: 120
