@@ -11,6 +11,10 @@ export interface Inputs {
 
   /**
    * If this is enabled, a comment with updated information will be added to existing issues each workflow run.
+   *
+   * Must meet YAML 1.2 "Core Schema" specification
+   *
+   * Support boolean input list: `true | True | TRUE | false | False | FALSE`
    */
   commentUpdates: boolean
 
@@ -21,6 +25,10 @@ export interface Inputs {
 
   /**
    * When an issue is opened, this will tag the stale branchs last committer in the comments.
+   *
+   * Must meet YAML 1.2 "Core Schema" specification
+   *
+   * Support boolean input list: `true | True | TRUE | false | False | FALSE`
    */
   tagLastCommitter: boolean
 

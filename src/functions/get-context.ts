@@ -6,6 +6,7 @@ const repoToken = core.getInput('repo-token', {required: true})
 core.setSecret(repoToken)
 export const github = getOctokit(repoToken)
 export const {owner: owner, repo: repo} = context.repo
+
 export const daysBeforeStale = Number(core.getInput('days-before-stale'))
 export const daysBeforeDelete = Number(core.getInput('days-before-delete'))
 export const commentUpdates = core.getBooleanInput('comment-updates')
@@ -49,14 +50,8 @@ export async function validateInputs(): Promise<Inputs> {
     result.daysBeforeDelete = inputDaysBeforeDelete
 
     //Validate and assign comment-updates
-    try {
-      const inputCommentUpdates = core.getBooleanInput('comment-updates')
-      result.commentUpdates = inputCommentUpdates
-    } catch (err: unknown) {
-      if (err instanceof TypeError) {
-        core.setFailed(`Failed to asdasdasdvalidate inputs. Error: ${err.message}`)
-      }
-    }
+    const inputCommentUpdates = core.getBooleanInput('comment-updates')
+    result.commentUpdates = inputCommentUpdates
 
     //Validate and assign max-issues
     const inputMaxIssues = Number(core.getInput('max-issues'))

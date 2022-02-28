@@ -1,5 +1,4 @@
 import * as core from '@actions/core'
-import {daysBeforeDelete, daysBeforeStale, tagLastCommitter, validateInputs} from './functions/get-context'
 import {closeIssue} from './functions/close-issue'
 import {createIssue} from './functions/create-issue'
 import {deleteBranch} from './functions/delete-branch'
@@ -16,12 +15,15 @@ import {logMaxIssues} from './functions/logging/log-max-issues'
 import {logTotalAssessed} from './functions/logging/log-total-assessed'
 import {logTotalDeleted} from './functions/logging/log-total-deleted'
 import {updateIssue} from './functions/update-issue'
+import {validateInputs} from './functions/get-context'
 
 export async function run(): Promise<void> {
+  //Validate & Return input values
+  const validInputs = await validateInputs()
+
+  //Declare output arrays
   const outputDeletes: string[] = []
   const outputStales: string[] = []
-
-  await validateInputs()
 
   try {
     //Collect Branches, Issue Budget, and Existing Issues
@@ -40,17 +42,17 @@ export async function run(): Promise<void> {
       const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === `[${branchName}] is STALE`)
 
       // Start output group for current branch assessment
-      core.startGroup(logBranchGroupColor(branchName, commitAge, daysBeforeStale, daysBeforeDelete))
-      core.info(logLastCommitColor(commitAge, daysBeforeStale, daysBeforeDelete))
+      core.startGroup(logBranchGroupColor(branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete))
+      core.info(logLastCommitColor(commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete))
 
       // Skip looking for last commit's login if input is set to false
       let lastCommitLogin = 'Unknown'
-      if (tagLastCommitter === true) {
+      if (validInputs.tagLastCommitter === true) {
         lastCommitLogin = await getRecentCommitLogin(branchToCheck.commmitSha)
       }
 
       //Create new issue if branch is stale & existing issue is not found & issue budget is >0
-      if (commitAge > daysBeforeStale) {
+      if (commitAge > validInputs.daysBeforeStale) {
         if (!filteredIssue.find(findIssue => findIssue.issueTitle === `[${branchName}] is STALE`) && issueBudgetRemaining > 0) {
           await createIssue(branchName, commitAge, lastCommitLogin)
           issueBudgetRemaining--
@@ -62,7 +64,7 @@ export async function run(): Promise<void> {
       }
 
       //Close issues if a branch becomes active again
-      if (commitAge < daysBeforeStale) {
+      if (commitAge < validInputs.daysBeforeStale) {
         for (const issueToClose of filteredIssue) {
           if (issueToClose.issueTitle === `[${branchName}] is STALE`) {
             core.info(logActiveBranch(branchName))
@@ -72,7 +74,7 @@ export async function run(): Promise<void> {
       }
 
       //Update existing issues
-      if (commitAge > daysBeforeStale) {
+      if (commitAge > validInputs.daysBeforeStale) {
         for (const issueToUpdate of filteredIssue) {
           if (issueToUpdate.issueTitle === `[${branchName}] is STALE`) {
             await updateIssue(issueToUpdate.issueNumber, branchName, commitAge, lastCommitLogin)
@@ -84,7 +86,7 @@ export async function run(): Promise<void> {
       }
 
       //Delete expired branches
-      if (commitAge > daysBeforeDelete) {
+      if (commitAge > validInputs.daysBeforeDelete) {
         for (const issueToDelete of filteredIssue) {
           if (issueToDelete.issueTitle === `[${branchName}] is STALE`) {
             await deleteBranch(branchName)

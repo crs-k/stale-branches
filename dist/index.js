@@ -494,15 +494,8 @@ function validateInputs() {
             result.daysBeforeStale = inputDaysBeforeStale;
             result.daysBeforeDelete = inputDaysBeforeDelete;
             //Validate and assign comment-updates
-            try {
-                const inputCommentUpdates = core.getBooleanInput('comment-updates');
-                result.commentUpdates = inputCommentUpdates;
-            }
-            catch (err) {
-                if (err instanceof TypeError) {
-                    core.setFailed(`Failed to asdasdasdvalidate inputs. Error: ${err.message}`);
-                }
-            }
+            const inputCommentUpdates = core.getBooleanInput('comment-updates');
+            result.commentUpdates = inputCommentUpdates;
             //Validate and assign max-issues
             const inputMaxIssues = Number(core.getInput('max-issues'));
             if (inputMaxIssues.toString() === 'NaN') {
@@ -1090,7 +1083,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
 const core = __importStar(__nccwpck_require__(2186));
-const get_context_1 = __nccwpck_require__(7782);
 const close_issue_1 = __nccwpck_require__(4094);
 const create_issue_1 = __nccwpck_require__(9810);
 const delete_branch_1 = __nccwpck_require__(5294);
@@ -1107,11 +1099,14 @@ const log_max_issues_1 = __nccwpck_require__(5487);
 const log_total_assessed_1 = __nccwpck_require__(2673);
 const log_total_deleted_1 = __nccwpck_require__(4888);
 const update_issue_1 = __nccwpck_require__(2914);
+const get_context_1 = __nccwpck_require__(7782);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
+        //Validate & Return input values
+        const validInputs = yield (0, get_context_1.validateInputs)();
+        //Declare output arrays
         const outputDeletes = [];
         const outputStales = [];
-        yield (0, get_context_1.validateInputs)();
         try {
             //Collect Branches, Issue Budget, and Existing Issues
             const branches = yield (0, get_branches_1.getBranches)();
@@ -1127,15 +1122,15 @@ function run() {
                 const branchName = branchToCheck.branchName;
                 const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === `[${branchName}] is STALE`);
                 // Start output group for current branch assessment
-                core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchName, commitAge, get_context_1.daysBeforeStale, get_context_1.daysBeforeDelete));
-                core.info((0, log_last_commit_color_1.logLastCommitColor)(commitAge, get_context_1.daysBeforeStale, get_context_1.daysBeforeDelete));
+                core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
+                core.info((0, log_last_commit_color_1.logLastCommitColor)(commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
                 // Skip looking for last commit's login if input is set to false
                 let lastCommitLogin = 'Unknown';
-                if (get_context_1.tagLastCommitter === true) {
+                if (validInputs.tagLastCommitter === true) {
                     lastCommitLogin = yield (0, get_committer_login_1.getRecentCommitLogin)(branchToCheck.commmitSha);
                 }
                 //Create new issue if branch is stale & existing issue is not found & issue budget is >0
-                if (commitAge > get_context_1.daysBeforeStale) {
+                if (commitAge > validInputs.daysBeforeStale) {
                     if (!filteredIssue.find(findIssue => findIssue.issueTitle === `[${branchName}] is STALE`) && issueBudgetRemaining > 0) {
                         yield (0, create_issue_1.createIssue)(branchName, commitAge, lastCommitLogin);
                         issueBudgetRemaining--;
@@ -1146,7 +1141,7 @@ function run() {
                     }
                 }
                 //Close issues if a branch becomes active again
-                if (commitAge < get_context_1.daysBeforeStale) {
+                if (commitAge < validInputs.daysBeforeStale) {
                     for (const issueToClose of filteredIssue) {
                         if (issueToClose.issueTitle === `[${branchName}] is STALE`) {
                             core.info((0, log_active_branch_1.logActiveBranch)(branchName));
@@ -1155,7 +1150,7 @@ function run() {
                     }
                 }
                 //Update existing issues
-                if (commitAge > get_context_1.daysBeforeStale) {
+                if (commitAge > validInputs.daysBeforeStale) {
                     for (const issueToUpdate of filteredIssue) {
                         if (issueToUpdate.issueTitle === `[${branchName}] is STALE`) {
                             yield (0, update_issue_1.updateIssue)(issueToUpdate.issueNumber, branchName, commitAge, lastCommitLogin);
@@ -1166,7 +1161,7 @@ function run() {
                     }
                 }
                 //Delete expired branches
-                if (commitAge > get_context_1.daysBeforeDelete) {
+                if (commitAge > validInputs.daysBeforeDelete) {
                     for (const issueToDelete of filteredIssue) {
                         if (issueToDelete.issueTitle === `[${branchName}] is STALE`) {
                             yield (0, delete_branch_1.deleteBranch)(branchName);
