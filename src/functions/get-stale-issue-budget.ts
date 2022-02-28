@@ -4,7 +4,7 @@ import {github, owner, repo} from './get-context'
 import {IssueResponse} from '../types/issues'
 import {logMaxIssues} from './logging/log-max-issues'
 
-export async function getIssueBudget(maxIssues, staleBranchLabel): Promise<number> {
+export async function getIssueBudget(maxIssues: number, staleBranchLabel: string): Promise<number> {
   let issues: IssueResponse[]
   let issueCount = 0
   let issueBudgetRemaining: number
