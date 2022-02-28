@@ -1,9 +1,9 @@
 import * as assert from 'assert'
 import * as core from '@actions/core'
-import {github, owner, repo, staleBranchLabel} from './get-context'
+import {github, owner, repo} from './get-context'
 import {IssueResponse} from '../types/issues'
 
-export async function getIssues(): Promise<IssueResponse[]> {
+export async function getIssues(staleBranchLabel: string): Promise<IssueResponse[]> {
   let issues: IssueResponse[]
 
   try {
@@ -24,8 +24,9 @@ export async function getIssues(): Promise<IssueResponse[]> {
   } catch (err) {
     if (err instanceof Error) {
       core.setFailed(`Failed to locate issues. Error: ${err.message}`)
+    } else {
+      core.setFailed(`Failed to locate issues.`)
     }
-    core.setFailed(`Failed to locate issues.`)
     issues = [{issueTitle: '', issueNumber: -1}]
   }
 

@@ -1,10 +1,10 @@
 import * as assert from 'assert'
 import * as core from '@actions/core'
-import {github, maxIssues, owner, repo, staleBranchLabel} from './get-context'
+import {github, owner, repo} from './get-context'
 import {IssueResponse} from '../types/issues'
 import {logMaxIssues} from './logging/log-max-issues'
 
-export async function getIssueBudget(): Promise<number> {
+export async function getIssueBudget(maxIssues: number, staleBranchLabel: string): Promise<number> {
   let issues: IssueResponse[]
   let issueCount = 0
   let issueBudgetRemaining: number
@@ -27,8 +27,9 @@ export async function getIssueBudget(): Promise<number> {
   } catch (err) {
     if (err instanceof Error) {
       core.setFailed(`Failed to calculate issue budget. Error: ${err.message}`)
+    } else {
+      core.setFailed(`Failed to calculate issue budget.`)
     }
-    core.setFailed(`Failed to calculate issue budget.`)
     issueBudgetRemaining = 0
   }
   core.info(logMaxIssues(issueBudgetRemaining))

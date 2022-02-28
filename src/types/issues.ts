@@ -1,13 +1,13 @@
 export interface IssueResponse {
   /**
-   * The Title of the GitHub Issue.
+   * The title of the GitHub issue.
    *
    * Example: [test-branch-19] is STALE
    */
   issueTitle: string
 
   /**
-   * The Number of the GitHub Issue.
+   * The number of the GitHub issue.
    *
    * Example: 350
    */

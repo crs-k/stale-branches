@@ -16,7 +16,7 @@ describe('Delete Branch Function', () => {
     expect(github.rest.git.deleteRef).toHaveBeenCalled()
   })
 
-  test('Action fails elegantly', async () => {
+  test('Action fails elegantly - Error', async () => {
     core.error = jest.fn()
     assert.ok = jest.fn()
     assert.ok.mockImplementation(() => {
@@ -25,5 +25,16 @@ describe('Delete Branch Function', () => {
 
     await deleteBranch(branchName)
     expect(core.error).toHaveBeenCalledWith(`Failed to delete branch heads/test. Error: response cannot be empty`)
+  })
+
+  test('Action fails elegantly - String', async () => {
+    core.error = jest.fn()
+    assert.ok = jest.fn()
+    assert.ok.mockImplementation(() => {
+      throw new String('response cannot be empty')
+    })
+
+    await deleteBranch(branchName)
+    expect(core.error).toHaveBeenCalledWith(`Failed to delete branch heads/test.`)
   })
 })

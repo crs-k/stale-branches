@@ -7,25 +7,25 @@ const core = require('@actions/core')
 const assert = require('assert')
 import {updateIssue} from '../../src/functions/update-issue'
 import {github} from '../../src/functions/get-context'
-import * as context from '../../src/functions/get-context'
 
 let issueNumber = 20
 let branchName = 'test'
 let commitAge = 100
 let lastCommitter = 'crs-k'
+let commentUpdates = true
+let daysBeforeDelete = 180
+let staleBranchLabel = 'Stale Branch Label'
+let tagLastCommitter = true
 
 describe('Update Issue Function', () => {
   test('updateIssue endpoint is called with tag committer enabled', async () => {
-    Object.defineProperty(context, 'commentUpdates', {value: true})
-    Object.defineProperty(context, 'tagLastCommitter', {value: true})
-    await updateIssue(issueNumber, branchName, commitAge, lastCommitter)
+    await updateIssue(issueNumber, branchName, commitAge, lastCommitter, commentUpdates, daysBeforeDelete, staleBranchLabel, tagLastCommitter)
     expect(github.rest.issues.createComment).toHaveBeenCalled()
   })
 
   test('updateIssue endpoint is called with tag committer disabled', async () => {
-    Object.defineProperty(context, 'commentUpdates', {value: true})
-    Object.defineProperty(context, 'tagLastCommitter', {value: false})
-    await updateIssue(issueNumber, branchName, commitAge, lastCommitter)
+    let tagLastCommitter = false
+    await updateIssue(issueNumber, branchName, commitAge, lastCommitter, commentUpdates, daysBeforeDelete, staleBranchLabel, tagLastCommitter)
     expect(github.rest.issues.createComment).toHaveBeenCalled()
   })
 
@@ -36,7 +36,7 @@ describe('Update Issue Function', () => {
       throw new Error('Created At cannot be empty')
     })
 
-    await updateIssue(issueNumber, branchName, commitAge, lastCommitter)
+    await updateIssue(issueNumber, branchName, commitAge, lastCommitter, commentUpdates, daysBeforeDelete, staleBranchLabel, tagLastCommitter)
     expect(core.info).toHaveBeenCalledWith(`No existing issue returned for issue number: 20. Error: Created At cannot be empty`)
   })
 })

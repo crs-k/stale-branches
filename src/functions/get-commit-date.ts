@@ -16,7 +16,11 @@ export async function getRecentCommitDate(sha: string): Promise<string> {
     commitDate = branchResponse.data.commit.committer!.date
     assert.ok(commitDate, 'Date cannot be empty.')
   } catch (err) {
-    if (err instanceof Error) core.setFailed(`Failed to retrieve commit for ${sha} in ${repo}. Error: ${err.message}`)
+    if (err instanceof Error) {
+      core.setFailed(`Failed to retrieve commit for ${sha} in ${repo}. Error: ${err.message}`)
+    } else {
+      core.setFailed(`Failed to retrieve commit for ${sha} in ${repo}.`)
+    }
     commitDate = ''
   }
 

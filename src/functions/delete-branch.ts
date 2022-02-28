@@ -20,7 +20,11 @@ export async function deleteBranch(name: string): Promise<number> {
     assert.ok(response, 'response cannot be empty')
     core.info(logDeleteBranch(refFull))
   } catch (err) {
-    if (err instanceof Error) core.error(`Failed to delete branch ${refFull}. Error: ${err.message}`)
+    if (err instanceof Error) {
+      core.error(`Failed to delete branch ${refFull}. Error: ${err.message}`)
+    } else {
+      core.error(`Failed to delete branch ${refFull}.`)
+    }
     confirm = 500
   }
 

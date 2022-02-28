@@ -2,6 +2,7 @@ import * as githubActual from '../../src/functions/get-context'
 // eslint-disable-next-line import/named
 import {GetResponseTypeFromEndpointMethod} from '@octokit/types'
 import {BranchResponse} from '../../src/types/branches'
+import {Inputs} from '../../src/types/inputs'
 
 export const context = {
   repo: {
@@ -10,12 +11,14 @@ export const context = {
   }
 }
 
-export const daysBeforeStale: number = 120
-export const daysBeforeDelete: number = 180
-export const commentUpdates: boolean = true
-export const maxIssues: number = 20
-export const repoToken: string = '20'
-export const staleBranchLabel: string = 'stale branch 🗑️'
+export const validInputs: Inputs = {
+  daysBeforeStale: 1,
+  daysBeforeDelete: 150,
+  commentUpdates: true,
+  maxIssues: 30,
+  tagLastCommitter: true,
+  staleBranchLabel: 'stale branch 🗑️'
+}
 
 type ListIssuesResponseDataType = GetResponseTypeFromEndpointMethod<typeof githubActual.github.rest.issues.listForRepo>
 

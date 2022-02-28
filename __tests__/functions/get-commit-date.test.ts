@@ -25,7 +25,7 @@ describe('Get Commits Function', () => {
     })
   })
 
-  test('Action fails elegantly', async () => {
+  test('Action fails elegantly - Error', async () => {
     core.setFailed = jest.fn()
     assert.ok = jest.fn()
     assert.ok.mockImplementation(() => {
@@ -34,5 +34,16 @@ describe('Get Commits Function', () => {
 
     await getRecentCommitDate(sha)
     expect(core.setFailed).toHaveBeenCalledWith(`Failed to retrieve commit for 123 in repo. Error: Date cannot be empty.`)
+  })
+
+  test('Action fails elegantly - String', async () => {
+    core.setFailed = jest.fn()
+    assert.ok = jest.fn()
+    assert.ok.mockImplementation(() => {
+      throw new String('Date cannot be empty.')
+    })
+
+    await getRecentCommitDate(sha)
+    expect(core.setFailed).toHaveBeenCalledWith(`Failed to retrieve commit for 123 in repo.`)
   })
 })
