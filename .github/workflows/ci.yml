@@ -52,7 +52,7 @@ jobs:
         with:
           repo-token: '${{ secrets.GITHUB_TOKEN }}'
           days-before-stale: 1
-          days-before-delete: '150'
+          days-before-delete: 2
           comment-updates: true
           max-issues: 30
           tag-committer: true
