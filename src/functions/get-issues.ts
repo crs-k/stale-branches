@@ -1,9 +1,9 @@
 import * as assert from 'assert'
 import * as core from '@actions/core'
-import {github, owner, repo, staleBranchLabel} from './get-context'
+import {github, owner, repo} from './get-context'
 import {IssueResponse} from '../types/issues'
 
-export async function getIssues(): Promise<IssueResponse[]> {
+export async function getIssues(staleBranchLabel: string): Promise<IssueResponse[]> {
   let issues: IssueResponse[]
 
   try {

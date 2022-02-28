@@ -1,10 +1,10 @@
 import * as assert from 'assert'
 import * as core from '@actions/core'
-import {github, maxIssues, owner, repo, staleBranchLabel} from './get-context'
+import {github, owner, repo} from './get-context'
 import {IssueResponse} from '../types/issues'
 import {logMaxIssues} from './logging/log-max-issues'
 
-export async function getIssueBudget(): Promise<number> {
+export async function getIssueBudget(maxIssues, staleBranchLabel): Promise<number> {
   let issues: IssueResponse[]
   let issueCount = 0
   let issueBudgetRemaining: number

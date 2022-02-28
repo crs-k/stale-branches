@@ -1,9 +1,18 @@
 import * as assert from 'assert'
 import * as core from '@actions/core'
-import {commentUpdates, daysBeforeDelete, github, owner, repo, staleBranchLabel, tagLastCommitter} from './get-context'
+import {github, owner, repo} from './get-context'
 import {logUpdateIssue} from './logging/log-update-issue'
 
-export async function updateIssue(issueNumber: number, branch: string, commitAge: number, lastCommitter: string): Promise<string> {
+export async function updateIssue(
+  issueNumber: number,
+  branch: string,
+  commitAge: number,
+  lastCommitter: string,
+  commentUpdates: boolean,
+  daysBeforeDelete: number,
+  staleBranchLabel: string,
+  tagLastCommitter: boolean
+): Promise<string> {
   let createdAt = ''
   let commentUrl: string
   let bodyString: string
