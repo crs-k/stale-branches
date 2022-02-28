@@ -11,12 +11,6 @@ export const context = {
   }
 }
 
-export const daysBeforeStale: number = 120
-export const daysBeforeDelete: number = 180
-export const commentUpdates: boolean = true
-export const maxIssues: number = 20
-export const repoToken: string = '20'
-export const staleBranchLabel: string = 'stale branch 🗑️'
 export const validInputs: Inputs = {
   daysBeforeStale: 1,
   daysBeforeDelete: 150,
