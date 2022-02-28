@@ -3,7 +3,9 @@ description: 'Finds and deletes stale branches'
 author: 'Chris Kerins'
 inputs:
   repo-token:
-    description: 'The GITHUB_TOKEN secret'
+    description: 'The token for the repository, defaults to `${{ secrets.GITHUB_TOKEN }}`'
+    required: false
+    default: '${{ secrets.GITHUB_TOKEN }}'
   days-before-stale:
     description: 'Number of days a branch has been inactive before it is considered stale. Default: 120.'
     required: false
