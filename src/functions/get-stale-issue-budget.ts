@@ -27,8 +27,9 @@ export async function getIssueBudget(maxIssues: number, staleBranchLabel: string
   } catch (err) {
     if (err instanceof Error) {
       core.setFailed(`Failed to calculate issue budget. Error: ${err.message}`)
+    } else {
+      core.setFailed(`Failed to calculate issue budget.`)
     }
-    core.setFailed(`Failed to calculate issue budget.`)
     issueBudgetRemaining = 0
   }
   core.info(logMaxIssues(issueBudgetRemaining))

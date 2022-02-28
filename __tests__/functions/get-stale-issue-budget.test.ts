@@ -33,7 +33,7 @@ describe('Get Stale Issue Budget Function', () => {
     expect(core.info).toHaveBeenCalled()
   })
 
-  test('Action fails elegantly', async () => {
+  test('Action fails elegantly - Error', async () => {
     core.setFailed = jest.fn()
     assert.ok = jest.fn()
     assert.ok.mockImplementation(() => {
@@ -42,6 +42,16 @@ describe('Get Stale Issue Budget Function', () => {
 
     await getIssueBudget(maxIssues, staleBranchLabel)
     expect(core.setFailed).toHaveBeenCalledWith(`Failed to calculate issue budget. Error: Issue ID cannot be empty`)
+  })
+
+  test('Action fails elegantly - String', async () => {
+    core.setFailed = jest.fn()
+    assert.ok = jest.fn()
+    assert.ok.mockImplementation(() => {
+      throw new String('Issue ID cannot be empty')
+    })
+
+    await getIssueBudget(maxIssues, staleBranchLabel)
     expect(core.setFailed).toHaveBeenCalledWith(`Failed to calculate issue budget.`)
   })
 })

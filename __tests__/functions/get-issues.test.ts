@@ -23,7 +23,7 @@ describe('Get Issues Function', () => {
     expect(assert.ok).toHaveBeenCalled()
   })
 
-  test('Action fails elegantly', async () => {
+  test('Action fails elegantly - Error', async () => {
     core.setFailed = jest.fn()
     assert.ok = jest.fn()
     assert.ok.mockImplementation(() => {
@@ -32,6 +32,16 @@ describe('Get Issues Function', () => {
 
     await getIssues(staleBranchLabel)
     expect(core.setFailed).toHaveBeenCalledWith(`Failed to locate issues. Error: Issue ID cannot be empty`)
+  })
+
+  test('Action fails elegantly - String', async () => {
+    core.setFailed = jest.fn()
+    assert.ok = jest.fn()
+    assert.ok.mockImplementation(() => {
+      throw new String('Issue ID cannot be empty')
+    })
+
+    await getIssues(staleBranchLabel)
     expect(core.setFailed).toHaveBeenCalledWith(`Failed to locate issues.`)
   })
 })

@@ -18,7 +18,11 @@ export async function closeIssue(issueNumber: number): Promise<string> {
     assert.ok(state, 'State cannot be empty')
     core.info(logCloseIssue(issueNumber, state))
   } catch (err) {
-    if (err instanceof Error) core.info(`No existing issue returned for issue number: ${issueNumber}. Description: ${err.message}`)
+    if (err instanceof Error) {
+      core.info(`No existing issue returned for issue number: ${issueNumber}. Description: ${err.message}`)
+    } else {
+      core.info(`No existing issue returned for issue number: ${issueNumber}.`)
+    }
     state = ''
   }
   return state

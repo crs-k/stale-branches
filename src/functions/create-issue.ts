@@ -35,7 +35,11 @@ export async function createIssue(branch: string, commitAge: number, lastCommitt
     assert.ok(issueId, 'Issue ID cannot be empty')
     core.info(logNewIssue(branch))
   } catch (err) {
-    if (err instanceof Error) core.setFailed(`Failed to create issue for ${branch}. Error: ${err.message}`)
+    if (err instanceof Error) {
+      core.setFailed(`Failed to create issue for ${branch}. Error: ${err.message}`)
+    } else {
+      core.setFailed(`Failed to create issue for ${branch}.`)
+    }
     issueId = 0
   }
 

@@ -27,7 +27,7 @@ describe('Create Issue Function', () => {
     expect(github.rest.issues.create).toHaveBeenCalled()
   })
 
-  test('Action fails elegantly', async () => {
+  test('Action fails elegantly - Error', async () => {
     core.setFailed = jest.fn()
     assert.ok = jest.fn()
     assert.ok.mockImplementation(() => {
@@ -36,5 +36,16 @@ describe('Create Issue Function', () => {
 
     await createIssue(branchName, commitAge, lastCommitter, daysBeforeDelete, staleBranchLabel, tagLastCommitter)
     expect(core.setFailed).toHaveBeenCalledWith(`Failed to create issue for test. Error: Issue ID cannot be empty`)
+  })
+
+  test('Action fails elegantly - String', async () => {
+    core.setFailed = jest.fn()
+    assert.ok = jest.fn()
+    assert.ok.mockImplementation(() => {
+      throw new String('Issue ID cannot be empty')
+    })
+
+    await createIssue(branchName, commitAge, lastCommitter, daysBeforeDelete, staleBranchLabel, tagLastCommitter)
+    expect(core.setFailed).toHaveBeenCalledWith(`Failed to create issue for test.`)
   })
 })

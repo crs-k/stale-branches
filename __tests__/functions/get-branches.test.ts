@@ -20,7 +20,7 @@ describe('Get Branches Function', () => {
     expect(assert.ok).toHaveBeenCalled()
   })
 
-  test('Action fails elegantly', async () => {
+  test('Action fails elegantly - Error', async () => {
     core.setFailed = jest.fn()
     assert.ok = jest.fn()
     assert.ok.mockImplementation(() => {
@@ -29,6 +29,16 @@ describe('Get Branches Function', () => {
 
     await getBranches()
     expect(core.setFailed).toHaveBeenCalledWith(`Failed to retrieve branches for repo. Error: Response cannot be empty.`)
+  })
+
+  test('Action fails elegantly - String', async () => {
+    core.setFailed = jest.fn()
+    assert.ok = jest.fn()
+    assert.ok.mockImplementation(() => {
+      throw new String('Response cannot be empty.')
+    })
+
+    await getBranches()
     expect(core.setFailed).toHaveBeenCalledWith(`Failed to retrieve branches for repo.`)
   })
 })

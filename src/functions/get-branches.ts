@@ -24,8 +24,9 @@ export async function getBranches(): Promise<BranchResponse[]> {
   } catch (err) {
     if (err instanceof Error) {
       core.setFailed(`Failed to retrieve branches for ${repo}. Error: ${err.message}`)
+    } else {
+      core.setFailed(`Failed to retrieve branches for ${repo}.`)
     }
-    core.setFailed(`Failed to retrieve branches for ${repo}.`)
     branches = [{branchName: '', commmitSha: ''}]
   }
 

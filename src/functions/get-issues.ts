@@ -24,8 +24,9 @@ export async function getIssues(staleBranchLabel: string): Promise<IssueResponse
   } catch (err) {
     if (err instanceof Error) {
       core.setFailed(`Failed to locate issues. Error: ${err.message}`)
+    } else {
+      core.setFailed(`Failed to locate issues.`)
     }
-    core.setFailed(`Failed to locate issues.`)
     issues = [{issueTitle: '', issueNumber: -1}]
   }
 

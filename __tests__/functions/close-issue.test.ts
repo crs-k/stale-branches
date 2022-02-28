@@ -32,7 +32,7 @@ describe('Close Issue Function', () => {
     expect(core.info).toHaveBeenCalledWith(logCloseIssue(issueNumber, state))
   })
 
-  test('Action fails elegantly', async () => {
+  test('Action fails elegantly - Error', async () => {
     core.info = jest.fn()
     assert.ok = jest.fn()
     assert.ok.mockImplementation(() => {
@@ -41,5 +41,16 @@ describe('Close Issue Function', () => {
 
     await closeIssue(issueNumber)
     expect(core.info).toHaveBeenCalledWith(`No existing issue returned for issue number: 1. Description: State cannot be empty`)
+  })
+
+  test('Action fails elegantly - String', async () => {
+    core.info = jest.fn()
+    assert.ok = jest.fn()
+    assert.ok.mockImplementation(() => {
+      throw new String('State cannot be empty')
+    })
+
+    await closeIssue(issueNumber)
+    expect(core.info).toHaveBeenCalledWith(`No existing issue returned for issue number: 1.`)
   })
 })
