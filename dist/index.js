@@ -106,12 +106,12 @@ const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
 const log_new_issue_1 = __nccwpck_require__(2344);
-function createIssue(branch, commitAge, lastCommitter) {
+function createIssue(branch, commitAge, lastCommitter, daysBeforeDelete, staleBranchLabel, tagLastCommitter) {
     return __awaiter(this, void 0, void 0, function* () {
         let issueId;
         let bodyString;
-        const daysUntilDelete = Math.max(0, get_context_1.daysBeforeDelete - commitAge);
-        switch (get_context_1.tagLastCommitter) {
+        const daysUntilDelete = Math.max(0, daysBeforeDelete - commitAge);
+        switch (tagLastCommitter) {
             case true:
                 bodyString = `@${lastCommitter}, \r \r ${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days.`;
                 break;
@@ -127,7 +127,7 @@ function createIssue(branch, commitAge, lastCommitter) {
                 body: bodyString,
                 labels: [
                     {
-                        name: get_context_1.staleBranchLabel,
+                        name: staleBranchLabel,
                         color: 'B60205',
                         description: 'Used by Stale Branches Action to label issues'
                     }
@@ -451,19 +451,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.validateInputs = exports.staleBranchLabel = exports.tagLastCommitter = exports.maxIssues = exports.commentUpdates = exports.daysBeforeDelete = exports.daysBeforeStale = exports.repo = exports.owner = exports.github = void 0;
+exports.validateInputs = exports.repo = exports.owner = exports.github = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github_1 = __nccwpck_require__(5438);
 const repoToken = core.getInput('repo-token');
 core.setSecret(repoToken);
 exports.github = (0, github_1.getOctokit)(repoToken);
 _a = github_1.context.repo, exports.owner = _a.owner, exports.repo = _a.repo;
-exports.daysBeforeStale = Number(core.getInput('days-before-stale'));
-exports.daysBeforeDelete = Number(core.getInput('days-before-delete'));
-exports.commentUpdates = core.getBooleanInput('comment-updates');
-exports.maxIssues = Number(core.getInput('max-issues'));
-exports.tagLastCommitter = core.getBooleanInput('tag-committer');
-exports.staleBranchLabel = String(core.getInput('stale-branch-label'));
+/* export const daysBeforeStale = Number(core.getInput('days-before-stale'))
+export const daysBeforeDelete = Number(core.getInput('days-before-delete'))
+export const commentUpdates = core.getBooleanInput('comment-updates')
+export const maxIssues = Number(core.getInput('max-issues'))
+export const tagLastCommitter = core.getBooleanInput('tag-committer')
+export const staleBranchLabel = String(core.getInput('stale-branch-label'))
+ */
 function validateInputs() {
     return __awaiter(this, void 0, void 0, function* () {
         const result = {};
@@ -486,10 +487,6 @@ function validateInputs() {
             if (inputDaysBeforeStale < 0) {
                 core.setFailed('days-before-stale must be greater than zero');
                 throw new Error('days-before-stale must be greater than zero');
-            }
-            if (inputDaysBeforeDelete < 0) {
-                core.setFailed('days-before-delete must be greater than zero');
-                throw new Error('days-before-delete must be greater than zero');
             }
             result.daysBeforeStale = inputDaysBeforeStale;
             result.daysBeforeDelete = inputDaysBeforeDelete;
@@ -575,7 +572,7 @@ exports.getIssues = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
-function getIssues() {
+function getIssues(staleBranchLabel) {
     return __awaiter(this, void 0, void 0, function* () {
         let issues;
         try {
@@ -583,7 +580,7 @@ function getIssues() {
                 owner: get_context_1.owner,
                 repo: get_context_1.repo,
                 state: 'open',
-                labels: get_context_1.staleBranchLabel,
+                labels: staleBranchLabel,
                 per_page: 100
             }, response => response.data.map(issue => ({ issueTitle: issue.title, issueNumber: issue.number })));
             issues = issueResponse;
@@ -643,7 +640,7 @@ const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
 const log_max_issues_1 = __nccwpck_require__(5487);
-function getIssueBudget() {
+function getIssueBudget(maxIssues, staleBranchLabel) {
     return __awaiter(this, void 0, void 0, function* () {
         let issues;
         let issueCount = 0;
@@ -653,12 +650,12 @@ function getIssueBudget() {
                 owner: get_context_1.owner,
                 repo: get_context_1.repo,
                 state: 'open',
-                labels: get_context_1.staleBranchLabel,
+                labels: staleBranchLabel,
                 per_page: 100
             }, response => response.data.map(issue => ({ issueTitle: issue.title, issueNumber: issue.number })));
             issues = issueResponse;
             issueCount = new Set(issues.map(filteredIssues => filteredIssues.issueNumber)).size;
-            issueBudgetRemaining = Math.max(0, get_context_1.maxIssues - issueCount);
+            issueBudgetRemaining = Math.max(0, maxIssues - issueCount);
             assert.ok(issues, 'Issue ID cannot be empty');
         }
         catch (err) {
@@ -999,14 +996,14 @@ const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
 const log_update_issue_1 = __nccwpck_require__(8045);
-function updateIssue(issueNumber, branch, commitAge, lastCommitter) {
+function updateIssue(issueNumber, branch, commitAge, lastCommitter, commentUpdates, daysBeforeDelete, staleBranchLabel, tagLastCommitter) {
     return __awaiter(this, void 0, void 0, function* () {
         let createdAt = '';
         let commentUrl;
         let bodyString;
-        const daysUntilDelete = Math.max(0, get_context_1.daysBeforeDelete - commitAge);
-        if (get_context_1.commentUpdates === true) {
-            switch (get_context_1.tagLastCommitter) {
+        const daysUntilDelete = Math.max(0, daysBeforeDelete - commitAge);
+        if (commentUpdates === true) {
+            switch (tagLastCommitter) {
                 case true:
                     bodyString = `@${lastCommitter}, \r \r ${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \r \r This issue was last updated on ${new Date().toString()}`;
                     break;
@@ -1022,7 +1019,7 @@ function updateIssue(issueNumber, branch, commitAge, lastCommitter) {
                     body: bodyString,
                     labels: [
                         {
-                            name: get_context_1.staleBranchLabel,
+                            name: staleBranchLabel,
                             color: 'B60205',
                             description: 'Used by Stale Branches Action to label issues'
                         }
@@ -1111,8 +1108,8 @@ function run() {
             //Collect Branches, Issue Budget, and Existing Issues
             const branches = yield (0, get_branches_1.getBranches)();
             const outputTotal = branches.length;
-            let issueBudgetRemaining = yield (0, get_stale_issue_budget_1.getIssueBudget)();
-            const existingIssue = yield (0, get_issues_1.getIssues)();
+            let issueBudgetRemaining = yield (0, get_stale_issue_budget_1.getIssueBudget)(validInputs.maxIssues, validInputs.staleBranchLabel);
+            const existingIssue = yield (0, get_issues_1.getIssues)(validInputs.staleBranchLabel);
             // Assess Branches
             for (const branchToCheck of branches) {
                 const lastCommitDate = yield (0, get_commit_date_1.getRecentCommitDate)(branchToCheck.commmitSha);
@@ -1132,7 +1129,7 @@ function run() {
                 //Create new issue if branch is stale & existing issue is not found & issue budget is >0
                 if (commitAge > validInputs.daysBeforeStale) {
                     if (!filteredIssue.find(findIssue => findIssue.issueTitle === `[${branchName}] is STALE`) && issueBudgetRemaining > 0) {
-                        yield (0, create_issue_1.createIssue)(branchName, commitAge, lastCommitLogin);
+                        yield (0, create_issue_1.createIssue)(branchName, commitAge, lastCommitLogin, validInputs.daysBeforeDelete, validInputs.staleBranchLabel, validInputs.tagLastCommitter);
                         issueBudgetRemaining--;
                         core.info((0, log_max_issues_1.logMaxIssues)(issueBudgetRemaining));
                         if (outputStales.includes(branchName) === false) {
@@ -1153,7 +1150,7 @@ function run() {
                 if (commitAge > validInputs.daysBeforeStale) {
                     for (const issueToUpdate of filteredIssue) {
                         if (issueToUpdate.issueTitle === `[${branchName}] is STALE`) {
-                            yield (0, update_issue_1.updateIssue)(issueToUpdate.issueNumber, branchName, commitAge, lastCommitLogin);
+                            yield (0, update_issue_1.updateIssue)(issueToUpdate.issueNumber, branchName, commitAge, lastCommitLogin, validInputs.commentUpdates, validInputs.daysBeforeDelete, validInputs.staleBranchLabel, validInputs.tagLastCommitter);
                             if (outputStales.includes(branchName) === false) {
                                 outputStales.push(branchName);
                             }
