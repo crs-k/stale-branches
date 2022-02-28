@@ -55,8 +55,12 @@ function closeIssue(issueNumber) {
             core.info((0, log_close_issue_1.logCloseIssue)(issueNumber, state));
         }
         catch (err) {
-            if (err instanceof Error)
+            if (err instanceof Error) {
                 core.info(`No existing issue returned for issue number: ${issueNumber}. Description: ${err.message}`);
+            }
+            else {
+                core.info(`No existing issue returned for issue number: ${issueNumber}.`);
+            }
             state = '';
         }
         return state;
@@ -138,8 +142,12 @@ function createIssue(branch, commitAge, lastCommitter, daysBeforeDelete, staleBr
             core.info((0, log_new_issue_1.logNewIssue)(branch));
         }
         catch (err) {
-            if (err instanceof Error)
+            if (err instanceof Error) {
                 core.setFailed(`Failed to create issue for ${branch}. Error: ${err.message}`);
+            }
+            else {
+                core.setFailed(`Failed to create issue for ${branch}.`);
+            }
             issueId = 0;
         }
         return issueId;
@@ -206,8 +214,12 @@ function deleteBranch(name) {
             core.info((0, log_delete_branch_1.logDeleteBranch)(refFull));
         }
         catch (err) {
-            if (err instanceof Error)
+            if (err instanceof Error) {
                 core.error(`Failed to delete branch ${refFull}. Error: ${err.message}`);
+            }
+            else {
+                core.error(`Failed to delete branch ${refFull}.`);
+            }
             confirm = 500;
         }
         return confirm;
@@ -275,7 +287,9 @@ function getBranches() {
             if (err instanceof Error) {
                 core.setFailed(`Failed to retrieve branches for ${get_context_1.repo}. Error: ${err.message}`);
             }
-            core.setFailed(`Failed to retrieve branches for ${get_context_1.repo}.`);
+            else {
+                core.setFailed(`Failed to retrieve branches for ${get_context_1.repo}.`);
+            }
             branches = [{ branchName: '', commmitSha: '' }];
         }
         return branches;
@@ -339,8 +353,12 @@ function getRecentCommitDate(sha) {
             assert.ok(commitDate, 'Date cannot be empty.');
         }
         catch (err) {
-            if (err instanceof Error)
+            if (err instanceof Error) {
                 core.setFailed(`Failed to retrieve commit for ${sha} in ${get_context_1.repo}. Error: ${err.message}`);
+            }
+            else {
+                core.setFailed(`Failed to retrieve commit for ${sha} in ${get_context_1.repo}.`);
+            }
             commitDate = '';
         }
         return commitDate;
@@ -404,8 +422,12 @@ function getRecentCommitLogin(sha) {
             assert.ok(lastCommitter, 'Committer cannot be empty.');
         }
         catch (err) {
-            if (err instanceof Error)
+            if (err instanceof Error) {
                 core.info(`Failed to retrieve commit for ${sha} in ${get_context_1.repo}. Error: ${err.message}`);
+            }
+            else {
+                core.info(`Failed to retrieve commit for ${sha} in ${get_context_1.repo}.`);
+            }
             lastCommitter = '';
         }
         return lastCommitter;
@@ -583,7 +605,9 @@ function getIssues(staleBranchLabel) {
             if (err instanceof Error) {
                 core.setFailed(`Failed to locate issues. Error: ${err.message}`);
             }
-            core.setFailed(`Failed to locate issues.`);
+            else {
+                core.setFailed(`Failed to locate issues.`);
+            }
             issues = [{ issueTitle: '', issueNumber: -1 }];
         }
         return issues;
@@ -655,7 +679,9 @@ function getIssueBudget(maxIssues, staleBranchLabel) {
             if (err instanceof Error) {
                 core.setFailed(`Failed to calculate issue budget. Error: ${err.message}`);
             }
-            core.setFailed(`Failed to calculate issue budget.`);
+            else {
+                core.setFailed(`Failed to calculate issue budget.`);
+            }
             issueBudgetRemaining = 0;
         }
         core.info((0, log_max_issues_1.logMaxIssues)(issueBudgetRemaining));
