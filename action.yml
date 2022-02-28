@@ -5,7 +5,7 @@ inputs:
   repo-token:
     description: 'The token to be used to auth with GitHub's API'
     required: false
-    default: '${{ secrets.GITHUB_TOKEN }}'
+    default: ${{ secrets.GITHUB_TOKEN }}
   days-before-stale:
     description: 'Number of days a branch has been inactive before it is considered stale. Default: 120.'
     required: false
