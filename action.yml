@@ -3,7 +3,7 @@ description: 'Finds and deletes stale branches'
 author: 'Chris Kerins'
 inputs:
   repo-token:
-    description: 'The token to be used to auth with GitHub's API'
+    description: 'The token to be used to auth with GitHubs API'
     required: false
     default: ${{ github.token }}
   days-before-stale:
