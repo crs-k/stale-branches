@@ -49,14 +49,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ./
-        with:
 
-          days-before-stale: 1
-          days-before-delete: '150'
-          comment-updates: true
-          max-issues: 30
-          tag-committer: true
-          stale-branch-label: 'stale branch 🗑️'
 
 
   Build:
