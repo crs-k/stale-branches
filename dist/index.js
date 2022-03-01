@@ -761,13 +761,19 @@ exports.getIssueBudget = getIssueBudget;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getDays = void 0;
+exports.getMinutes = exports.getDays = void 0;
 function getDays(date1, date2) {
     const diffMs = Math.abs(date2 - date1);
     const days = Math.round(diffMs / (1000 * 60 * 60 * 24));
     return days;
 }
 exports.getDays = getDays;
+function getMinutes(date1, date2) {
+    const diffMs = Math.abs(date2 - date1);
+    const minutes = Math.round(diffMs / (1000 * 60));
+    return minutes;
+}
+exports.getMinutes = getMinutes;
 /* USED FOR TESTING
 export function getHours(date1, date2): number {
   const diffMs = Math.abs(date2 - date1)
@@ -775,11 +781,7 @@ export function getHours(date1, date2): number {
   return hours
 }
 
-export function getMinutes(date1, date2): number {
-  const diffMs = Math.abs(date2 - date1)
-  const minutes = Math.round(diffMs / (1000 * 60))
-  return minutes
-}
+
 
 export function getnSeconds(date1, date2): number {
   const diffMs = Math.abs(date2 - date1)
@@ -988,12 +990,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.logRateLimit = void 0;
+const get_time_1 = __nccwpck_require__(1035);
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logRateLimit(rateLimit) {
     const rateLimitUsed = Math.round((rateLimit.used / rateLimit.limit) * 100);
     const rateLimitRemaining = Math.round((rateLimit.remaining / rateLimit.limit) * 100);
+    const currentDate = new Date().getTime();
     const rateLimitReset = new Date(rateLimit.reset * 1000);
-    const rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.greenBright.open}${rateLimitUsed}%${ansi_styles_1.default.greenBright.close}, Rate Limit Remaining: ${ansi_styles_1.default.greenBright.open}${rateLimitRemaining}%${ansi_styles_1.default.greenBright.close}, Rate Limit Reset: ${ansi_styles_1.default.greenBright.open}${rateLimitReset}${ansi_styles_1.default.greenBright.close}`;
+    const rateLimitResetMinutes = (0, get_time_1.getMinutes)(currentDate, rateLimitReset);
+    const rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.greenBright.open}${rateLimitUsed}%${ansi_styles_1.default.greenBright.close}, Rate Limit Remaining: ${ansi_styles_1.default.greenBright.open}${rateLimitRemaining}%${ansi_styles_1.default.greenBright.close}, Rate Limit Reset: ${ansi_styles_1.default.greenBright.open}${rateLimitResetMinutes}${ansi_styles_1.default.greenBright.close}`;
     //color group based on age of branch
     /*   if (commitAge > daysBeforeDelete) {
       rateLimitColor = `[${styles.redBright.open}${rateLimit}${styles.redBright.close}]`

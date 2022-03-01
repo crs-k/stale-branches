@@ -1,12 +1,15 @@
 import {RateLimit} from '../../types/rate-limit'
+import {getMinutes} from '../get-time'
 import styles from 'ansi-styles'
 
 export function logRateLimit(rateLimit: RateLimit): string {
   const rateLimitUsed = Math.round((rateLimit.used / rateLimit.limit) * 100)
   const rateLimitRemaining = Math.round((rateLimit.remaining / rateLimit.limit) * 100)
+  const currentDate = new Date().getTime()
   const rateLimitReset = new Date(rateLimit.reset * 1000)
+  const rateLimitResetMinutes = getMinutes(currentDate, rateLimitReset)
 
-  const rateLimitColor = `Rate Limit Used: ${styles.greenBright.open}${rateLimitUsed}%${styles.greenBright.close}, Rate Limit Remaining: ${styles.greenBright.open}${rateLimitRemaining}%${styles.greenBright.close}, Rate Limit Reset: ${styles.greenBright.open}${rateLimitReset}${styles.greenBright.close}`
+  const rateLimitColor = `Rate Limit Used: ${styles.greenBright.open}${rateLimitUsed}%${styles.greenBright.close}, Rate Limit Remaining: ${styles.greenBright.open}${rateLimitRemaining}%${styles.greenBright.close}, Rate Limit Reset: ${styles.greenBright.open}${rateLimitResetMinutes}${styles.greenBright.close}`
 
   //color group based on age of branch
   /*   if (commitAge > daysBeforeDelete) {
