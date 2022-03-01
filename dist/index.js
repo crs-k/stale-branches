@@ -655,14 +655,23 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getRateLimit = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
+const get_time_1 = __nccwpck_require__(1035);
 const get_context_1 = __nccwpck_require__(7782);
 function getRateLimit() {
     return __awaiter(this, void 0, void 0, function* () {
         let rateLimit = {};
+        const rateLimitResponse = {};
         try {
-            const rateResponse = yield get_context_1.github.rest.rateLimit.get();
-            rateLimit = rateResponse.data.resources.core;
-            assert.ok(rateLimit, 'Rate Limit cannot be empty.');
+            rateLimit = yield get_context_1.github.rest.rateLimit.get();
+            const rateLimitUsed = Math.round((rateLimit.data.resources.core.used / rateLimit.data.resources.core.limit) * 100);
+            const rateLimitRemaining = Math.round((rateLimit.data.resources.core.remaining / rateLimit.data.resources.core.limit) * 100);
+            const currentDate = new Date().getTime();
+            const rateLimitReset = new Date(rateLimit.data.resources.core.reset * 1000);
+            const rateLimitResetMinutes = (0, get_time_1.getMinutes)(currentDate, rateLimitReset);
+            rateLimitResponse.used = rateLimitUsed;
+            rateLimitResponse.remaining = rateLimitRemaining;
+            rateLimitResponse.reset = rateLimitResetMinutes;
+            assert.ok(rateLimitResponse, 'Rate Limit Response cannot be empty.');
         }
         catch (err) {
             if (err instanceof Error) {
@@ -672,7 +681,7 @@ function getRateLimit() {
                 core.info(`Failed to retrieve rate limit data.`);
             }
         }
-        return rateLimit;
+        return rateLimitResponse;
     });
 }
 exports.getRateLimit = getRateLimit;
@@ -990,15 +999,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.logRateLimit = void 0;
-const get_time_1 = __nccwpck_require__(1035);
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logRateLimit(rateLimit) {
-    const rateLimitUsed = Math.round((rateLimit.used / rateLimit.limit) * 100);
-    const rateLimitRemaining = Math.round((rateLimit.remaining / rateLimit.limit) * 100);
-    const currentDate = new Date().getTime();
-    const rateLimitReset = new Date(rateLimit.reset * 1000);
-    const rateLimitResetMinutes = (0, get_time_1.getMinutes)(currentDate, rateLimitReset);
-    const rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.greenBright.open}${rateLimitUsed}%${ansi_styles_1.default.greenBright.close}, Rate Limit Remaining: ${ansi_styles_1.default.greenBright.open}${rateLimitRemaining}%${ansi_styles_1.default.greenBright.close}, Rate Limit Reset: ${ansi_styles_1.default.greenBright.open}${rateLimitResetMinutes}${ansi_styles_1.default.greenBright.close}`;
+    const rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.greenBright.open}${rateLimit.used}%${ansi_styles_1.default.greenBright.close}, Rate Limit Remaining: ${ansi_styles_1.default.greenBright.open}${rateLimit.remaining}%${ansi_styles_1.default.greenBright.close}, Resets in ${ansi_styles_1.default.greenBright.open}${rateLimit.remaining}${ansi_styles_1.default.greenBright.close} minutes.`;
     //color group based on age of branch
     /*   if (commitAge > daysBeforeDelete) {
       rateLimitColor = `[${styles.redBright.open}${rateLimit}${styles.redBright.close}]`
