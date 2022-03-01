@@ -48,7 +48,7 @@ export async function run(): Promise<void> {
       // Start output group for current branch assessment
       core.startGroup(logBranchGroupColor(branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete))
       // Break if Rate Limit usage exceeds 95%
-      if (rateLimit.used > 10) {
+      if (rateLimit.used > 95) {
         core.info(logRateLimitBreak(rateLimit))
         core.setFailed('Exiting to avoid rate limit violation.')
         break
