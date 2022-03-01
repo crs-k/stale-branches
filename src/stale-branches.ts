@@ -6,6 +6,7 @@ import {getBranches} from './functions/get-branches'
 import {getDays} from './functions/get-time'
 import {getIssueBudget} from './functions/get-stale-issue-budget'
 import {getIssues} from './functions/get-issues'
+import {getRateLimit} from './functions/get-rate-limit'
 import {getRecentCommitDate} from './functions/get-commit-date'
 import {getRecentCommitLogin} from './functions/get-committer-login'
 import {logActiveBranch} from './functions/logging/log-active-branch'
@@ -34,6 +35,9 @@ export async function run(): Promise<void> {
 
     // Assess Branches
     for (const branchToCheck of branches) {
+      const rateLimit = getRateLimit()
+      core.info(JSON.stringify(rateLimit))
+
       const lastCommitDate = await getRecentCommitDate(branchToCheck.commmitSha)
       const currentDate = new Date().getTime()
       const commitDate = new Date(lastCommitDate).getTime()

@@ -618,6 +618,68 @@ exports.getIssues = getIssues;
 
 /***/ }),
 
+/***/ 8727:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getRateLimit = void 0;
+const assert = __importStar(__nccwpck_require__(9491));
+const core = __importStar(__nccwpck_require__(2186));
+const get_context_1 = __nccwpck_require__(7782);
+function getRateLimit() {
+    return __awaiter(this, void 0, void 0, function* () {
+        let rateLimit = {};
+        try {
+            const rateResponse = yield get_context_1.github.rest.rateLimit.get();
+            rateLimit = rateResponse;
+            assert.ok(rateLimit, 'Rate Limit cannot be empty.');
+        }
+        catch (err) {
+            if (err instanceof Error) {
+                core.info(`Failed to retrieve rate limit data. Error: ${err.message}`);
+            }
+            else {
+                core.info(`Failed to retrieve rate limit data.`);
+            }
+        }
+        return rateLimit;
+    });
+}
+exports.getRateLimit = getRateLimit;
+
+
+/***/ }),
+
 /***/ 7705:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -1106,6 +1168,7 @@ const get_branches_1 = __nccwpck_require__(6204);
 const get_time_1 = __nccwpck_require__(1035);
 const get_stale_issue_budget_1 = __nccwpck_require__(7705);
 const get_issues_1 = __nccwpck_require__(4298);
+const get_rate_limit_1 = __nccwpck_require__(8727);
 const get_commit_date_1 = __nccwpck_require__(6267);
 const get_committer_login_1 = __nccwpck_require__(4764);
 const log_active_branch_1 = __nccwpck_require__(1182);
@@ -1131,6 +1194,8 @@ function run() {
             const existingIssue = yield (0, get_issues_1.getIssues)(validInputs.staleBranchLabel);
             // Assess Branches
             for (const branchToCheck of branches) {
+                const rateLimit = (0, get_rate_limit_1.getRateLimit)();
+                core.info(JSON.stringify(rateLimit));
                 const lastCommitDate = yield (0, get_commit_date_1.getRecentCommitDate)(branchToCheck.commmitSha);
                 const currentDate = new Date().getTime();
                 const commitDate = new Date(lastCommitDate).getTime();
