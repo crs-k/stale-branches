@@ -654,24 +654,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getRateLimit = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
-const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
 function getRateLimit() {
     return __awaiter(this, void 0, void 0, function* () {
         let rateLimit = {};
-        try {
-            const rateResponse = yield get_context_1.github.rest.rateLimit.get();
-            rateLimit = rateResponse;
-            assert.ok(rateLimit, 'Rate Limit cannot be empty.');
-        }
-        catch (err) {
-            if (err instanceof Error) {
-                core.info(`Failed to retrieve rate limit data. Error: ${err.message}`);
-            }
-            else {
-                core.info(`Failed to retrieve rate limit data.`);
-            }
-        }
+        //try {
+        const rateResponse = yield get_context_1.github.rest.rateLimit.get();
+        rateLimit = rateResponse;
+        assert.ok(rateLimit, 'Rate Limit cannot be empty.');
+        /*   } catch (err) {
+          if (err instanceof Error) {
+            core.info(`Failed to retrieve rate limit data. Error: ${err.message}`)
+          } else {
+            core.info(`Failed to retrieve rate limit data.`)
+          }
+        } */
         return rateLimit;
     });
 }
