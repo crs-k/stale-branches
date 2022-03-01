@@ -994,7 +994,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.logRateLimitBreak = void 0;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logRateLimitBreak(rateLimit) {
-    const rateLimitBreak = `Exiting due to rate limit usage of ${ansi_styles_1.default.redBright.open}${rateLimit.used}%${ansi_styles_1.default.redBright.close}, Resets in ${ansi_styles_1.default.magenta.open}${rateLimit.remaining}${ansi_styles_1.default.magenta.close} minutes.`;
+    const rateLimitBreak = `Exiting due to rate limit usage of ${ansi_styles_1.default.redBright.open}${rateLimit.used}%${ansi_styles_1.default.redBright.close}. Rate limit resets in ${ansi_styles_1.default.magenta.open}${rateLimit.remaining}${ansi_styles_1.default.magenta.close} minutes.`;
     return rateLimitBreak;
 }
 exports.logRateLimitBreak = logRateLimitBreak;
