@@ -1,16 +1,13 @@
 import * as assert from 'assert'
 import * as core from '@actions/core'
-// eslint-disable-next-line import/named
-import {GetResponseTypeFromEndpointMethod} from '@octokit/types'
+import {RateLimit} from '../types/rate-limit'
 import {github} from './get-context'
 
-type ListIssuesResponseDataType = GetResponseTypeFromEndpointMethod<typeof github.rest.rateLimit.get>
-
-export async function getRateLimit(): Promise<string> {
-  let rateLimit = {} as unknown as ListIssuesResponseDataType
+export async function getRateLimit(): Promise<RateLimit> {
+  let rateLimit = {} as unknown as RateLimit
   try {
     const rateResponse = await github.rest.rateLimit.get()
-    rateLimit = rateResponse
+    rateLimit = rateResponse.data.resources.core
     assert.ok(rateLimit, 'Rate Limit cannot be empty.')
   } catch (err) {
     if (err instanceof Error) {
@@ -20,5 +17,5 @@ export async function getRateLimit(): Promise<string> {
     }
   }
 
-  return JSON.stringify(rateLimit.data.resources.core)
+  return rateLimit
 }

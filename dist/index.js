@@ -661,7 +661,7 @@ function getRateLimit() {
         let rateLimit = {};
         try {
             const rateResponse = yield get_context_1.github.rest.rateLimit.get();
-            rateLimit = rateResponse;
+            rateLimit = rateResponse.data.resources.core;
             assert.ok(rateLimit, 'Rate Limit cannot be empty.');
         }
         catch (err) {
@@ -672,7 +672,7 @@ function getRateLimit() {
                 core.info(`Failed to retrieve rate limit data.`);
             }
         }
-        return JSON.stringify(rateLimit.data.resources.core);
+        return rateLimit;
     });
 }
 exports.getRateLimit = getRateLimit;
@@ -1195,7 +1195,7 @@ function run() {
             // Assess Branches
             for (const branchToCheck of branches) {
                 const rateLimit = yield (0, get_rate_limit_1.getRateLimit)();
-                core.info(rateLimit);
+                core.info(JSON.stringify(rateLimit));
                 const lastCommitDate = yield (0, get_commit_date_1.getRecentCommitDate)(branchToCheck.commmitSha);
                 const currentDate = new Date().getTime();
                 const commitDate = new Date(lastCommitDate).getTime();
