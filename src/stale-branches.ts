@@ -13,6 +13,7 @@ import {logActiveBranch} from './functions/logging/log-active-branch'
 import {logBranchGroupColor} from './functions/logging/log-branch-group-color'
 import {logLastCommitColor} from './functions/logging/log-last-commit-color'
 import {logMaxIssues} from './functions/logging/log-max-issues'
+import {logRateLimit} from './functions/logging/log-rate-limit'
 import {logTotalAssessed} from './functions/logging/log-total-assessed'
 import {logTotalDeleted} from './functions/logging/log-total-deleted'
 import {updateIssue} from './functions/update-issue'
@@ -47,6 +48,7 @@ export async function run(): Promise<void> {
 
       // Start output group for current branch assessment
       core.startGroup(logBranchGroupColor(branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete))
+      core.info(logRateLimit(rateLimit))
       core.info(logLastCommitColor(commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete))
 
       // Skip looking for last commit's login if input is set to false

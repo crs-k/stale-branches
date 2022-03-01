@@ -978,6 +978,38 @@ exports.logNewIssue = logNewIssue;
 
 /***/ }),
 
+/***/ 8725:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.logRateLimit = void 0;
+const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+function logRateLimit(rateLimit) {
+    const rateLimitUsed = rateLimit.used / rateLimit.limit;
+    const rateLimitRemaining = rateLimit.remaining / rateLimit.limit;
+    const d = new Date(0); // The 0 there is the key, which sets the date to the epoch
+    const rateLimitReset = d.setUTCSeconds(rateLimit.reset);
+    const rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.greenBright.open}${rateLimitUsed}${ansi_styles_1.default.greenBright.close}, Rate Limit Remaining: ${ansi_styles_1.default.greenBright.open}${rateLimitRemaining}${ansi_styles_1.default.greenBright.close}, Rate Limit Reset: ${ansi_styles_1.default.greenBright.open}${rateLimitReset}${ansi_styles_1.default.greenBright.close}`;
+    //color group based on age of branch
+    /*   if (commitAge > daysBeforeDelete) {
+      rateLimitColor = `[${styles.redBright.open}${rateLimit}${styles.redBright.close}]`
+    } else if (commitAge > daysBeforeStale) {
+      rateLimitColor = `[${styles.yellowBright.open}${rateLimit}${styles.yellowBright.close}]`
+    } else if (commitAge < daysBeforeStale) {
+      rateLimitColor = `[${styles.greenBright.open}${rateLimit}${styles.greenBright.close}]`
+    } */
+    return rateLimitColor;
+}
+exports.logRateLimit = logRateLimit;
+
+
+/***/ }),
+
 /***/ 2673:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -1175,6 +1207,7 @@ const log_active_branch_1 = __nccwpck_require__(1182);
 const log_branch_group_color_1 = __nccwpck_require__(3839);
 const log_last_commit_color_1 = __nccwpck_require__(2965);
 const log_max_issues_1 = __nccwpck_require__(5487);
+const log_rate_limit_1 = __nccwpck_require__(8725);
 const log_total_assessed_1 = __nccwpck_require__(2673);
 const log_total_deleted_1 = __nccwpck_require__(4888);
 const update_issue_1 = __nccwpck_require__(2914);
@@ -1204,6 +1237,7 @@ function run() {
                 const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === `[${branchName}] is STALE`);
                 // Start output group for current branch assessment
                 core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
+                core.info((0, log_rate_limit_1.logRateLimit)(rateLimit));
                 core.info((0, log_last_commit_color_1.logLastCommitColor)(commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
                 // Skip looking for last commit's login if input is set to false
                 let lastCommitLogin = 'Unknown';
