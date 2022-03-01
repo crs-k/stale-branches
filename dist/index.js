@@ -1014,16 +1014,16 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.logRateLimit = void 0;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logRateLimit(rateLimit) {
-    let rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.greenBright.open}${rateLimit.used}%${ansi_styles_1.default.greenBright.close}, Resets in ${ansi_styles_1.default.magenta.open}${rateLimit.remaining}${ansi_styles_1.default.magenta.close} minutes.`;
+    let rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.greenBright.open}${rateLimit.used}%${ansi_styles_1.default.greenBright.close}. Resets in ${ansi_styles_1.default.magenta.open}${rateLimit.remaining}${ansi_styles_1.default.magenta.close} minutes.`;
     // color output based on remaining rate limit %
     if (rateLimit.used > 95) {
-        rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.redBright.open}${rateLimit.used}%${ansi_styles_1.default.redBright.close}, Resets in ${ansi_styles_1.default.magenta.open}${rateLimit.remaining}${ansi_styles_1.default.magenta.close} minutes.`;
+        rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.redBright.open}${rateLimit.used}%${ansi_styles_1.default.redBright.close}. Resets in ${ansi_styles_1.default.magenta.open}${rateLimit.remaining}${ansi_styles_1.default.magenta.close} minutes.`;
     }
     else if (rateLimit.used >= 85) {
-        rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.yellowBright.open}${rateLimit.used}%${ansi_styles_1.default.yellowBright.close}, Resets in ${ansi_styles_1.default.magenta.open}${rateLimit.remaining}${ansi_styles_1.default.magenta.close} minutes.`;
+        rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.yellowBright.open}${rateLimit.used}%${ansi_styles_1.default.yellowBright.close}. Resets in ${ansi_styles_1.default.magenta.open}${rateLimit.remaining}${ansi_styles_1.default.magenta.close} minutes.`;
     }
     else if (rateLimit.used < 85) {
-        rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.greenBright.open}${rateLimit.used}%${ansi_styles_1.default.greenBright.close}, Resets in ${ansi_styles_1.default.magenta.open}${rateLimit.remaining}${ansi_styles_1.default.magenta.close} minutes.`;
+        rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.greenBright.open}${rateLimit.used}%${ansi_styles_1.default.greenBright.close}. Resets in ${ansi_styles_1.default.magenta.open}${rateLimit.remaining}${ansi_styles_1.default.magenta.close} minutes.`;
     }
     return rateLimitColor;
 }
