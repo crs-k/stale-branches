@@ -8,17 +8,16 @@ describe('Get Time Functions', () => {
     let result = timeFuncs.getDays(startDate, endDate)
     expect(result).toBe(2)
   })
-  /* 
-  test('Get Hours', async () => {
-    let result = timeFuncs.getHours(startDate, endDate)
-    expect(result).toBe(48)
-  })
 
   test('Get Minutes', async () => {
     let result = timeFuncs.getMinutes(startDate, endDate)
     expect(result).toBe(2880)
   })
-
+  /* 
+  test('Get Hours', async () => {
+    let result = timeFuncs.getHours(startDate, endDate)
+    expect(result).toBe(48)
+  })
   test('Get Seconds', async () => {
     let result = timeFuncs.getnSeconds(startDate, endDate)
     expect(result).toBe(172800)
