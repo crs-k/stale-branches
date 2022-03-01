@@ -1006,10 +1006,10 @@ function logRateLimit(rateLimit) {
     if (rateLimit.used > 95) {
         rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.redBright.open}${rateLimit.used}%${ansi_styles_1.default.redBright.close}, Resets in ${ansi_styles_1.default.magentaBright.open}${rateLimit.remaining}${ansi_styles_1.default.magentaBright.close} minutes.`;
     }
-    else if (rateLimit.used < 85) {
+    else if (rateLimit.used >= 85) {
         rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.yellowBright.open}${rateLimit.used}%${ansi_styles_1.default.yellowBright.close}, Resets in ${ansi_styles_1.default.magentaBright.open}${rateLimit.remaining}${ansi_styles_1.default.magentaBright.close} minutes.`;
     }
-    else if (rateLimit.used < 0) {
+    else if (rateLimit.used < 85) {
         rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.greenBright.open}${rateLimit.used}%${ansi_styles_1.default.greenBright.close}, Resets in ${ansi_styles_1.default.magentaBright.open}${rateLimit.remaining}${ansi_styles_1.default.magentaBright.close} minutes.`;
     }
     return rateLimitColor;
