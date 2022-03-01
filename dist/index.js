@@ -990,9 +990,9 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.logRateLimit = void 0;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logRateLimit(rateLimit) {
-    const rateLimitUsed = (rateLimit.used / rateLimit.limit) * 100;
-    const rateLimitRemaining = (rateLimit.remaining / rateLimit.limit) * 100;
-    const rateLimitReset = new Date(rateLimit.reset);
+    const rateLimitUsed = Math.round((rateLimit.used / rateLimit.limit) * 100);
+    const rateLimitRemaining = Math.round((rateLimit.remaining / rateLimit.limit) * 100);
+    const rateLimitReset = new Date(rateLimit.reset * 1000);
     const rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.greenBright.open}${rateLimitUsed}%${ansi_styles_1.default.greenBright.close}, Rate Limit Remaining: ${ansi_styles_1.default.greenBright.open}${rateLimitRemaining}%${ansi_styles_1.default.greenBright.close}, Rate Limit Reset: ${ansi_styles_1.default.greenBright.open}${rateLimitReset}${ansi_styles_1.default.greenBright.close}`;
     //color group based on age of branch
     /*   if (commitAge > daysBeforeDelete) {

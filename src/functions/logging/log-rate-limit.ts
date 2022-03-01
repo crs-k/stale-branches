@@ -2,9 +2,9 @@ import {RateLimit} from '../../types/rate-limit'
 import styles from 'ansi-styles'
 
 export function logRateLimit(rateLimit: RateLimit): string {
-  const rateLimitUsed = (rateLimit.used / rateLimit.limit) * 100
-  const rateLimitRemaining = (rateLimit.remaining / rateLimit.limit) * 100
-  const rateLimitReset = new Date(rateLimit.reset)
+  const rateLimitUsed = Math.round((rateLimit.used / rateLimit.limit) * 100)
+  const rateLimitRemaining = Math.round((rateLimit.remaining / rateLimit.limit) * 100)
+  const rateLimitReset = new Date(rateLimit.reset * 1000)
 
   const rateLimitColor = `Rate Limit Used: ${styles.greenBright.open}${rateLimitUsed}%${styles.greenBright.close}, Rate Limit Remaining: ${styles.greenBright.open}${rateLimitRemaining}%${styles.greenBright.close}, Rate Limit Reset: ${styles.greenBright.open}${rateLimitReset}${styles.greenBright.close}`
 
