@@ -672,7 +672,7 @@ function getRateLimit() {
                 core.info(`Failed to retrieve rate limit data.`);
             }
         }
-        return JSON.stringify(rateLimit);
+        return JSON.stringify(rateLimit.data.resources.core);
     });
 }
 exports.getRateLimit = getRateLimit;

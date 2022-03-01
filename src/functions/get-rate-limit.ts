@@ -20,5 +20,5 @@ export async function getRateLimit(): Promise<string> {
     }
   }
 
-  return JSON.stringify(rateLimit)
+  return JSON.stringify(rateLimit.data.resources.core)
 }
