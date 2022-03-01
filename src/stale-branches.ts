@@ -13,7 +13,6 @@ import {logActiveBranch} from './functions/logging/log-active-branch'
 import {logBranchGroupColor} from './functions/logging/log-branch-group-color'
 import {logLastCommitColor} from './functions/logging/log-last-commit-color'
 import {logMaxIssues} from './functions/logging/log-max-issues'
-import {logRateLimit} from './functions/logging/log-rate-limit'
 import {logRateLimitBreak} from './functions/logging/log-rate-limit-break'
 import {logTotalAssessed} from './functions/logging/log-total-assessed'
 import {logTotalDeleted} from './functions/logging/log-total-deleted'
@@ -53,7 +52,6 @@ export async function run(): Promise<void> {
         core.setFailed('Exiting to avoid rate limit violation.')
         break
       }
-      core.info(logRateLimit(rateLimit))
       core.info(logLastCommitColor(commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete))
 
       // Skip looking for last commit's login if input is set to false
