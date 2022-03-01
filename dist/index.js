@@ -990,11 +990,10 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.logRateLimit = void 0;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logRateLimit(rateLimit) {
-    const rateLimitUsed = rateLimit.used / rateLimit.limit;
-    const rateLimitRemaining = rateLimit.remaining / rateLimit.limit;
-    const d = new Date(0); // The 0 there is the key, which sets the date to the epoch
-    const rateLimitReset = d.setUTCSeconds(rateLimit.reset);
-    const rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.greenBright.open}${rateLimitUsed}${ansi_styles_1.default.greenBright.close}, Rate Limit Remaining: ${ansi_styles_1.default.greenBright.open}${rateLimitRemaining}${ansi_styles_1.default.greenBright.close}, Rate Limit Reset: ${ansi_styles_1.default.greenBright.open}${rateLimitReset}${ansi_styles_1.default.greenBright.close}`;
+    const rateLimitUsed = (rateLimit.used / rateLimit.limit) * 100;
+    const rateLimitRemaining = (rateLimit.remaining / rateLimit.limit) * 100;
+    const rateLimitReset = new Date(rateLimit.reset);
+    const rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.greenBright.open}${rateLimitUsed}%${ansi_styles_1.default.greenBright.close}, Rate Limit Remaining: ${ansi_styles_1.default.greenBright.open}${rateLimitRemaining}%${ansi_styles_1.default.greenBright.close}, Rate Limit Reset: ${ansi_styles_1.default.greenBright.open}${rateLimitReset}${ansi_styles_1.default.greenBright.close}`;
     //color group based on age of branch
     /*   if (commitAge > daysBeforeDelete) {
       rateLimitColor = `[${styles.redBright.open}${rateLimit}${styles.redBright.close}]`
@@ -1228,7 +1227,6 @@ function run() {
             // Assess Branches
             for (const branchToCheck of branches) {
                 const rateLimit = yield (0, get_rate_limit_1.getRateLimit)();
-                core.info(JSON.stringify(rateLimit));
                 const lastCommitDate = yield (0, get_commit_date_1.getRecentCommitDate)(branchToCheck.commmitSha);
                 const currentDate = new Date().getTime();
                 const commitDate = new Date(lastCommitDate).getTime();
