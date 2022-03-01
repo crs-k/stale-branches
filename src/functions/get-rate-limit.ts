@@ -23,6 +23,7 @@ export async function getRateLimit(): Promise<RateLimit> {
     rateLimitResponse.used = rateLimitUsed
     rateLimitResponse.remaining = rateLimitRemaining
     rateLimitResponse.reset = rateLimitResetMinutes
+    rateLimitResponse.resetDateTime = rateLimitReset
 
     assert.ok(rateLimitResponse, 'Rate Limit Response cannot be empty.')
   } catch (err) {

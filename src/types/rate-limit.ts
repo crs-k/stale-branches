@@ -18,6 +18,15 @@ export interface RateLimit {
   reset: number
 
   /**
+   * The time the rate limit resets
+   *
+   * Calculated as: new Date(reset * 1000)
+   *
+   * Example: Mon Jul 01 2013 13:47:53 GMT-0400 (EDT)
+   */
+  resetDateTime: Date
+
+  /**
    * The amount of rate limit used expressed as a percentage
    *
    * Calculated as: Math.round((used / limit) * 100)

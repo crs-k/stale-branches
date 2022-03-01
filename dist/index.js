@@ -664,6 +664,7 @@ function getRateLimit() {
             rateLimitResponse.used = rateLimitUsed;
             rateLimitResponse.remaining = rateLimitRemaining;
             rateLimitResponse.reset = rateLimitResetMinutes;
+            rateLimitResponse.resetDateTime = rateLimitReset;
             assert.ok(rateLimitResponse, 'Rate Limit Response cannot be empty.');
         }
         catch (err) {
@@ -994,7 +995,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.logRateLimitBreak = void 0;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logRateLimitBreak(rateLimit) {
-    const rateLimitBreak = `Exiting due to rate limit usage of ${ansi_styles_1.default.redBright.open}${rateLimit.used}%${ansi_styles_1.default.redBright.close}. Rate limit resets in ${ansi_styles_1.default.magenta.open}${rateLimit.remaining}${ansi_styles_1.default.magenta.close} minutes.`;
+    const rateLimitBreak = `Exiting due to rate limit usage of ${ansi_styles_1.default.redBright.open}${rateLimit.used}%${ansi_styles_1.default.redBright.close}. Rate limit resets in ${ansi_styles_1.default.magenta.open}${rateLimit.reset}${ansi_styles_1.default.magenta.close} minutes @ ${ansi_styles_1.default.magenta.open}${rateLimit.resetDateTime}${ansi_styles_1.default.magenta.close}.`;
     return rateLimitBreak;
 }
 exports.logRateLimitBreak = logRateLimitBreak;
@@ -1014,16 +1015,16 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.logRateLimit = void 0;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logRateLimit(rateLimit) {
-    let rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.greenBright.open}${rateLimit.used}%${ansi_styles_1.default.greenBright.close}. Resets in ${ansi_styles_1.default.magenta.open}${rateLimit.remaining}${ansi_styles_1.default.magenta.close} minutes.`;
+    let rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.greenBright.open}${rateLimit.used}%${ansi_styles_1.default.greenBright.close}. Resets in ${ansi_styles_1.default.magenta.open}${rateLimit.reset}${ansi_styles_1.default.magenta.close} minutes @ ${ansi_styles_1.default.magenta.open}${rateLimit.resetDateTime}${ansi_styles_1.default.magenta.close}.`;
     // color output based on remaining rate limit %
     if (rateLimit.used > 90) {
-        rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.redBright.open}${rateLimit.used}%${ansi_styles_1.default.redBright.close}. Resets in ${ansi_styles_1.default.magenta.open}${rateLimit.remaining}${ansi_styles_1.default.magenta.close} minutes.`;
+        rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.redBright.open}${rateLimit.used}%${ansi_styles_1.default.redBright.close}. Resets in ${ansi_styles_1.default.magenta.open}${rateLimit.reset}${ansi_styles_1.default.magenta.close} minutes @ ${ansi_styles_1.default.magenta.open}${rateLimit.resetDateTime}${ansi_styles_1.default.magenta.close}.`;
     }
     else if (rateLimit.used >= 80) {
-        rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.yellowBright.open}${rateLimit.used}%${ansi_styles_1.default.yellowBright.close}. Resets in ${ansi_styles_1.default.magenta.open}${rateLimit.remaining}${ansi_styles_1.default.magenta.close} minutes.`;
+        rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.yellowBright.open}${rateLimit.used}%${ansi_styles_1.default.yellowBright.close}. Resets in ${ansi_styles_1.default.magenta.open}${rateLimit.reset}${ansi_styles_1.default.magenta.close} minutes @ ${ansi_styles_1.default.magenta.open}${rateLimit.resetDateTime}${ansi_styles_1.default.magenta.close}.`;
     }
     else if (rateLimit.used < 80) {
-        rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.greenBright.open}${rateLimit.used}%${ansi_styles_1.default.greenBright.close}. Resets in ${ansi_styles_1.default.magenta.open}${rateLimit.remaining}${ansi_styles_1.default.magenta.close} minutes.`;
+        rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.greenBright.open}${rateLimit.used}%${ansi_styles_1.default.greenBright.close}. Resets in ${ansi_styles_1.default.magenta.open}${rateLimit.reset}${ansi_styles_1.default.magenta.close} minutes @ ${ansi_styles_1.default.magenta.open}${rateLimit.resetDateTime}${ansi_styles_1.default.magenta.close}.`;
     }
     return rateLimitColor;
 }
