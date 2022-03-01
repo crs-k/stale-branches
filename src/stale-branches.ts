@@ -35,8 +35,8 @@ export async function run(): Promise<void> {
 
     // Assess Branches
     for (const branchToCheck of branches) {
-      const rateLimit = getRateLimit()
-      core.info(JSON.stringify(rateLimit))
+      const rateLimit = await getRateLimit()
+      core.info(rateLimit)
 
       const lastCommitDate = await getRecentCommitDate(branchToCheck.commmitSha)
       const currentDate = new Date().getTime()
