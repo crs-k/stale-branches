@@ -488,19 +488,15 @@ function validateInputs() {
             const inputDaysBeforeStale = Number(core.getInput('days-before-stale'));
             const inputDaysBeforeDelete = Number(core.getInput('days-before-delete'));
             if (inputDaysBeforeStale >= inputDaysBeforeDelete) {
-                core.setFailed('days-before-stale cannot be greater than or equal to days-before-delete');
                 throw new Error('days-before-stale cannot be greater than or equal to days-before-delete');
             }
             if (inputDaysBeforeStale.toString() === 'NaN') {
-                core.setFailed('days-before-stale must be a number');
                 throw new Error('days-before-stale must be a number');
             }
             if (inputDaysBeforeDelete.toString() === 'NaN') {
-                core.setFailed('days-before-delete must be a number');
                 throw new Error('days-before-delete must be a number');
             }
             if (inputDaysBeforeStale < 0) {
-                core.setFailed('days-before-stale must be greater than zero');
                 throw new Error('days-before-stale must be greater than zero');
             }
             result.daysBeforeStale = inputDaysBeforeStale;
@@ -511,11 +507,9 @@ function validateInputs() {
             //Validate and assign max-issues
             const inputMaxIssues = Number(core.getInput('max-issues'));
             if (inputMaxIssues.toString() === 'NaN') {
-                core.setFailed('max-issues must be a number');
                 throw new Error('max-issues must be a number');
             }
             if (inputMaxIssues < 0) {
-                core.setFailed('max-issues must be greater than zero');
                 throw new Error('max-issues must be greater than zero');
             }
             result.maxIssues = inputMaxIssues;
@@ -525,7 +519,6 @@ function validateInputs() {
             //Validate and assign stale-branch-label
             const inputStaleBranchLabel = String(core.getInput('stale-branch-label'));
             if (inputStaleBranchLabel.length > 50) {
-                core.setFailed('stale-branch-label must be 50 characters or less');
                 throw new Error('stale-branch-label must be 50 characters or less');
             }
             result.staleBranchLabel = inputStaleBranchLabel;
@@ -534,10 +527,10 @@ function validateInputs() {
             if (err instanceof Error) {
                 core.setFailed(`Failed to validate inputs. Error: ${err.message}`);
             }
-            if (err instanceof TypeError) {
+            else if (err instanceof TypeError) {
                 core.setFailed(`Failed to validate inputs. Error: ${err.message}`);
             }
-            if (typeof err === 'string') {
+            else {
                 core.setFailed(`Failed to validate inputs. Error: ${err}`);
             }
         }
