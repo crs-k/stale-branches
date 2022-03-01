@@ -1260,7 +1260,7 @@ function run() {
                 // Start output group for current branch assessment
                 core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
                 // Break if Rate Limit usage exceeds 95%
-                if (rateLimit.used > 95) {
+                if (rateLimit.used > 10) {
                     core.info((0, log_rate_limit_break_1.logRateLimitBreak)(rateLimit));
                     core.setFailed('Exiting to avoid rate limit violation.');
                     break;
