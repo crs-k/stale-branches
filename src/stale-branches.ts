@@ -6,12 +6,14 @@ import {getBranches} from './functions/get-branches'
 import {getDays} from './functions/get-time'
 import {getIssueBudget} from './functions/get-stale-issue-budget'
 import {getIssues} from './functions/get-issues'
+import {getRateLimit} from './functions/get-rate-limit'
 import {getRecentCommitDate} from './functions/get-commit-date'
 import {getRecentCommitLogin} from './functions/get-committer-login'
 import {logActiveBranch} from './functions/logging/log-active-branch'
 import {logBranchGroupColor} from './functions/logging/log-branch-group-color'
 import {logLastCommitColor} from './functions/logging/log-last-commit-color'
 import {logMaxIssues} from './functions/logging/log-max-issues'
+import {logRateLimitBreak} from './functions/logging/log-rate-limit-break'
 import {logTotalAssessed} from './functions/logging/log-total-assessed'
 import {logTotalDeleted} from './functions/logging/log-total-deleted'
 import {updateIssue} from './functions/update-issue'
@@ -34,6 +36,7 @@ export async function run(): Promise<void> {
 
     // Assess Branches
     for (const branchToCheck of branches) {
+      const rateLimit = await getRateLimit()
       const lastCommitDate = await getRecentCommitDate(branchToCheck.commmitSha)
       const currentDate = new Date().getTime()
       const commitDate = new Date(lastCommitDate).getTime()
@@ -43,6 +46,12 @@ export async function run(): Promise<void> {
 
       // Start output group for current branch assessment
       core.startGroup(logBranchGroupColor(branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete))
+      // Break if Rate Limit usage exceeds 95%
+      if (rateLimit.used > 95) {
+        core.info(logRateLimitBreak(rateLimit))
+        core.setFailed('Exiting to avoid rate limit violation.')
+        break
+      }
       core.info(logLastCommitColor(commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete))
 
       // Skip looking for last commit's login if input is set to false

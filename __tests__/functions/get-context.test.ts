@@ -3,9 +3,6 @@ const core = require('@actions/core')
 import {github, owner, repo, validateInputs} from '../../src/functions/get-context'
 
 describe('Get Context Function', () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
   test('Mock context check', async () => {
     expect(github).toBeTruthy
     expect(owner).toBe('owner')
@@ -22,7 +19,6 @@ describe('Get Context Function', () => {
       .mockReturnValueOnce('Stale Branch Label') // stale-branch-label
     await validateInputs()
 
-    expect(core.setFailed).toHaveBeenCalledWith('days-before-stale cannot be greater than or equal to days-before-delete')
     expect(core.setFailed).toHaveBeenCalledWith('Failed to validate inputs. Error: days-before-stale cannot be greater than or equal to days-before-delete')
   })
 
@@ -36,7 +32,6 @@ describe('Get Context Function', () => {
       .mockReturnValueOnce('Stale Branch Label') // stale-branch-label
     await validateInputs()
 
-    expect(core.setFailed).toHaveBeenCalledWith('days-before-stale must be a number')
     expect(core.setFailed).toHaveBeenCalledWith('Failed to validate inputs. Error: days-before-stale must be a number')
   })
 
@@ -50,7 +45,6 @@ describe('Get Context Function', () => {
       .mockReturnValueOnce('Stale Branch Label') // stale-branch-label
     await validateInputs()
 
-    expect(core.setFailed).toHaveBeenCalledWith('days-before-delete must be a number')
     expect(core.setFailed).toHaveBeenCalledWith('Failed to validate inputs. Error: days-before-delete must be a number')
   })
 
@@ -64,7 +58,6 @@ describe('Get Context Function', () => {
       .mockReturnValueOnce('Stale Branch Label') // stale-branch-label
     await validateInputs()
 
-    expect(core.setFailed).toHaveBeenCalledWith('days-before-stale must be greater than zero')
     expect(core.setFailed).toHaveBeenCalledWith('Failed to validate inputs. Error: days-before-stale must be greater than zero')
   })
 
@@ -78,7 +71,6 @@ describe('Get Context Function', () => {
       .mockReturnValueOnce('Stale Branch Label') // stale-branch-label
     await validateInputs()
 
-    expect(core.setFailed).toHaveBeenCalledWith('max-issues must be a number')
     expect(core.setFailed).toHaveBeenCalledWith('Failed to validate inputs. Error: max-issues must be a number')
   })
 
@@ -92,7 +84,6 @@ describe('Get Context Function', () => {
       .mockReturnValueOnce('Stale Branch Label') // stale-branch-label
     await validateInputs()
 
-    expect(core.setFailed).toHaveBeenCalledWith('max-issues must be greater than zero')
     expect(core.setFailed).toHaveBeenCalledWith('Failed to validate inputs. Error: max-issues must be greater than zero')
   })
 
@@ -106,7 +97,54 @@ describe('Get Context Function', () => {
       .mockReturnValueOnce('Stale Branch Label Stale Branch Label Stale Branch Label') // stale-branch-label
     await validateInputs()
 
-    expect(core.setFailed).toHaveBeenCalledWith('stale-branch-label must be 50 characters or less')
     expect(core.setFailed).toHaveBeenCalledWith('Failed to validate inputs. Error: stale-branch-label must be 50 characters or less')
+  })
+  test('Expect Success: Proper Inputs', async () => {
+    core.setFailed = jest.fn()
+    core.getBooleanInput = jest.fn().mockReturnValueOnce(true).mockReturnValueOnce(true)
+    core.getInput = jest
+      .fn()
+      .mockReturnValueOnce('1') // days-before-stale
+      .mockReturnValueOnce('5') // days-before-delete
+      .mockReturnValueOnce('5') // max-issues
+      .mockReturnValueOnce('Stale Branch Label') // stale-branch-label
+    await validateInputs()
+
+    expect(core.getInput).toHaveBeenCalledTimes(4)
+    expect(core.getBooleanInput).toHaveBeenCalledTimes(2)
+  })
+
+  test('Expect Failure: - TypeError', async () => {
+    core.setFailed = jest.fn()
+    core.getInput = jest
+      .fn()
+      .mockReturnValueOnce('1') // days-before-stale
+      .mockReturnValueOnce('5') // days-before-delete
+      .mockReturnValueOnce('5') // max-issues
+      .mockReturnValueOnce('Stale Branch Label') // stale-branch-label
+    core.getBooleanInput = jest.fn()
+    core.getBooleanInput.mockImplementation(() => {
+      throw new TypeError('TypeError')
+    })
+
+    await validateInputs()
+    expect(core.setFailed).toHaveBeenCalledWith(`Failed to validate inputs. Error: TypeError`)
+  })
+
+  test('Expect Failure: - String', async () => {
+    core.setFailed = jest.fn()
+    core.getInput = jest
+      .fn()
+      .mockReturnValueOnce('1') // days-before-stale
+      .mockReturnValueOnce('5') // days-before-delete
+      .mockReturnValueOnce('5') // max-issues
+      .mockReturnValueOnce('Stale Branch Label') // stale-branch-label
+    core.getBooleanInput = jest.fn().mockReturnValueOnce(true)
+    core.getBooleanInput.mockImplementation(() => {
+      throw new String('String')
+    })
+
+    await validateInputs()
+    expect(core.setFailed).toHaveBeenCalledWith(`Failed to validate inputs. Error: String`)
   })
 })

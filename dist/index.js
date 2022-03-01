@@ -488,19 +488,15 @@ function validateInputs() {
             const inputDaysBeforeStale = Number(core.getInput('days-before-stale'));
             const inputDaysBeforeDelete = Number(core.getInput('days-before-delete'));
             if (inputDaysBeforeStale >= inputDaysBeforeDelete) {
-                core.setFailed('days-before-stale cannot be greater than or equal to days-before-delete');
                 throw new Error('days-before-stale cannot be greater than or equal to days-before-delete');
             }
             if (inputDaysBeforeStale.toString() === 'NaN') {
-                core.setFailed('days-before-stale must be a number');
                 throw new Error('days-before-stale must be a number');
             }
             if (inputDaysBeforeDelete.toString() === 'NaN') {
-                core.setFailed('days-before-delete must be a number');
                 throw new Error('days-before-delete must be a number');
             }
             if (inputDaysBeforeStale < 0) {
-                core.setFailed('days-before-stale must be greater than zero');
                 throw new Error('days-before-stale must be greater than zero');
             }
             result.daysBeforeStale = inputDaysBeforeStale;
@@ -511,11 +507,9 @@ function validateInputs() {
             //Validate and assign max-issues
             const inputMaxIssues = Number(core.getInput('max-issues'));
             if (inputMaxIssues.toString() === 'NaN') {
-                core.setFailed('max-issues must be a number');
                 throw new Error('max-issues must be a number');
             }
             if (inputMaxIssues < 0) {
-                core.setFailed('max-issues must be greater than zero');
                 throw new Error('max-issues must be greater than zero');
             }
             result.maxIssues = inputMaxIssues;
@@ -525,7 +519,6 @@ function validateInputs() {
             //Validate and assign stale-branch-label
             const inputStaleBranchLabel = String(core.getInput('stale-branch-label'));
             if (inputStaleBranchLabel.length > 50) {
-                core.setFailed('stale-branch-label must be 50 characters or less');
                 throw new Error('stale-branch-label must be 50 characters or less');
             }
             result.staleBranchLabel = inputStaleBranchLabel;
@@ -534,10 +527,10 @@ function validateInputs() {
             if (err instanceof Error) {
                 core.setFailed(`Failed to validate inputs. Error: ${err.message}`);
             }
-            if (err instanceof TypeError) {
+            else if (err instanceof TypeError) {
                 core.setFailed(`Failed to validate inputs. Error: ${err.message}`);
             }
-            if (typeof err === 'string') {
+            else {
                 core.setFailed(`Failed to validate inputs. Error: ${err}`);
             }
         }
@@ -614,6 +607,78 @@ function getIssues(staleBranchLabel) {
     });
 }
 exports.getIssues = getIssues;
+
+
+/***/ }),
+
+/***/ 8727:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getRateLimit = void 0;
+const assert = __importStar(__nccwpck_require__(9491));
+const core = __importStar(__nccwpck_require__(2186));
+const get_time_1 = __nccwpck_require__(1035);
+const get_context_1 = __nccwpck_require__(7782);
+function getRateLimit() {
+    return __awaiter(this, void 0, void 0, function* () {
+        let rateLimit = {};
+        const rateLimitResponse = {};
+        try {
+            rateLimit = yield get_context_1.github.rest.rateLimit.get();
+            const rateLimitUsed = Math.round((rateLimit.data.resources.core.used / rateLimit.data.resources.core.limit) * 100);
+            const rateLimitRemaining = Math.round((rateLimit.data.resources.core.remaining / rateLimit.data.resources.core.limit) * 100);
+            const currentDate = new Date().getTime();
+            const rateLimitReset = new Date(rateLimit.data.resources.core.reset * 1000);
+            const rateLimitResetMinutes = (0, get_time_1.getMinutes)(currentDate, rateLimitReset);
+            rateLimitResponse.used = rateLimitUsed;
+            rateLimitResponse.remaining = rateLimitRemaining;
+            rateLimitResponse.reset = rateLimitResetMinutes;
+            rateLimitResponse.resetDateTime = rateLimitReset;
+            assert.ok(rateLimitResponse, 'Rate Limit Response cannot be empty.');
+        }
+        catch (err) {
+            if (err instanceof Error) {
+                core.info(`Failed to retrieve rate limit data. Error: ${err.message}`);
+            }
+            else {
+                core.info(`Failed to retrieve rate limit data.`);
+            }
+        }
+        return rateLimitResponse;
+    });
+}
+exports.getRateLimit = getRateLimit;
 
 
 /***/ }),
@@ -699,13 +764,19 @@ exports.getIssueBudget = getIssueBudget;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getDays = void 0;
+exports.getMinutes = exports.getDays = void 0;
 function getDays(date1, date2) {
     const diffMs = Math.abs(date2 - date1);
     const days = Math.round(diffMs / (1000 * 60 * 60 * 24));
     return days;
 }
 exports.getDays = getDays;
+function getMinutes(date1, date2) {
+    const diffMs = Math.abs(date2 - date1);
+    const minutes = Math.round(diffMs / (1000 * 60));
+    return minutes;
+}
+exports.getMinutes = getMinutes;
 /* USED FOR TESTING
 export function getHours(date1, date2): number {
   const diffMs = Math.abs(date2 - date1)
@@ -713,11 +784,7 @@ export function getHours(date1, date2): number {
   return hours
 }
 
-export function getMinutes(date1, date2): number {
-  const diffMs = Math.abs(date2 - date1)
-  const minutes = Math.round(diffMs / (1000 * 60))
-  return minutes
-}
+
 
 export function getnSeconds(date1, date2): number {
   const diffMs = Math.abs(date2 - date1)
@@ -916,6 +983,26 @@ exports.logNewIssue = logNewIssue;
 
 /***/ }),
 
+/***/ 8956:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.logRateLimitBreak = void 0;
+const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+function logRateLimitBreak(rateLimit) {
+    const rateLimitBreak = `Exiting due to rate limit usage of ${ansi_styles_1.default.redBright.open}${rateLimit.used}%${ansi_styles_1.default.redBright.close}. Rate limit resets in ${ansi_styles_1.default.magenta.open}${rateLimit.reset}${ansi_styles_1.default.magenta.close} minutes @ ${ansi_styles_1.default.magenta.open}${rateLimit.resetDateTime}${ansi_styles_1.default.magenta.close}.`;
+    return rateLimitBreak;
+}
+exports.logRateLimitBreak = logRateLimitBreak;
+
+
+/***/ }),
+
 /***/ 2673:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -1106,12 +1193,14 @@ const get_branches_1 = __nccwpck_require__(6204);
 const get_time_1 = __nccwpck_require__(1035);
 const get_stale_issue_budget_1 = __nccwpck_require__(7705);
 const get_issues_1 = __nccwpck_require__(4298);
+const get_rate_limit_1 = __nccwpck_require__(8727);
 const get_commit_date_1 = __nccwpck_require__(6267);
 const get_committer_login_1 = __nccwpck_require__(4764);
 const log_active_branch_1 = __nccwpck_require__(1182);
 const log_branch_group_color_1 = __nccwpck_require__(3839);
 const log_last_commit_color_1 = __nccwpck_require__(2965);
 const log_max_issues_1 = __nccwpck_require__(5487);
+const log_rate_limit_break_1 = __nccwpck_require__(8956);
 const log_total_assessed_1 = __nccwpck_require__(2673);
 const log_total_deleted_1 = __nccwpck_require__(4888);
 const update_issue_1 = __nccwpck_require__(2914);
@@ -1131,6 +1220,7 @@ function run() {
             const existingIssue = yield (0, get_issues_1.getIssues)(validInputs.staleBranchLabel);
             // Assess Branches
             for (const branchToCheck of branches) {
+                const rateLimit = yield (0, get_rate_limit_1.getRateLimit)();
                 const lastCommitDate = yield (0, get_commit_date_1.getRecentCommitDate)(branchToCheck.commmitSha);
                 const currentDate = new Date().getTime();
                 const commitDate = new Date(lastCommitDate).getTime();
@@ -1139,6 +1229,12 @@ function run() {
                 const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === `[${branchName}] is STALE`);
                 // Start output group for current branch assessment
                 core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
+                // Break if Rate Limit usage exceeds 95%
+                if (rateLimit.used > 95) {
+                    core.info((0, log_rate_limit_break_1.logRateLimitBreak)(rateLimit));
+                    core.setFailed('Exiting to avoid rate limit violation.');
+                    break;
+                }
                 core.info((0, log_last_commit_color_1.logLastCommitColor)(commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
                 // Skip looking for last commit's login if input is set to false
                 let lastCommitLogin = 'Unknown';
