@@ -982,6 +982,26 @@ exports.logNewIssue = logNewIssue;
 
 /***/ }),
 
+/***/ 8956:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.logRateLimitBreak = void 0;
+const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+function logRateLimitBreak(rateLimit) {
+    const rateLimitBreak = `Exiting due to rate limit usage of ${ansi_styles_1.default.redBright.open}${rateLimit.used}%${ansi_styles_1.default.redBright.close}, Resets in ${ansi_styles_1.default.magenta.open}${rateLimit.remaining}${ansi_styles_1.default.magenta.close} minutes.`;
+    return rateLimitBreak;
+}
+exports.logRateLimitBreak = logRateLimitBreak;
+
+
+/***/ }),
+
 /***/ 8725:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -1210,6 +1230,7 @@ const log_branch_group_color_1 = __nccwpck_require__(3839);
 const log_last_commit_color_1 = __nccwpck_require__(2965);
 const log_max_issues_1 = __nccwpck_require__(5487);
 const log_rate_limit_1 = __nccwpck_require__(8725);
+const log_rate_limit_break_1 = __nccwpck_require__(8956);
 const log_total_assessed_1 = __nccwpck_require__(2673);
 const log_total_deleted_1 = __nccwpck_require__(4888);
 const update_issue_1 = __nccwpck_require__(2914);
@@ -1238,6 +1259,12 @@ function run() {
                 const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === `[${branchName}] is STALE`);
                 // Start output group for current branch assessment
                 core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
+                // Break if Rate Limit usage exceeds 95%
+                if (rateLimit.used > 95) {
+                    core.info((0, log_rate_limit_break_1.logRateLimitBreak)(rateLimit));
+                    core.setFailed('Exiting to avoid rate limit violation.');
+                    break;
+                }
                 core.info((0, log_rate_limit_1.logRateLimit)(rateLimit));
                 core.info((0, log_last_commit_color_1.logLastCommitColor)(commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
                 // Skip looking for last commit's login if input is set to false
