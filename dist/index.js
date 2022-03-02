@@ -62,7 +62,7 @@ const get_context_1 = __nccwpck_require__(7782);
 function closeIssueComment(issueNumber, branch, closeReason) {
     return __awaiter(this, void 0, void 0, function* () {
         let createdAt = '';
-        const bodyString = `This issue was closed on ${new Date().toString()} because ${branch} ${closeReason}`;
+        const bodyString = `This issue was closed because ${branch} ${closeReason}`;
         try {
             const issueResponse = yield get_context_1.github.rest.issues.createComment({
                 owner: get_context_1.owner,
