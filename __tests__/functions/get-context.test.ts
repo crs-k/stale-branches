@@ -145,6 +145,6 @@ describe('Get Context Function', () => {
     })
 
     await validateInputs()
-    expect(core.setFailed).toHaveBeenCalledWith(`Failed to validate inputs. Error: String`)
+    expect(core.setFailed).toHaveBeenCalledWith(`Failed to validate inputs.`)
   })
 })
