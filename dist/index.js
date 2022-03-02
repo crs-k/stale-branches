@@ -1,6 +1,91 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 3879:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CloseReason = void 0;
+var CloseReason;
+(function (CloseReason) {
+    CloseReason["Active"] = "has become active again.";
+    CloseReason["Deleted"] = "has been deleted.";
+})(CloseReason = exports.CloseReason || (exports.CloseReason = {}));
+
+
+/***/ }),
+
+/***/ 5876:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.closeIssueComment = void 0;
+const assert = __importStar(__nccwpck_require__(9491));
+const core = __importStar(__nccwpck_require__(2186));
+const get_context_1 = __nccwpck_require__(7782);
+function closeIssueComment(issueNumber, branch, closeReason) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let createdAt = '';
+        const bodyString = `This issue was closed on ${new Date().toString()} because ${branch} ${closeReason}`;
+        try {
+            const issueResponse = yield get_context_1.github.rest.issues.createComment({
+                owner: get_context_1.owner,
+                repo: get_context_1.repo,
+                issue_number: issueNumber,
+                body: bodyString
+            });
+            createdAt = issueResponse.data.created_at;
+            assert.ok(createdAt, 'Created At cannot be empty');
+        }
+        catch (err) {
+            if (err instanceof Error)
+                core.info(`No existing issue returned for issue number: ${issueNumber}. Error: ${err.message}`);
+            createdAt = '';
+        }
+        return createdAt;
+    });
+}
+exports.closeIssueComment = closeIssueComment;
+
+
+/***/ }),
+
 /***/ 4094:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -1231,7 +1316,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
 const core = __importStar(__nccwpck_require__(2186));
+const issue_close_reason_1 = __nccwpck_require__(3879);
 const close_issue_1 = __nccwpck_require__(4094);
+const close_issue_comment_1 = __nccwpck_require__(5876);
 const create_issue_1 = __nccwpck_require__(9810);
 const delete_branch_1 = __nccwpck_require__(5294);
 const get_branches_1 = __nccwpck_require__(6204);
@@ -1302,6 +1389,7 @@ function run() {
                     for (const issueToClose of filteredIssue) {
                         if (issueToClose.issueTitle === `[${branchName}] is STALE`) {
                             core.info((0, log_active_branch_1.logActiveBranch)(branchName));
+                            yield (0, close_issue_comment_1.closeIssueComment)(issueToClose.issueNumber, branchName, issue_close_reason_1.CloseReason.Active);
                             yield (0, close_issue_1.closeIssue)(issueToClose.issueNumber);
                         }
                     }
@@ -1322,6 +1410,7 @@ function run() {
                     for (const issueToDelete of filteredIssue) {
                         if (issueToDelete.issueTitle === `[${branchName}] is STALE`) {
                             yield (0, delete_branch_1.deleteBranch)(branchName);
+                            yield (0, close_issue_comment_1.closeIssueComment)(issueToDelete.issueNumber, branchName, issue_close_reason_1.CloseReason.Deleted);
                             yield (0, close_issue_1.closeIssue)(issueToDelete.issueNumber);
                             outputDeletes.push(branchName);
                         }

@@ -3,7 +3,14 @@ import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
 import {logNewIssue} from './logging/log-new-issue'
 
-export async function createIssue(branch: string, commitAge: number, lastCommitter: string, daysBeforeDelete: number, staleBranchLabel: string, tagLastCommitter: boolean): Promise<number> {
+export async function createIssue(
+  branch: string,
+  commitAge: number,
+  lastCommitter: string,
+  daysBeforeDelete: number,
+  staleBranchLabel: string,
+  tagLastCommitter: boolean
+): Promise<number> {
   let issueId: number
   let bodyString: string
   const daysUntilDelete = Math.max(0, daysBeforeDelete - commitAge)

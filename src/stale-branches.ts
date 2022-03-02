@@ -1,5 +1,7 @@
 import * as core from '@actions/core'
+import {CloseReason} from './enums/issue-close-reason'
 import {closeIssue} from './functions/close-issue'
+import {closeIssueComment} from './functions/close-issue-comment'
 import {createIssue} from './functions/create-issue'
 import {deleteBranch} from './functions/delete-branch'
 import {getBranches} from './functions/get-branches'
@@ -77,6 +79,7 @@ export async function run(): Promise<void> {
         for (const issueToClose of filteredIssue) {
           if (issueToClose.issueTitle === `[${branchName}] is STALE`) {
             core.info(logActiveBranch(branchName))
+            await closeIssueComment(issueToClose.issueNumber, branchName, CloseReason.Active)
             await closeIssue(issueToClose.issueNumber)
           }
         }
@@ -108,6 +111,7 @@ export async function run(): Promise<void> {
         for (const issueToDelete of filteredIssue) {
           if (issueToDelete.issueTitle === `[${branchName}] is STALE`) {
             await deleteBranch(branchName)
+            await closeIssueComment(issueToDelete.issueNumber, branchName, CloseReason.Deleted)
             await closeIssue(issueToDelete.issueNumber)
             outputDeletes.push(branchName)
           }
