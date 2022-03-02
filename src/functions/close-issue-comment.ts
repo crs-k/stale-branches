@@ -4,7 +4,7 @@ import {github, owner, repo} from './get-context'
 
 export async function closeIssueComment(issueNumber: number, branch: string, closeReason: string): Promise<string> {
   let createdAt = ''
-  const bodyString = `This issue was closed on ${new Date().toString()} because ${branch} ${closeReason}`
+  const bodyString = `This issue was closed because ${branch} ${closeReason}`
 
   try {
     const issueResponse = await github.rest.issues.createComment({
