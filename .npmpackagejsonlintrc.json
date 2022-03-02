@@ -28,9 +28,6 @@
       "repository-type": "error",
       "scripts-type": "error",
       "version-type": "error",
-      "valid-values-author": ["error", [
-        "Chris Kerins"
-      ]],
       "name-format": "error",
       "version-format": "error"
     }
