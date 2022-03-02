@@ -62,10 +62,8 @@ export async function validateInputs(): Promise<Inputs> {
   } catch (err: unknown) {
     if (err instanceof Error) {
       core.setFailed(`Failed to validate inputs. Error: ${err.message}`)
-    } else if (err instanceof TypeError) {
-      core.setFailed(`Failed to validate inputs. Error: ${err.message}`)
     } else {
-      core.setFailed(`Failed to validate inputs. Error: ${err}`)
+      core.setFailed(`Failed to validate inputs.`)
     }
   }
   return result
