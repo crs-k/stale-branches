@@ -4,16 +4,16 @@ import {createIssue} from './functions/create-issue'
 import {createIssueTitle} from './utils/create-issues-title'
 import {deleteBranch} from './functions/delete-branch'
 import {getBranches} from './functions/get-branches'
-import {getDays} from './functions/get-time'
 import {getIssueBudget} from './functions/get-stale-issue-budget'
 import {getIssues} from './functions/get-issues'
 import {getRateLimit} from './functions/get-rate-limit'
-import {getRecentCommitDate} from './functions/get-commit-date'
+import {getRecentCommitAge} from './functions/get-commit-age'
 import {getRecentCommitLogin} from './functions/get-committer-login'
 import {logActiveBranch} from './functions/logging/log-active-branch'
 import {logBranchGroupColor} from './functions/logging/log-branch-group-color'
 import {logLastCommitColor} from './functions/logging/log-last-commit-color'
 import {logMaxIssues} from './functions/logging/log-max-issues'
+import {logRateLimit} from './functions/logging/log-rate-limit'
 import {logRateLimitBreak} from './functions/logging/log-rate-limit-break'
 import {logTotalAssessed} from './functions/logging/log-total-assessed'
 import {logTotalDeleted} from './functions/logging/log-total-deleted'
@@ -39,16 +39,17 @@ export async function run(): Promise<void> {
     for (const branchToCheck of branches) {
       const rateLimit = await getRateLimit()
 
-      const lastCommitDate = await getRecentCommitDate(branchToCheck.commmitSha)
-      const currentDate = new Date().getTime()
+      const commitAge = await getRecentCommitAge(branchToCheck.commmitSha)
+      /*       const currentDate = new Date().getTime()
       const commitDate = new Date(lastCommitDate).getTime()
-      const commitAge = getDays(currentDate, commitDate)
+      const commitAge = getDays(currentDate, commitDate) */
       const branchName = branchToCheck.branchName
       const issueTitleString = createIssueTitle(branchName)
       const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === issueTitleString)
 
       // Start output group for current branch assessment
       core.startGroup(logBranchGroupColor(branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete))
+      core.info(logRateLimit(rateLimit))
       // Break if Rate Limit usage exceeds 95%
       if (rateLimit.used > 95) {
         core.info(logRateLimitBreak(rateLimit))
