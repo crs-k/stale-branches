@@ -39,12 +39,11 @@ export async function run(): Promise<void> {
     for (const branchToCheck of branches) {
       const rateLimit = await getRateLimit()
       const commitAge = await getRecentCommitAge(branchToCheck.commmitSha)
-      const branchName = branchToCheck.branchName
-      const issueTitleString = createIssueTitle(branchName)
+      const issueTitleString = createIssueTitle(branchToCheck.branchName)
       const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === issueTitleString)
 
       // Start output group for current branch assessment
-      core.startGroup(logBranchGroupColor(branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete))
+      core.startGroup(logBranchGroupColor(branchToCheck.branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete))
       core.info(logRateLimit(rateLimit))
       // Break if Rate Limit usage exceeds 95%
       if (rateLimit.used > 95) {
@@ -63,11 +62,11 @@ export async function run(): Promise<void> {
       //Create new issue if branch is stale & existing issue is not found & issue budget is >0
       if (commitAge > validInputs.daysBeforeStale) {
         if (!filteredIssue.find(findIssue => findIssue.issueTitle === issueTitleString) && issueBudgetRemaining > 0) {
-          await createIssue(branchName, commitAge, lastCommitLogin, validInputs.daysBeforeDelete, validInputs.staleBranchLabel, validInputs.tagLastCommitter)
+          await createIssue(branchToCheck.branchName, commitAge, lastCommitLogin, validInputs.daysBeforeDelete, validInputs.staleBranchLabel, validInputs.tagLastCommitter)
           issueBudgetRemaining--
           core.info(logMaxIssues(issueBudgetRemaining))
-          if (outputStales.includes(branchName) === false) {
-            outputStales.push(branchName)
+          if (outputStales.includes(branchToCheck.branchName) === false) {
+            outputStales.push(branchToCheck.branchName)
           }
         }
       }
@@ -76,7 +75,7 @@ export async function run(): Promise<void> {
       if (commitAge < validInputs.daysBeforeStale) {
         for (const issueToClose of filteredIssue) {
           if (issueToClose.issueTitle === issueTitleString) {
-            core.info(logActiveBranch(branchName))
+            core.info(logActiveBranch(branchToCheck.branchName))
             await closeIssue(issueToClose.issueNumber)
           }
         }
@@ -88,7 +87,7 @@ export async function run(): Promise<void> {
           if (issueToUpdate.issueTitle === issueTitleString) {
             await updateIssue(
               issueToUpdate.issueNumber,
-              branchName,
+              branchToCheck.branchName,
               commitAge,
               lastCommitLogin,
               validInputs.commentUpdates,
@@ -96,8 +95,8 @@ export async function run(): Promise<void> {
               validInputs.staleBranchLabel,
               validInputs.tagLastCommitter
             )
-            if (outputStales.includes(branchName) === false) {
-              outputStales.push(branchName)
+            if (outputStales.includes(branchToCheck.branchName) === false) {
+              outputStales.push(branchToCheck.branchName)
             }
           }
         }
@@ -107,9 +106,9 @@ export async function run(): Promise<void> {
       if (commitAge > validInputs.daysBeforeDelete) {
         for (const issueToDelete of filteredIssue) {
           if (issueToDelete.issueTitle === issueTitleString) {
-            await deleteBranch(branchName)
+            await deleteBranch(branchToCheck.branchName)
             await closeIssue(issueToDelete.issueNumber)
-            outputDeletes.push(branchName)
+            outputDeletes.push(branchToCheck.branchName)
           }
         }
       }
