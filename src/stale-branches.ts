@@ -50,14 +50,14 @@ export async function run(): Promise<void> {
       const issueTitleString = createIssueTitle(branchToCheck.branchName)
       const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === issueTitleString)
 
-      // Start output group for current branch assessment
-      core.startGroup(logBranchGroupColor(branchToCheck.branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete))
-      core.info(logLastCommitColor(commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete))
-
       // Skip looking for last commit's login if input is set to false
       if (validInputs.tagLastCommitter === true) {
         lastCommitLogin = await getRecentCommitLogin(branchToCheck.commmitSha)
       }
+
+      // Start output group for current branch assessment
+      core.startGroup(logBranchGroupColor(branchToCheck.branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete))
+      core.info(logLastCommitColor(commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete))
 
       //Create new issue if branch is stale & existing issue is not found & issue budget is >0
       if (commitAge > validInputs.daysBeforeStale) {
@@ -65,7 +65,7 @@ export async function run(): Promise<void> {
           await createIssue(branchToCheck.branchName, commitAge, lastCommitLogin, validInputs.daysBeforeDelete, validInputs.staleBranchLabel, validInputs.tagLastCommitter)
           issueBudgetRemaining--
           core.info(logMaxIssues(issueBudgetRemaining))
-          if (outputStales.includes(branchToCheck.branchName) === false) {
+          if (!outputStales.includes(branchToCheck.branchName)) {
             outputStales.push(branchToCheck.branchName)
           }
         }
@@ -95,7 +95,7 @@ export async function run(): Promise<void> {
               validInputs.staleBranchLabel,
               validInputs.tagLastCommitter
             )
-            if (outputStales.includes(branchToCheck.branchName) === false) {
+            if (!outputStales.includes(branchToCheck.branchName)) {
               outputStales.push(branchToCheck.branchName)
             }
           }
