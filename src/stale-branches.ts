@@ -28,7 +28,7 @@ export async function run(): Promise<void> {
   const outputStales: string[] = []
 
   try {
-    //Collect Branches, Issue Budget, and Existing Issues
+    //Collect Branches, Issue Budget, Existing Issues, & initialize lastCommitLogin
     const branches = await getBranches()
     const outputTotal = branches.length
     const existingIssue = await getIssues(validInputs.staleBranchLabel)
