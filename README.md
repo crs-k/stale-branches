@@ -18,6 +18,11 @@ When a branch has been inactive for more than the `days-before-stale` input, an 
 * See [example workflow](https://github.com/crs-k/stale-branches#example-workflow).
 
 ## Workflow Output
+* Output is grouped by branch.
+  * Active branches are green
+  * Stale branches are yellow
+  * Dead branches are red
+  
 ![image](https://user-images.githubusercontent.com/26232872/155919116-50a2ded9-2839-4957-aaa2-caa9c40c91c9.png)
 
 
