@@ -3,7 +3,7 @@ import * as core from '@actions/core'
 // eslint-disable-next-line import/named
 import {GetResponseTypeFromEndpointMethod} from '@octokit/types'
 import {RateLimit} from '../types/rate-limit'
-import {getMinutes} from './get-time'
+import {getMinutes} from '../utils/get-time'
 import {github} from './get-context'
 
 type ListIssuesResponseDataType = GetResponseTypeFromEndpointMethod<typeof github.rest.rateLimit.get>
@@ -17,13 +17,13 @@ export async function getRateLimit(): Promise<RateLimit> {
     const rateLimitUsed = Math.round((rateLimit.data.resources.core.used / rateLimit.data.resources.core.limit) * 100)
     const rateLimitRemaining = Math.round((rateLimit.data.resources.core.remaining / rateLimit.data.resources.core.limit) * 100)
     const currentDate = new Date().getTime()
-    const rateLimitReset = new Date(rateLimit.data.resources.core.reset * 1000)
+    const rateLimitReset = new Date(rateLimit.data.resources.core.reset * 1000).getTime()
     const rateLimitResetMinutes = getMinutes(currentDate, rateLimitReset)
 
     rateLimitResponse.used = rateLimitUsed
     rateLimitResponse.remaining = rateLimitRemaining
     rateLimitResponse.reset = rateLimitResetMinutes
-    rateLimitResponse.resetDateTime = rateLimitReset
+    rateLimitResponse.resetDateTime = new Date(rateLimitReset)
 
     assert.ok(rateLimitResponse, 'Rate Limit Response cannot be empty.')
   } catch (err) {

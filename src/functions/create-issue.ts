@@ -1,12 +1,14 @@
 import * as assert from 'assert'
 import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
+import {createIssueTitle} from '../utils/create-issues-title'
 import {logNewIssue} from './logging/log-new-issue'
 
 export async function createIssue(branch: string, commitAge: number, lastCommitter: string, daysBeforeDelete: number, staleBranchLabel: string, tagLastCommitter: boolean): Promise<number> {
   let issueId: number
   let bodyString: string
   const daysUntilDelete = Math.max(0, daysBeforeDelete - commitAge)
+  const issueTitleString = createIssueTitle(branch)
 
   switch (tagLastCommitter) {
     case true:
@@ -21,7 +23,7 @@ export async function createIssue(branch: string, commitAge: number, lastCommitt
     const issueResponse = await github.rest.issues.create({
       owner,
       repo,
-      title: `[${branch}] is STALE`,
+      title: issueTitleString,
       body: bodyString,
       labels: [
         {

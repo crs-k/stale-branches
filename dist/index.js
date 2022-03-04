@@ -117,12 +117,14 @@ exports.createIssue = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
+const create_issues_title_1 = __nccwpck_require__(4554);
 const log_new_issue_1 = __nccwpck_require__(2344);
 function createIssue(branch, commitAge, lastCommitter, daysBeforeDelete, staleBranchLabel, tagLastCommitter) {
     return __awaiter(this, void 0, void 0, function* () {
         let issueId;
         let bodyString;
         const daysUntilDelete = Math.max(0, daysBeforeDelete - commitAge);
+        const issueTitleString = (0, create_issues_title_1.createIssueTitle)(branch);
         switch (tagLastCommitter) {
             case true:
                 bodyString = `@${lastCommitter}, \r \r ${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days.`;
@@ -135,7 +137,7 @@ function createIssue(branch, commitAge, lastCommitter, daysBeforeDelete, staleBr
             const issueResponse = yield get_context_1.github.rest.issues.create({
                 owner: get_context_1.owner,
                 repo: get_context_1.repo,
-                title: `[${branch}] is STALE`,
+                title: issueTitleString,
                 body: bodyString,
                 labels: [
                     {
@@ -316,7 +318,7 @@ exports.getBranches = getBranches;
 
 /***/ }),
 
-/***/ 6267:
+/***/ 8005:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -354,22 +356,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getRecentCommitDate = void 0;
+exports.getRecentCommitAge = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
-function getRecentCommitDate(sha) {
+const get_time_1 = __nccwpck_require__(2249);
+function getRecentCommitAge(sha) {
     return __awaiter(this, void 0, void 0, function* () {
         let commitDate;
+        const currentDate = new Date().getTime();
         try {
-            const branchResponse = yield get_context_1.github.rest.repos.getCommit({
+            const commitResponse = yield get_context_1.github.rest.repos.getCommit({
                 owner: get_context_1.owner,
                 repo: get_context_1.repo,
                 ref: sha,
                 per_page: 1,
                 page: 1
             });
-            commitDate = branchResponse.data.commit.committer.date;
+            commitDate = commitResponse.data.commit.committer.date;
             assert.ok(commitDate, 'Date cannot be empty.');
         }
         catch (err) {
@@ -381,10 +385,12 @@ function getRecentCommitDate(sha) {
             }
             commitDate = '';
         }
-        return commitDate;
+        const commitDateTime = new Date(commitDate).getTime();
+        const commitAge = (0, get_time_1.getDays)(currentDate, commitDateTime);
+        return commitAge;
     });
 }
-exports.getRecentCommitDate = getRecentCommitDate;
+exports.getRecentCommitAge = getRecentCommitAge;
 
 
 /***/ }),
@@ -435,14 +441,14 @@ function getRecentCommitLogin(sha) {
     return __awaiter(this, void 0, void 0, function* () {
         let lastCommitter;
         try {
-            const branchResponse = yield get_context_1.github.rest.repos.getCommit({
+            const commitResponse = yield get_context_1.github.rest.repos.getCommit({
                 owner: get_context_1.owner,
                 repo: get_context_1.repo,
                 ref: sha,
                 per_page: 1,
                 page: 1
             });
-            lastCommitter = branchResponse.data.committer.login;
+            lastCommitter = commitResponse.data.committer.login;
             assert.ok(lastCommitter, 'Committer cannot be empty.');
         }
         catch (err) {
@@ -681,7 +687,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getRateLimit = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
-const get_time_1 = __nccwpck_require__(1035);
+const get_time_1 = __nccwpck_require__(2249);
 const get_context_1 = __nccwpck_require__(7782);
 function getRateLimit() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -692,12 +698,12 @@ function getRateLimit() {
             const rateLimitUsed = Math.round((rateLimit.data.resources.core.used / rateLimit.data.resources.core.limit) * 100);
             const rateLimitRemaining = Math.round((rateLimit.data.resources.core.remaining / rateLimit.data.resources.core.limit) * 100);
             const currentDate = new Date().getTime();
-            const rateLimitReset = new Date(rateLimit.data.resources.core.reset * 1000);
+            const rateLimitReset = new Date(rateLimit.data.resources.core.reset * 1000).getTime();
             const rateLimitResetMinutes = (0, get_time_1.getMinutes)(currentDate, rateLimitReset);
             rateLimitResponse.used = rateLimitUsed;
             rateLimitResponse.remaining = rateLimitRemaining;
             rateLimitResponse.reset = rateLimitResetMinutes;
-            rateLimitResponse.resetDateTime = rateLimitReset;
+            rateLimitResponse.resetDateTime = new Date(rateLimitReset);
             assert.ok(rateLimitResponse, 'Rate Limit Response cannot be empty.');
         }
         catch (err) {
@@ -791,44 +797,6 @@ function getIssueBudget(maxIssues, staleBranchLabel) {
     });
 }
 exports.getIssueBudget = getIssueBudget;
-
-
-/***/ }),
-
-/***/ 1035:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getMinutes = exports.getDays = void 0;
-function getDays(date1, date2) {
-    const diffMs = Math.abs(date2 - date1);
-    const days = Math.round(diffMs / (1000 * 60 * 60 * 24));
-    return days;
-}
-exports.getDays = getDays;
-function getMinutes(date1, date2) {
-    const diffMs = Math.abs(date2 - date1);
-    const minutes = Math.round(diffMs / (1000 * 60));
-    return minutes;
-}
-exports.getMinutes = getMinutes;
-/* USED FOR TESTING
-export function getHours(date1, date2): number {
-  const diffMs = Math.abs(date2 - date1)
-  const hours = Math.round(diffMs / (1000 * 60 * 60))
-  return hours
-}
-
-
-
-export function getnSeconds(date1, date2): number {
-  const diffMs = Math.abs(date2 - date1)
-  const seconds = Math.round(diffMs / 1000)
-  return seconds
-}
- */
 
 
 /***/ }),
@@ -1010,9 +978,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.logNewIssue = void 0;
+const create_issues_title_1 = __nccwpck_require__(4554);
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logNewIssue(branchName) {
-    const newIssue = `${ansi_styles_1.default.bold.open}New issue created:${ansi_styles_1.default.bold.close} ${ansi_styles_1.default.magentaBright.open}[${branchName}] is STALE${ansi_styles_1.default.magentaBright.close}.`;
+    const issueTitleString = (0, create_issues_title_1.createIssueTitle)(branchName);
+    const newIssue = `${ansi_styles_1.default.bold.open}New issue created:${ansi_styles_1.default.bold.close} ${ansi_styles_1.default.magentaBright.open}${issueTitleString}${ansi_styles_1.default.magentaBright.close}.`;
     return newIssue;
 }
 exports.logNewIssue = logNewIssue;
@@ -1142,22 +1112,15 @@ exports.updateIssue = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
+const create_issues_comment_1 = __nccwpck_require__(9670);
 const log_update_issue_1 = __nccwpck_require__(8045);
 function updateIssue(issueNumber, branch, commitAge, lastCommitter, commentUpdates, daysBeforeDelete, staleBranchLabel, tagLastCommitter) {
     return __awaiter(this, void 0, void 0, function* () {
         let createdAt = '';
         let commentUrl;
         let bodyString;
-        const daysUntilDelete = Math.max(0, daysBeforeDelete - commitAge);
         if (commentUpdates === true) {
-            switch (tagLastCommitter) {
-                case true:
-                    bodyString = `@${lastCommitter}, \r \r ${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \r \r This issue was last updated on ${new Date().toString()}`;
-                    break;
-                case false:
-                    bodyString = `${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \r \r This issue was last updated on ${new Date().toString()}`;
-                    break;
-            }
+            bodyString = (0, create_issues_comment_1.createIssueComment)(branch, lastCommitter, commitAge, daysBeforeDelete, commentUpdates, tagLastCommitter);
             try {
                 const issueResponse = yield get_context_1.github.rest.issues.createComment({
                     owner: get_context_1.owner,
@@ -1233,13 +1196,13 @@ exports.run = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const close_issue_1 = __nccwpck_require__(4094);
 const create_issue_1 = __nccwpck_require__(9810);
+const create_issues_title_1 = __nccwpck_require__(4554);
 const delete_branch_1 = __nccwpck_require__(5294);
 const get_branches_1 = __nccwpck_require__(6204);
-const get_time_1 = __nccwpck_require__(1035);
 const get_stale_issue_budget_1 = __nccwpck_require__(7705);
 const get_issues_1 = __nccwpck_require__(4298);
 const get_rate_limit_1 = __nccwpck_require__(8727);
-const get_commit_date_1 = __nccwpck_require__(6267);
+const get_commit_age_1 = __nccwpck_require__(8005);
 const get_committer_login_1 = __nccwpck_require__(4764);
 const log_active_branch_1 = __nccwpck_require__(1182);
 const log_branch_group_color_1 = __nccwpck_require__(3839);
@@ -1258,50 +1221,48 @@ function run() {
         const outputDeletes = [];
         const outputStales = [];
         try {
-            //Collect Branches, Issue Budget, and Existing Issues
+            //Collect Branches, Issue Budget, Existing Issues, & initialize lastCommitLogin
             const branches = yield (0, get_branches_1.getBranches)();
             const outputTotal = branches.length;
-            let issueBudgetRemaining = yield (0, get_stale_issue_budget_1.getIssueBudget)(validInputs.maxIssues, validInputs.staleBranchLabel);
             const existingIssue = yield (0, get_issues_1.getIssues)(validInputs.staleBranchLabel);
+            let issueBudgetRemaining = yield (0, get_stale_issue_budget_1.getIssueBudget)(validInputs.maxIssues, validInputs.staleBranchLabel);
+            let lastCommitLogin = 'Unknown';
             // Assess Branches
             for (const branchToCheck of branches) {
-                const rateLimit = yield (0, get_rate_limit_1.getRateLimit)();
-                const lastCommitDate = yield (0, get_commit_date_1.getRecentCommitDate)(branchToCheck.commmitSha);
-                const currentDate = new Date().getTime();
-                const commitDate = new Date(lastCommitDate).getTime();
-                const commitAge = (0, get_time_1.getDays)(currentDate, commitDate);
-                const branchName = branchToCheck.branchName;
-                const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === `[${branchName}] is STALE`);
-                // Start output group for current branch assessment
-                core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
                 // Break if Rate Limit usage exceeds 95%
+                const rateLimit = yield (0, get_rate_limit_1.getRateLimit)();
                 if (rateLimit.used > 95) {
                     core.info((0, log_rate_limit_break_1.logRateLimitBreak)(rateLimit));
                     core.setFailed('Exiting to avoid rate limit violation.');
                     break;
                 }
-                core.info((0, log_last_commit_color_1.logLastCommitColor)(commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
+                //Get age of last commit, generate issue title, and filter existing issues to current branch
+                const commitAge = yield (0, get_commit_age_1.getRecentCommitAge)(branchToCheck.commmitSha);
+                const issueTitleString = (0, create_issues_title_1.createIssueTitle)(branchToCheck.branchName);
+                const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === issueTitleString);
                 // Skip looking for last commit's login if input is set to false
-                let lastCommitLogin = 'Unknown';
                 if (validInputs.tagLastCommitter === true) {
                     lastCommitLogin = yield (0, get_committer_login_1.getRecentCommitLogin)(branchToCheck.commmitSha);
                 }
+                // Start output group for current branch assessment
+                core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchToCheck.branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
+                core.info((0, log_last_commit_color_1.logLastCommitColor)(commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
                 //Create new issue if branch is stale & existing issue is not found & issue budget is >0
                 if (commitAge > validInputs.daysBeforeStale) {
-                    if (!filteredIssue.find(findIssue => findIssue.issueTitle === `[${branchName}] is STALE`) && issueBudgetRemaining > 0) {
-                        yield (0, create_issue_1.createIssue)(branchName, commitAge, lastCommitLogin, validInputs.daysBeforeDelete, validInputs.staleBranchLabel, validInputs.tagLastCommitter);
+                    if (!filteredIssue.find(findIssue => findIssue.issueTitle === issueTitleString) && issueBudgetRemaining > 0) {
+                        yield (0, create_issue_1.createIssue)(branchToCheck.branchName, commitAge, lastCommitLogin, validInputs.daysBeforeDelete, validInputs.staleBranchLabel, validInputs.tagLastCommitter);
                         issueBudgetRemaining--;
                         core.info((0, log_max_issues_1.logMaxIssues)(issueBudgetRemaining));
-                        if (outputStales.includes(branchName) === false) {
-                            outputStales.push(branchName);
+                        if (!outputStales.includes(branchToCheck.branchName)) {
+                            outputStales.push(branchToCheck.branchName);
                         }
                     }
                 }
                 //Close issues if a branch becomes active again
                 if (commitAge < validInputs.daysBeforeStale) {
                     for (const issueToClose of filteredIssue) {
-                        if (issueToClose.issueTitle === `[${branchName}] is STALE`) {
-                            core.info((0, log_active_branch_1.logActiveBranch)(branchName));
+                        if (issueToClose.issueTitle === issueTitleString) {
+                            core.info((0, log_active_branch_1.logActiveBranch)(branchToCheck.branchName));
                             yield (0, close_issue_1.closeIssue)(issueToClose.issueNumber);
                         }
                     }
@@ -1309,10 +1270,10 @@ function run() {
                 //Update existing issues
                 if (commitAge > validInputs.daysBeforeStale) {
                     for (const issueToUpdate of filteredIssue) {
-                        if (issueToUpdate.issueTitle === `[${branchName}] is STALE`) {
-                            yield (0, update_issue_1.updateIssue)(issueToUpdate.issueNumber, branchName, commitAge, lastCommitLogin, validInputs.commentUpdates, validInputs.daysBeforeDelete, validInputs.staleBranchLabel, validInputs.tagLastCommitter);
-                            if (outputStales.includes(branchName) === false) {
-                                outputStales.push(branchName);
+                        if (issueToUpdate.issueTitle === issueTitleString) {
+                            yield (0, update_issue_1.updateIssue)(issueToUpdate.issueNumber, branchToCheck.branchName, commitAge, lastCommitLogin, validInputs.commentUpdates, validInputs.daysBeforeDelete, validInputs.staleBranchLabel, validInputs.tagLastCommitter);
+                            if (!outputStales.includes(branchToCheck.branchName)) {
+                                outputStales.push(branchToCheck.branchName);
                             }
                         }
                     }
@@ -1320,13 +1281,14 @@ function run() {
                 //Delete expired branches
                 if (commitAge > validInputs.daysBeforeDelete) {
                     for (const issueToDelete of filteredIssue) {
-                        if (issueToDelete.issueTitle === `[${branchName}] is STALE`) {
-                            yield (0, delete_branch_1.deleteBranch)(branchName);
+                        if (issueToDelete.issueTitle === issueTitleString) {
+                            yield (0, delete_branch_1.deleteBranch)(branchToCheck.branchName);
                             yield (0, close_issue_1.closeIssue)(issueToDelete.issueNumber);
-                            outputDeletes.push(branchName);
+                            outputDeletes.push(branchToCheck.branchName);
                         }
                     }
                 }
+                // Close output group for current branch assessment
                 core.endGroup();
             }
             core.setOutput('stale-branches', JSON.stringify(outputStales));
@@ -1341,6 +1303,84 @@ function run() {
     });
 }
 exports.run = run;
+
+
+/***/ }),
+
+/***/ 9670:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createIssueComment = void 0;
+function createIssueComment(branch, lastCommitter, commitAge, daysBeforeDelete, commentUpdates, tagLastCommitter) {
+    const daysUntilDelete = Math.max(0, daysBeforeDelete - commitAge);
+    let bodyString;
+    switch (tagLastCommitter) {
+        case true:
+            bodyString = `@${lastCommitter}, \r \r ${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \r \r This issue was last updated on ${new Date().toString()}`;
+            break;
+        case false:
+            bodyString = `${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \r \r This issue was last updated on ${new Date().toString()}`;
+            break;
+    }
+    return bodyString;
+}
+exports.createIssueComment = createIssueComment;
+
+
+/***/ }),
+
+/***/ 4554:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createIssueTitle = void 0;
+function createIssueTitle(branchName) {
+    return `[${branchName}] is STALE`;
+}
+exports.createIssueTitle = createIssueTitle;
+
+
+/***/ }),
+
+/***/ 2249:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getMinutes = exports.getDays = void 0;
+function getDays(date1, date2) {
+    const diffMs = Math.abs(date2 - date1);
+    const days = Math.round(diffMs / (1000 * 60 * 60 * 24));
+    return days;
+}
+exports.getDays = getDays;
+function getMinutes(date1, date2) {
+    const diffMs = Math.abs(date2 - date1);
+    const minutes = Math.round(diffMs / (1000 * 60));
+    return minutes;
+}
+exports.getMinutes = getMinutes;
+/* USED FOR TESTING
+export function getHours(date1, date2): number {
+  const diffMs = Math.abs(date2 - date1)
+  const hours = Math.round(diffMs / (1000 * 60 * 60))
+  return hours
+}
+
+
+
+export function getnSeconds(date1, date2): number {
+  const diffMs = Math.abs(date2 - date1)
+  const seconds = Math.round(diffMs / 1000)
+  return seconds
+}
+ */
 
 
 /***/ }),

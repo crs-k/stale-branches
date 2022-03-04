@@ -1,6 +1,7 @@
 import * as assert from 'assert'
 import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
+import {createIssueComment} from '../utils/create-issues-comment'
 import {logUpdateIssue} from './logging/log-update-issue'
 
 export async function updateIssue(
@@ -16,17 +17,9 @@ export async function updateIssue(
   let createdAt = ''
   let commentUrl: string
   let bodyString: string
-  const daysUntilDelete = Math.max(0, daysBeforeDelete - commitAge)
 
   if (commentUpdates === true) {
-    switch (tagLastCommitter) {
-      case true:
-        bodyString = `@${lastCommitter}, \r \r ${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \r \r This issue was last updated on ${new Date().toString()}`
-        break
-      case false:
-        bodyString = `${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \r \r This issue was last updated on ${new Date().toString()}`
-        break
-    }
+    bodyString = createIssueComment(branch, lastCommitter, commitAge, daysBeforeDelete, commentUpdates, tagLastCommitter)
 
     try {
       const issueResponse = await github.rest.issues.createComment({
