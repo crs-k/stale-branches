@@ -38,11 +38,7 @@ export async function run(): Promise<void> {
     // Assess Branches
     for (const branchToCheck of branches) {
       const rateLimit = await getRateLimit()
-
       const commitAge = await getRecentCommitAge(branchToCheck.commmitSha)
-      /*       const currentDate = new Date().getTime()
-      const commitDate = new Date(lastCommitDate).getTime()
-      const commitAge = getDays(currentDate, commitDate) */
       const branchName = branchToCheck.branchName
       const issueTitleString = createIssueTitle(branchName)
       const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === issueTitleString)

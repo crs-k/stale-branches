@@ -358,7 +358,7 @@ exports.getRecentCommitAge = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
-const get_time_1 = __nccwpck_require__(1035);
+const get_time_1 = __nccwpck_require__(2249);
 function getRecentCommitAge(sha) {
     return __awaiter(this, void 0, void 0, function* () {
         let commitDate;
@@ -685,7 +685,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getRateLimit = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
-const get_time_1 = __nccwpck_require__(1035);
+const get_time_1 = __nccwpck_require__(2249);
 const get_context_1 = __nccwpck_require__(7782);
 function getRateLimit() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -795,44 +795,6 @@ function getIssueBudget(maxIssues, staleBranchLabel) {
     });
 }
 exports.getIssueBudget = getIssueBudget;
-
-
-/***/ }),
-
-/***/ 1035:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getMinutes = exports.getDays = void 0;
-function getDays(date1, date2) {
-    const diffMs = Math.abs(date2 - date1);
-    const days = Math.round(diffMs / (1000 * 60 * 60 * 24));
-    return days;
-}
-exports.getDays = getDays;
-function getMinutes(date1, date2) {
-    const diffMs = Math.abs(date2 - date1);
-    const minutes = Math.round(diffMs / (1000 * 60));
-    return minutes;
-}
-exports.getMinutes = getMinutes;
-/* USED FOR TESTING
-export function getHours(date1, date2): number {
-  const diffMs = Math.abs(date2 - date1)
-  const hours = Math.round(diffMs / (1000 * 60 * 60))
-  return hours
-}
-
-
-
-export function getnSeconds(date1, date2): number {
-  const diffMs = Math.abs(date2 - date1)
-  const seconds = Math.round(diffMs / 1000)
-  return seconds
-}
- */
 
 
 /***/ }),
@@ -1302,9 +1264,6 @@ function run() {
             for (const branchToCheck of branches) {
                 const rateLimit = yield (0, get_rate_limit_1.getRateLimit)();
                 const commitAge = yield (0, get_commit_age_1.getRecentCommitAge)(branchToCheck.commmitSha);
-                /*       const currentDate = new Date().getTime()
-                const commitDate = new Date(lastCommitDate).getTime()
-                const commitAge = getDays(currentDate, commitDate) */
                 const branchName = branchToCheck.branchName;
                 const issueTitleString = (0, create_issues_title_1.createIssueTitle)(branchName);
                 const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === issueTitleString);
@@ -1393,6 +1352,44 @@ function createIssueTitle(branchName) {
     return `[${branchName}] is STALE`;
 }
 exports.createIssueTitle = createIssueTitle;
+
+
+/***/ }),
+
+/***/ 2249:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getMinutes = exports.getDays = void 0;
+function getDays(date1, date2) {
+    const diffMs = Math.abs(date2 - date1);
+    const days = Math.round(diffMs / (1000 * 60 * 60 * 24));
+    return days;
+}
+exports.getDays = getDays;
+function getMinutes(date1, date2) {
+    const diffMs = Math.abs(date2 - date1);
+    const minutes = Math.round(diffMs / (1000 * 60));
+    return minutes;
+}
+exports.getMinutes = getMinutes;
+/* USED FOR TESTING
+export function getHours(date1, date2): number {
+  const diffMs = Math.abs(date2 - date1)
+  const hours = Math.round(diffMs / (1000 * 60 * 60))
+  return hours
+}
+
+
+
+export function getnSeconds(date1, date2): number {
+  const diffMs = Math.abs(date2 - date1)
+  const seconds = Math.round(diffMs / 1000)
+  return seconds
+}
+ */
 
 
 /***/ }),
