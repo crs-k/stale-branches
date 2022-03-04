@@ -1233,6 +1233,7 @@ exports.run = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const close_issue_1 = __nccwpck_require__(4094);
 const create_issue_1 = __nccwpck_require__(9810);
+const create_issues_title_1 = __nccwpck_require__(4554);
 const delete_branch_1 = __nccwpck_require__(5294);
 const get_branches_1 = __nccwpck_require__(6204);
 const get_time_1 = __nccwpck_require__(1035);
@@ -1271,6 +1272,8 @@ function run() {
                 const commitDate = new Date(lastCommitDate).getTime();
                 const commitAge = (0, get_time_1.getDays)(currentDate, commitDate);
                 const branchName = branchToCheck.branchName;
+                const issueTitle = (0, create_issues_title_1.createIssueTitle)(branchName);
+                core.info(issueTitle);
                 const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === `[${branchName}] is STALE`);
                 // Start output group for current branch assessment
                 core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
@@ -1341,6 +1344,21 @@ function run() {
     });
 }
 exports.run = run;
+
+
+/***/ }),
+
+/***/ 4554:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createIssueTitle = void 0;
+function createIssueTitle(branchName) {
+    return `[${branchName}] is STALE`;
+}
+exports.createIssueTitle = createIssueTitle;
 
 
 /***/ }),

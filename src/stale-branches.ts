@@ -1,6 +1,7 @@
 import * as core from '@actions/core'
 import {closeIssue} from './functions/close-issue'
 import {createIssue} from './functions/create-issue'
+import {createIssueTitle} from './utils/create-issues-title'
 import {deleteBranch} from './functions/delete-branch'
 import {getBranches} from './functions/get-branches'
 import {getDays} from './functions/get-time'
@@ -37,11 +38,14 @@ export async function run(): Promise<void> {
     // Assess Branches
     for (const branchToCheck of branches) {
       const rateLimit = await getRateLimit()
+
       const lastCommitDate = await getRecentCommitDate(branchToCheck.commmitSha)
       const currentDate = new Date().getTime()
       const commitDate = new Date(lastCommitDate).getTime()
       const commitAge = getDays(currentDate, commitDate)
       const branchName = branchToCheck.branchName
+      const issueTitle = createIssueTitle(branchName)
+      core.info(issueTitle)
       const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === `[${branchName}] is STALE`)
 
       // Start output group for current branch assessment
