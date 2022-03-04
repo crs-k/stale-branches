@@ -1272,9 +1272,8 @@ function run() {
                 const commitDate = new Date(lastCommitDate).getTime();
                 const commitAge = (0, get_time_1.getDays)(currentDate, commitDate);
                 const branchName = branchToCheck.branchName;
-                const issueTitle = (0, create_issues_title_1.createIssueTitle)(branchName);
-                core.info(issueTitle);
-                const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === `[${branchName}] is STALE`);
+                const issueTitleString = (0, create_issues_title_1.createIssueTitle)(branchName);
+                const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === issueTitleString);
                 // Start output group for current branch assessment
                 core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
                 // Break if Rate Limit usage exceeds 95%
@@ -1291,7 +1290,7 @@ function run() {
                 }
                 //Create new issue if branch is stale & existing issue is not found & issue budget is >0
                 if (commitAge > validInputs.daysBeforeStale) {
-                    if (!filteredIssue.find(findIssue => findIssue.issueTitle === `[${branchName}] is STALE`) && issueBudgetRemaining > 0) {
+                    if (!filteredIssue.find(findIssue => findIssue.issueTitle === issueTitleString) && issueBudgetRemaining > 0) {
                         yield (0, create_issue_1.createIssue)(branchName, commitAge, lastCommitLogin, validInputs.daysBeforeDelete, validInputs.staleBranchLabel, validInputs.tagLastCommitter);
                         issueBudgetRemaining--;
                         core.info((0, log_max_issues_1.logMaxIssues)(issueBudgetRemaining));
@@ -1303,7 +1302,7 @@ function run() {
                 //Close issues if a branch becomes active again
                 if (commitAge < validInputs.daysBeforeStale) {
                     for (const issueToClose of filteredIssue) {
-                        if (issueToClose.issueTitle === `[${branchName}] is STALE`) {
+                        if (issueToClose.issueTitle === issueTitleString) {
                             core.info((0, log_active_branch_1.logActiveBranch)(branchName));
                             yield (0, close_issue_1.closeIssue)(issueToClose.issueNumber);
                         }
@@ -1312,7 +1311,7 @@ function run() {
                 //Update existing issues
                 if (commitAge > validInputs.daysBeforeStale) {
                     for (const issueToUpdate of filteredIssue) {
-                        if (issueToUpdate.issueTitle === `[${branchName}] is STALE`) {
+                        if (issueToUpdate.issueTitle === issueTitleString) {
                             yield (0, update_issue_1.updateIssue)(issueToUpdate.issueNumber, branchName, commitAge, lastCommitLogin, validInputs.commentUpdates, validInputs.daysBeforeDelete, validInputs.staleBranchLabel, validInputs.tagLastCommitter);
                             if (outputStales.includes(branchName) === false) {
                                 outputStales.push(branchName);
@@ -1323,7 +1322,7 @@ function run() {
                 //Delete expired branches
                 if (commitAge > validInputs.daysBeforeDelete) {
                     for (const issueToDelete of filteredIssue) {
-                        if (issueToDelete.issueTitle === `[${branchName}] is STALE`) {
+                        if (issueToDelete.issueTitle === issueTitleString) {
                             yield (0, delete_branch_1.deleteBranch)(branchName);
                             yield (0, close_issue_1.closeIssue)(issueToDelete.issueNumber);
                             outputDeletes.push(branchName);
