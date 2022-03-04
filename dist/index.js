@@ -1228,7 +1228,7 @@ function run() {
         const outputDeletes = [];
         const outputStales = [];
         try {
-            //Collect Branches, Issue Budget, and Existing Issues
+            //Collect Branches, Issue Budget, Existing Issues, & initialize lastCommitLogin
             const branches = yield (0, get_branches_1.getBranches)();
             const outputTotal = branches.length;
             const existingIssue = yield (0, get_issues_1.getIssues)(validInputs.staleBranchLabel);
