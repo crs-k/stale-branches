@@ -1236,20 +1236,20 @@ function run() {
             let lastCommitLogin = 'Unknown';
             // Assess Branches
             for (const branchToCheck of branches) {
-                //Check rate limit, get age of last commit, generate issue title, and filter existing issues to current branch
+                // Break if Rate Limit usage exceeds 95%
                 const rateLimit = yield (0, get_rate_limit_1.getRateLimit)();
+                if (rateLimit.used > 95) {
+                    core.info((0, log_rate_limit_break_1.logRateLimitBreak)(rateLimit));
+                    core.setFailed('Exiting to avoid rate limit violation.');
+                    break;
+                }
+                //Get age of last commit, generate issue title, and filter existing issues to current branch
                 const commitAge = yield (0, get_commit_age_1.getRecentCommitAge)(branchToCheck.commmitSha);
                 const issueTitleString = (0, create_issues_title_1.createIssueTitle)(branchToCheck.branchName);
                 const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === issueTitleString);
                 // Start output group for current branch assessment
                 core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchToCheck.branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
                 core.info((0, log_last_commit_color_1.logLastCommitColor)(commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
-                // Break if Rate Limit usage exceeds 95%
-                if (rateLimit.used > 95) {
-                    core.info((0, log_rate_limit_break_1.logRateLimitBreak)(rateLimit));
-                    core.setFailed('Exiting to avoid rate limit violation.');
-                    break;
-                }
                 // Skip looking for last commit's login if input is set to false
                 if (validInputs.tagLastCommitter === true) {
                     lastCommitLogin = yield (0, get_committer_login_1.getRecentCommitLogin)(branchToCheck.commmitSha);
