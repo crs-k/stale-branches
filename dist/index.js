@@ -316,7 +316,7 @@ exports.getBranches = getBranches;
 
 /***/ }),
 
-/***/ 6267:
+/***/ 8005:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -354,22 +354,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getRecentCommitDate = void 0;
+exports.getRecentCommitAge = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
-function getRecentCommitDate(sha) {
+const get_time_1 = __nccwpck_require__(1035);
+function getRecentCommitAge(sha) {
     return __awaiter(this, void 0, void 0, function* () {
         let commitDate;
+        const currentDate = new Date().getTime();
         try {
-            const branchResponse = yield get_context_1.github.rest.repos.getCommit({
+            const commitResponse = yield get_context_1.github.rest.repos.getCommit({
                 owner: get_context_1.owner,
                 repo: get_context_1.repo,
                 ref: sha,
                 per_page: 1,
                 page: 1
             });
-            commitDate = branchResponse.data.commit.committer.date;
+            commitDate = commitResponse.data.commit.committer.date;
             assert.ok(commitDate, 'Date cannot be empty.');
         }
         catch (err) {
@@ -381,10 +383,12 @@ function getRecentCommitDate(sha) {
             }
             commitDate = '';
         }
-        return commitDate;
+        const commitDateTime = new Date(commitDate).getTime();
+        const commitAge = (0, get_time_1.getDays)(currentDate, commitDateTime);
+        return commitAge;
     });
 }
-exports.getRecentCommitDate = getRecentCommitDate;
+exports.getRecentCommitAge = getRecentCommitAge;
 
 
 /***/ }),
@@ -435,14 +439,14 @@ function getRecentCommitLogin(sha) {
     return __awaiter(this, void 0, void 0, function* () {
         let lastCommitter;
         try {
-            const branchResponse = yield get_context_1.github.rest.repos.getCommit({
+            const commitResponse = yield get_context_1.github.rest.repos.getCommit({
                 owner: get_context_1.owner,
                 repo: get_context_1.repo,
                 ref: sha,
                 per_page: 1,
                 page: 1
             });
-            lastCommitter = branchResponse.data.committer.login;
+            lastCommitter = commitResponse.data.committer.login;
             assert.ok(lastCommitter, 'Committer cannot be empty.');
         }
         catch (err) {
@@ -692,12 +696,12 @@ function getRateLimit() {
             const rateLimitUsed = Math.round((rateLimit.data.resources.core.used / rateLimit.data.resources.core.limit) * 100);
             const rateLimitRemaining = Math.round((rateLimit.data.resources.core.remaining / rateLimit.data.resources.core.limit) * 100);
             const currentDate = new Date().getTime();
-            const rateLimitReset = new Date(rateLimit.data.resources.core.reset * 1000);
+            const rateLimitReset = new Date(rateLimit.data.resources.core.reset * 1000).getTime();
             const rateLimitResetMinutes = (0, get_time_1.getMinutes)(currentDate, rateLimitReset);
             rateLimitResponse.used = rateLimitUsed;
             rateLimitResponse.remaining = rateLimitRemaining;
             rateLimitResponse.reset = rateLimitResetMinutes;
-            rateLimitResponse.resetDateTime = rateLimitReset;
+            rateLimitResponse.resetDateTime = new Date(rateLimitReset);
             assert.ok(rateLimitResponse, 'Rate Limit Response cannot be empty.');
         }
         catch (err) {
@@ -1040,6 +1044,36 @@ exports.logRateLimitBreak = logRateLimitBreak;
 
 /***/ }),
 
+/***/ 8725:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.logRateLimit = void 0;
+const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+function logRateLimit(rateLimit) {
+    let rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.greenBright.open}${rateLimit.used}%${ansi_styles_1.default.greenBright.close}. Resets in ${ansi_styles_1.default.magenta.open}${rateLimit.reset}${ansi_styles_1.default.magenta.close}.`;
+    // color output based on remaining rate limit %
+    if (rateLimit.used > 90) {
+        rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.redBright.open}${rateLimit.used}%${ansi_styles_1.default.redBright.close}. Resets in ${ansi_styles_1.default.magenta.open}${rateLimit.reset}${ansi_styles_1.default.magenta.close}.`;
+    }
+    else if (rateLimit.used >= 80) {
+        rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.yellowBright.open}${rateLimit.used}%${ansi_styles_1.default.yellowBright.close}. Resets in ${ansi_styles_1.default.magenta.open}${rateLimit.reset}${ansi_styles_1.default.magenta.close}.`;
+    }
+    else if (rateLimit.used < 80) {
+        rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.greenBright.open}${rateLimit.used}%${ansi_styles_1.default.greenBright.close}. Resets in ${ansi_styles_1.default.magenta.open}${rateLimit.reset}${ansi_styles_1.default.magenta.close}.`;
+    }
+    return rateLimitColor;
+}
+exports.logRateLimit = logRateLimit;
+
+
+/***/ }),
+
 /***/ 2673:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -1236,16 +1270,16 @@ const create_issue_1 = __nccwpck_require__(9810);
 const create_issues_title_1 = __nccwpck_require__(4554);
 const delete_branch_1 = __nccwpck_require__(5294);
 const get_branches_1 = __nccwpck_require__(6204);
-const get_time_1 = __nccwpck_require__(1035);
 const get_stale_issue_budget_1 = __nccwpck_require__(7705);
 const get_issues_1 = __nccwpck_require__(4298);
 const get_rate_limit_1 = __nccwpck_require__(8727);
-const get_commit_date_1 = __nccwpck_require__(6267);
+const get_commit_age_1 = __nccwpck_require__(8005);
 const get_committer_login_1 = __nccwpck_require__(4764);
 const log_active_branch_1 = __nccwpck_require__(1182);
 const log_branch_group_color_1 = __nccwpck_require__(3839);
 const log_last_commit_color_1 = __nccwpck_require__(2965);
 const log_max_issues_1 = __nccwpck_require__(5487);
+const log_rate_limit_1 = __nccwpck_require__(8725);
 const log_rate_limit_break_1 = __nccwpck_require__(8956);
 const log_total_assessed_1 = __nccwpck_require__(2673);
 const log_total_deleted_1 = __nccwpck_require__(4888);
@@ -1267,15 +1301,16 @@ function run() {
             // Assess Branches
             for (const branchToCheck of branches) {
                 const rateLimit = yield (0, get_rate_limit_1.getRateLimit)();
-                const lastCommitDate = yield (0, get_commit_date_1.getRecentCommitDate)(branchToCheck.commmitSha);
-                const currentDate = new Date().getTime();
-                const commitDate = new Date(lastCommitDate).getTime();
-                const commitAge = (0, get_time_1.getDays)(currentDate, commitDate);
+                const commitAge = yield (0, get_commit_age_1.getRecentCommitAge)(branchToCheck.commmitSha);
+                /*       const currentDate = new Date().getTime()
+                const commitDate = new Date(lastCommitDate).getTime()
+                const commitAge = getDays(currentDate, commitDate) */
                 const branchName = branchToCheck.branchName;
                 const issueTitleString = (0, create_issues_title_1.createIssueTitle)(branchName);
                 const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === issueTitleString);
                 // Start output group for current branch assessment
                 core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
+                core.info((0, log_rate_limit_1.logRateLimit)(rateLimit));
                 // Break if Rate Limit usage exceeds 95%
                 if (rateLimit.used > 95) {
                     core.info((0, log_rate_limit_break_1.logRateLimitBreak)(rateLimit));
