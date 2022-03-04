@@ -1112,22 +1112,15 @@ exports.updateIssue = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
+const create_issues_comment_1 = __nccwpck_require__(9670);
 const log_update_issue_1 = __nccwpck_require__(8045);
 function updateIssue(issueNumber, branch, commitAge, lastCommitter, commentUpdates, daysBeforeDelete, staleBranchLabel, tagLastCommitter) {
     return __awaiter(this, void 0, void 0, function* () {
         let createdAt = '';
         let commentUrl;
         let bodyString;
-        const daysUntilDelete = Math.max(0, daysBeforeDelete - commitAge);
         if (commentUpdates === true) {
-            switch (tagLastCommitter) {
-                case true:
-                    bodyString = `@${lastCommitter}, \r \r ${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \r \r This issue was last updated on ${new Date().toString()}`;
-                    break;
-                case false:
-                    bodyString = `${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \r \r This issue was last updated on ${new Date().toString()}`;
-                    break;
-            }
+            bodyString = (0, create_issues_comment_1.createIssueComment)(branch, lastCommitter, commitAge, daysBeforeDelete, commentUpdates, tagLastCommitter);
             try {
                 const issueResponse = yield get_context_1.github.rest.issues.createComment({
                     owner: get_context_1.owner,
@@ -1310,6 +1303,31 @@ function run() {
     });
 }
 exports.run = run;
+
+
+/***/ }),
+
+/***/ 9670:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createIssueComment = void 0;
+function createIssueComment(branch, lastCommitter, commitAge, daysBeforeDelete, commentUpdates, tagLastCommitter) {
+    const daysUntilDelete = Math.max(0, daysBeforeDelete - commitAge);
+    let bodyString;
+    switch (tagLastCommitter) {
+        case true:
+            bodyString = `@${lastCommitter}, \r \r ${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \r \r This issue was last updated on ${new Date().toString()}`;
+            break;
+        case false:
+            bodyString = `${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \r \r This issue was last updated on ${new Date().toString()}`;
+            break;
+    }
+    return bodyString;
+}
+exports.createIssueComment = createIssueComment;
 
 
 /***/ }),
