@@ -31,12 +31,13 @@ export async function run(): Promise<void> {
     //Collect Branches, Issue Budget, and Existing Issues
     const branches = await getBranches()
     const outputTotal = branches.length
-    let issueBudgetRemaining = await getIssueBudget(validInputs.maxIssues, validInputs.staleBranchLabel)
     const existingIssue = await getIssues(validInputs.staleBranchLabel)
+    let issueBudgetRemaining = await getIssueBudget(validInputs.maxIssues, validInputs.staleBranchLabel)
+    let lastCommitLogin = 'Unknown'
 
     // Assess Branches
     for (const branchToCheck of branches) {
-      //Check rate limit
+      //Check rate limit, get age of last commit, generate issue title, and filter existing issues to current branch
       const rateLimit = await getRateLimit()
       const commitAge = await getRecentCommitAge(branchToCheck.commmitSha)
       const issueTitleString = createIssueTitle(branchToCheck.branchName)
@@ -44,6 +45,7 @@ export async function run(): Promise<void> {
 
       // Start output group for current branch assessment
       core.startGroup(logBranchGroupColor(branchToCheck.branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete))
+      core.info(logLastCommitColor(commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete))
 
       // Break if Rate Limit usage exceeds 95%
       if (rateLimit.used > 95) {
@@ -51,10 +53,8 @@ export async function run(): Promise<void> {
         core.setFailed('Exiting to avoid rate limit violation.')
         break
       }
-      core.info(logLastCommitColor(commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete))
 
       // Skip looking for last commit's login if input is set to false
-      let lastCommitLogin = 'Unknown'
       if (validInputs.tagLastCommitter === true) {
         lastCommitLogin = await getRecentCommitLogin(branchToCheck.commmitSha)
       }
@@ -112,6 +112,7 @@ export async function run(): Promise<void> {
           }
         }
       }
+      // Close output group for current branch assessment
       core.endGroup()
     }
     core.setOutput('stale-branches', JSON.stringify(outputStales))
