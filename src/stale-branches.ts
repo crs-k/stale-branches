@@ -37,8 +37,15 @@ export async function run(): Promise<void> {
 
     // Assess Branches
     for (const branchToCheck of branches) {
-      //Check rate limit, get age of last commit, generate issue title, and filter existing issues to current branch
+      // Break if Rate Limit usage exceeds 95%
       const rateLimit = await getRateLimit()
+      if (rateLimit.used > 95) {
+        core.info(logRateLimitBreak(rateLimit))
+        core.setFailed('Exiting to avoid rate limit violation.')
+        break
+      }
+
+      //Get age of last commit, generate issue title, and filter existing issues to current branch
       const commitAge = await getRecentCommitAge(branchToCheck.commmitSha)
       const issueTitleString = createIssueTitle(branchToCheck.branchName)
       const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === issueTitleString)
@@ -46,13 +53,6 @@ export async function run(): Promise<void> {
       // Start output group for current branch assessment
       core.startGroup(logBranchGroupColor(branchToCheck.branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete))
       core.info(logLastCommitColor(commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete))
-
-      // Break if Rate Limit usage exceeds 95%
-      if (rateLimit.used > 95) {
-        core.info(logRateLimitBreak(rateLimit))
-        core.setFailed('Exiting to avoid rate limit violation.')
-        break
-      }
 
       // Skip looking for last commit's login if input is set to false
       if (validInputs.tagLastCommitter === true) {
