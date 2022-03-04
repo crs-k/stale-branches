@@ -1010,36 +1010,6 @@ exports.logRateLimitBreak = logRateLimitBreak;
 
 /***/ }),
 
-/***/ 8725:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.logRateLimit = void 0;
-const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
-function logRateLimit(rateLimit) {
-    let rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.greenBright.open}${rateLimit.used}%${ansi_styles_1.default.greenBright.close}. Resets in ${ansi_styles_1.default.magenta.open}${rateLimit.reset}${ansi_styles_1.default.magenta.close} minutes.`;
-    // color output based on remaining rate limit %
-    if (rateLimit.used > 90) {
-        rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.redBright.open}${rateLimit.used}%${ansi_styles_1.default.redBright.close}. Resets in ${ansi_styles_1.default.magenta.open}${rateLimit.reset}${ansi_styles_1.default.magenta.close} minutes.`;
-    }
-    else if (rateLimit.used >= 80) {
-        rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.yellowBright.open}${rateLimit.used}%${ansi_styles_1.default.yellowBright.close}. Resets in ${ansi_styles_1.default.magenta.open}${rateLimit.reset}${ansi_styles_1.default.magenta.close} minutes.`;
-    }
-    else if (rateLimit.used < 80) {
-        rateLimitColor = `Rate Limit Used: ${ansi_styles_1.default.greenBright.open}${rateLimit.used}%${ansi_styles_1.default.greenBright.close}. Resets in ${ansi_styles_1.default.magenta.open}${rateLimit.reset}${ansi_styles_1.default.magenta.close} minutes.`;
-    }
-    return rateLimitColor;
-}
-exports.logRateLimit = logRateLimit;
-
-
-/***/ }),
-
 /***/ 2673:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -1245,7 +1215,6 @@ const log_active_branch_1 = __nccwpck_require__(1182);
 const log_branch_group_color_1 = __nccwpck_require__(3839);
 const log_last_commit_color_1 = __nccwpck_require__(2965);
 const log_max_issues_1 = __nccwpck_require__(5487);
-const log_rate_limit_1 = __nccwpck_require__(8725);
 const log_rate_limit_break_1 = __nccwpck_require__(8956);
 const log_total_assessed_1 = __nccwpck_require__(2673);
 const log_total_deleted_1 = __nccwpck_require__(4888);
@@ -1273,7 +1242,6 @@ function run() {
                 const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === issueTitleString);
                 // Start output group for current branch assessment
                 core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchToCheck.branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
-                core.info((0, log_rate_limit_1.logRateLimit)(rateLimit));
                 // Break if Rate Limit usage exceeds 95%
                 if (rateLimit.used > 95) {
                     core.info((0, log_rate_limit_break_1.logRateLimitBreak)(rateLimit));
