@@ -1264,11 +1264,10 @@ function run() {
             for (const branchToCheck of branches) {
                 const rateLimit = yield (0, get_rate_limit_1.getRateLimit)();
                 const commitAge = yield (0, get_commit_age_1.getRecentCommitAge)(branchToCheck.commmitSha);
-                const branchName = branchToCheck.branchName;
-                const issueTitleString = (0, create_issues_title_1.createIssueTitle)(branchName);
+                const issueTitleString = (0, create_issues_title_1.createIssueTitle)(branchToCheck.branchName);
                 const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === issueTitleString);
                 // Start output group for current branch assessment
-                core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
+                core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchToCheck.branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
                 core.info((0, log_rate_limit_1.logRateLimit)(rateLimit));
                 // Break if Rate Limit usage exceeds 95%
                 if (rateLimit.used > 95) {
@@ -1285,11 +1284,11 @@ function run() {
                 //Create new issue if branch is stale & existing issue is not found & issue budget is >0
                 if (commitAge > validInputs.daysBeforeStale) {
                     if (!filteredIssue.find(findIssue => findIssue.issueTitle === issueTitleString) && issueBudgetRemaining > 0) {
-                        yield (0, create_issue_1.createIssue)(branchName, commitAge, lastCommitLogin, validInputs.daysBeforeDelete, validInputs.staleBranchLabel, validInputs.tagLastCommitter);
+                        yield (0, create_issue_1.createIssue)(branchToCheck.branchName, commitAge, lastCommitLogin, validInputs.daysBeforeDelete, validInputs.staleBranchLabel, validInputs.tagLastCommitter);
                         issueBudgetRemaining--;
                         core.info((0, log_max_issues_1.logMaxIssues)(issueBudgetRemaining));
-                        if (outputStales.includes(branchName) === false) {
-                            outputStales.push(branchName);
+                        if (outputStales.includes(branchToCheck.branchName) === false) {
+                            outputStales.push(branchToCheck.branchName);
                         }
                     }
                 }
@@ -1297,7 +1296,7 @@ function run() {
                 if (commitAge < validInputs.daysBeforeStale) {
                     for (const issueToClose of filteredIssue) {
                         if (issueToClose.issueTitle === issueTitleString) {
-                            core.info((0, log_active_branch_1.logActiveBranch)(branchName));
+                            core.info((0, log_active_branch_1.logActiveBranch)(branchToCheck.branchName));
                             yield (0, close_issue_1.closeIssue)(issueToClose.issueNumber);
                         }
                     }
@@ -1306,9 +1305,9 @@ function run() {
                 if (commitAge > validInputs.daysBeforeStale) {
                     for (const issueToUpdate of filteredIssue) {
                         if (issueToUpdate.issueTitle === issueTitleString) {
-                            yield (0, update_issue_1.updateIssue)(issueToUpdate.issueNumber, branchName, commitAge, lastCommitLogin, validInputs.commentUpdates, validInputs.daysBeforeDelete, validInputs.staleBranchLabel, validInputs.tagLastCommitter);
-                            if (outputStales.includes(branchName) === false) {
-                                outputStales.push(branchName);
+                            yield (0, update_issue_1.updateIssue)(issueToUpdate.issueNumber, branchToCheck.branchName, commitAge, lastCommitLogin, validInputs.commentUpdates, validInputs.daysBeforeDelete, validInputs.staleBranchLabel, validInputs.tagLastCommitter);
+                            if (outputStales.includes(branchToCheck.branchName) === false) {
+                                outputStales.push(branchToCheck.branchName);
                             }
                         }
                     }
@@ -1317,9 +1316,9 @@ function run() {
                 if (commitAge > validInputs.daysBeforeDelete) {
                     for (const issueToDelete of filteredIssue) {
                         if (issueToDelete.issueTitle === issueTitleString) {
-                            yield (0, delete_branch_1.deleteBranch)(branchName);
+                            yield (0, delete_branch_1.deleteBranch)(branchToCheck.branchName);
                             yield (0, close_issue_1.closeIssue)(issueToDelete.issueNumber);
-                            outputDeletes.push(branchName);
+                            outputDeletes.push(branchToCheck.branchName);
                         }
                     }
                 }
