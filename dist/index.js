@@ -117,12 +117,14 @@ exports.createIssue = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
+const create_issues_title_1 = __nccwpck_require__(4554);
 const log_new_issue_1 = __nccwpck_require__(2344);
 function createIssue(branch, commitAge, lastCommitter, daysBeforeDelete, staleBranchLabel, tagLastCommitter) {
     return __awaiter(this, void 0, void 0, function* () {
         let issueId;
         let bodyString;
         const daysUntilDelete = Math.max(0, daysBeforeDelete - commitAge);
+        const issueTitleString = (0, create_issues_title_1.createIssueTitle)(branch);
         switch (tagLastCommitter) {
             case true:
                 bodyString = `@${lastCommitter}, \r \r ${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days.`;
@@ -135,7 +137,7 @@ function createIssue(branch, commitAge, lastCommitter, daysBeforeDelete, staleBr
             const issueResponse = yield get_context_1.github.rest.issues.create({
                 owner: get_context_1.owner,
                 repo: get_context_1.repo,
-                title: `[${branch}] is STALE`,
+                title: issueTitleString,
                 body: bodyString,
                 labels: [
                     {
@@ -976,9 +978,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.logNewIssue = void 0;
+const create_issues_title_1 = __nccwpck_require__(4554);
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logNewIssue(branchName) {
-    const newIssue = `${ansi_styles_1.default.bold.open}New issue created:${ansi_styles_1.default.bold.close} ${ansi_styles_1.default.magentaBright.open}[${branchName}] is STALE${ansi_styles_1.default.magentaBright.close}.`;
+    const issueTitleString = (0, create_issues_title_1.createIssueTitle)(branchName);
+    const newIssue = `${ansi_styles_1.default.bold.open}New issue created:${ansi_styles_1.default.bold.close} ${ansi_styles_1.default.magentaBright.open}${issueTitleString}${ansi_styles_1.default.magentaBright.close}.`;
     return newIssue;
 }
 exports.logNewIssue = logNewIssue;
@@ -1262,6 +1266,7 @@ function run() {
             const existingIssue = yield (0, get_issues_1.getIssues)(validInputs.staleBranchLabel);
             // Assess Branches
             for (const branchToCheck of branches) {
+                //Check rate limit
                 const rateLimit = yield (0, get_rate_limit_1.getRateLimit)();
                 const commitAge = yield (0, get_commit_age_1.getRecentCommitAge)(branchToCheck.commmitSha);
                 const issueTitleString = (0, create_issues_title_1.createIssueTitle)(branchToCheck.branchName);
