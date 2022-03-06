@@ -17,15 +17,6 @@ When a branch has been inactive for more than the `days-before-stale` input, an 
   * See [inputs](https://github.com/crs-k/stale-branches#inputs) for more info.
 * See [example workflow](https://github.com/crs-k/stale-branches#example-workflow).
 
-## Workflow Output
-* Output is grouped by branch.
-  * Active branches are green
-  * Stale branches are yellow
-  * Dead branches are red
-  
-![image](https://user-images.githubusercontent.com/26232872/155919116-50a2ded9-2839-4957-aaa2-caa9c40c91c9.png)
-
-
 ## Usage
 
 ### Pre-requisites
@@ -51,6 +42,14 @@ Outputs are defined in [`action.yml`](action.yml):
 | ---- | ----------- |
 | `stale-branches` | List of all branches identified as stale during a workflow run. |
 | `deleted-branches` | List of all branches deleted during a workflow run. |
+
+#### Terminal Output Groups
+* Output is grouped by branch.
+  * Active branches are green
+  * Stale branches are yellow
+  * Dead branches are red
+  
+![image](https://user-images.githubusercontent.com/26232872/155919116-50a2ded9-2839-4957-aaa2-caa9c40c91c9.png)
 
 
 ## Example workflow
