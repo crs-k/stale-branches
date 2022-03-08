@@ -75,6 +75,84 @@ exports.closeIssue = closeIssue;
 
 /***/ }),
 
+/***/ 5466:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.compareBranches = void 0;
+const assert = __importStar(__nccwpck_require__(9491));
+const core = __importStar(__nccwpck_require__(2186));
+const get_context_1 = __nccwpck_require__(7782);
+const get_default_branch_1 = __nccwpck_require__(8662);
+const log_compare_branches_1 = __nccwpck_require__(5396);
+function compareBranches(head) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const branchComparison = {};
+        const base = yield (0, get_default_branch_1.getDefaultBranch)();
+        const basehead = `${base}${head}`;
+        try {
+            const branchComparisonResponse = yield get_context_1.github.rest.repos.compareCommitsWithBasehead({
+                owner: get_context_1.owner,
+                repo: get_context_1.repo,
+                basehead
+            });
+            branchComparison.aheadBy = branchComparisonResponse.data.ahead_by;
+            branchComparison.behindBy = branchComparisonResponse.data.behind_by;
+            branchComparison.branchStatus = branchComparisonResponse.data.status;
+            branchComparison.totalCommits = branchComparisonResponse.data.total_commits;
+            assert.ok(branchComparison.branchStatus, 'Branch Comparison Status cannot be empty.');
+            core.info((0, log_compare_branches_1.logCompareBranches)(branchComparison, base, head));
+        }
+        catch (err) {
+            if (err instanceof Error) {
+                core.info(`Failed to retrieve branch comparison data. Error: ${err.message}`);
+            }
+            else {
+                core.info(`Failed to retrieve branch comparison data.`);
+            }
+        }
+        return branchComparison;
+    });
+}
+exports.compareBranches = compareBranches;
+
+
+/***/ }),
+
 /***/ 9810:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -573,6 +651,78 @@ exports.validateInputs = validateInputs;
 
 /***/ }),
 
+/***/ 8662:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getDefaultBranch = void 0;
+const assert = __importStar(__nccwpck_require__(9491));
+const core = __importStar(__nccwpck_require__(2186));
+const get_context_1 = __nccwpck_require__(7782);
+function getDefaultBranch() {
+    return __awaiter(this, void 0, void 0, function* () {
+        let result;
+        try {
+            // Get the default branch from the repo info
+            const response = yield get_context_1.github.rest.repos.get({ owner: get_context_1.owner, repo: get_context_1.repo });
+            result = response.data.default_branch;
+            assert.ok(result, 'default_branch cannot be empty');
+        }
+        catch (err) {
+            // Handle .wiki repo
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            if ((err === null || err === void 0 ? void 0 : err.status) === 404 && get_context_1.repo.toUpperCase().endsWith('.WIKI')) {
+                result = 'main';
+            }
+            // Otherwise error
+            else {
+                if (err instanceof Error)
+                    core.setFailed(`Failed to get default branch: ${err.message}`);
+                result = '';
+            }
+        }
+        return result;
+    });
+}
+exports.getDefaultBranch = getDefaultBranch;
+
+
+/***/ }),
+
 /***/ 4298:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -867,6 +1017,27 @@ function logCloseIssue(issueNumber, state) {
     return closeIssue;
 }
 exports.logCloseIssue = logCloseIssue;
+
+
+/***/ }),
+
+/***/ 5396:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.logCompareBranches = void 0;
+const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+function logCompareBranches(branchComparison, base, head) {
+    //const compareBranches1 = `${styles.bold.open}[${styles.magenta.open}${branchComparison.aheadBy}${styles.magenta.close}] ${styles.blueBright.open}branches found${styles.blueBright.close}.${styles.bold.close}`
+    const compareBranches = `${ansi_styles_1.default.bold.open}${head} is ${branchComparison.branchStatus} ${base} by aheadby: ${branchComparison.aheadBy} behindby: ${branchComparison.behindBy} with ${branchComparison.totalCommits} total commits${ansi_styles_1.default.bold.close}`;
+    return compareBranches;
+}
+exports.logCompareBranches = logCompareBranches;
 
 
 /***/ }),
@@ -1195,6 +1366,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const close_issue_1 = __nccwpck_require__(4094);
+const compare_branches_1 = __nccwpck_require__(5466);
 const create_issue_1 = __nccwpck_require__(9810);
 const create_issues_title_1 = __nccwpck_require__(4554);
 const delete_branch_1 = __nccwpck_require__(5294);
@@ -1229,6 +1401,8 @@ function run() {
             let lastCommitLogin = 'Unknown';
             // Assess Branches
             for (const branchToCheck of branches) {
+                //compare branches test
+                yield (0, compare_branches_1.compareBranches)(branchToCheck.branchName);
                 // Break if Rate Limit usage exceeds 95%
                 const rateLimit = yield (0, get_rate_limit_1.getRateLimit)();
                 if (rateLimit.used > 95) {

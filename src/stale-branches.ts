@@ -1,5 +1,6 @@
 import * as core from '@actions/core'
 import {closeIssue} from './functions/close-issue'
+import {compareBranches} from './functions/compare-branches'
 import {createIssue} from './functions/create-issue'
 import {createIssueTitle} from './utils/create-issues-title'
 import {deleteBranch} from './functions/delete-branch'
@@ -37,6 +38,9 @@ export async function run(): Promise<void> {
 
     // Assess Branches
     for (const branchToCheck of branches) {
+      //compare branches test
+      await compareBranches(branchToCheck.branchName)
+
       // Break if Rate Limit usage exceeds 95%
       const rateLimit = await getRateLimit()
       if (rateLimit.used > 95) {
