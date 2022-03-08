@@ -1036,7 +1036,6 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.logCompareBranches = void 0;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logCompareBranches(branchComparison, base, head) {
-    //const compareBranches1 = `${styles.bold.open}[${styles.magenta.open}${branchComparison.aheadBy}${styles.magenta.close}] ${styles.blueBright.open}branches found${styles.blueBright.close}.${styles.bold.close}`
     let compareBranches;
     compareBranches = `${ansi_styles_1.default.bold.open}${head} has a status of [${branchComparison.branchStatus}] in comparison to ${base}. ${head} is ahead by ${branchComparison.aheadBy} commits and behind by ${branchComparison.behindBy} commits.${ansi_styles_1.default.bold.close}`;
     switch (branchComparison.branchStatus) {

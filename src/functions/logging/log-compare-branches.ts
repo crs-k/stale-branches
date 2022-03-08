@@ -2,7 +2,6 @@ import {BranchComparison} from '../../types/branch-comparison'
 import styles from 'ansi-styles'
 
 export function logCompareBranches(branchComparison: BranchComparison, base: string, head: string): string {
-  //const compareBranches1 = `${styles.bold.open}[${styles.magenta.open}${branchComparison.aheadBy}${styles.magenta.close}] ${styles.blueBright.open}branches found${styles.blueBright.close}.${styles.bold.close}`
   let compareBranches: string
   compareBranches = `${styles.bold.open}${head} has a status of [${branchComparison.branchStatus}] in comparison to ${base}. ${head} is ahead by ${branchComparison.aheadBy} commits and behind by ${branchComparison.behindBy} commits.${styles.bold.close}`
   switch (branchComparison.branchStatus) {
