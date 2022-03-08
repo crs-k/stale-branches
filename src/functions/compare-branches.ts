@@ -8,7 +8,11 @@ import {logCompareBranches} from './logging/log-compare-branches'
 export async function compareBranches(head: string): Promise<BranchComparison> {
   const branchComparison = {} as unknown as BranchComparison
   const base = await getDefaultBranch()
-  const basehead = `${base}${head}`
+  const refAppend = 'heads/'
+  const baseFull = refAppend.concat(base)
+  const headFull = refAppend.concat(head)
+
+  const basehead = `${baseFull}${headFull}`
   try {
     const branchComparisonResponse = await github.rest.repos.compareCommitsWithBasehead({
       owner,

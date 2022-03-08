@@ -123,7 +123,10 @@ function compareBranches(head) {
     return __awaiter(this, void 0, void 0, function* () {
         const branchComparison = {};
         const base = yield (0, get_default_branch_1.getDefaultBranch)();
-        const basehead = `${base}${head}`;
+        const refAppend = 'heads/';
+        const baseFull = refAppend.concat(base);
+        const headFull = refAppend.concat(head);
+        const basehead = `${baseFull}${headFull}`;
         try {
             const branchComparisonResponse = yield get_context_1.github.rest.repos.compareCommitsWithBasehead({
                 owner: get_context_1.owner,
