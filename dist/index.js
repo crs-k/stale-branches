@@ -1037,7 +1037,22 @@ exports.logCompareBranches = void 0;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logCompareBranches(branchComparison, base, head) {
     //const compareBranches1 = `${styles.bold.open}[${styles.magenta.open}${branchComparison.aheadBy}${styles.magenta.close}] ${styles.blueBright.open}branches found${styles.blueBright.close}.${styles.bold.close}`
-    const compareBranches = `${ansi_styles_1.default.bold.open}${head} is ${branchComparison.branchStatus} ${base} by aheadby: ${branchComparison.aheadBy} behindby: ${branchComparison.behindBy} with ${branchComparison.totalCommits} total commits${ansi_styles_1.default.bold.close}`;
+    let compareBranches;
+    compareBranches = `${ansi_styles_1.default.bold.open}${head} is ${branchComparison.branchStatus} ${base} by aheadby: ${branchComparison.aheadBy} behindby: ${branchComparison.behindBy} with ${branchComparison.totalCommits} total commits${ansi_styles_1.default.bold.close}`;
+    switch (branchComparison.branchStatus) {
+        case 'diverged':
+            compareBranches = `${ansi_styles_1.default.bold.open}${head} is ${branchComparison.branchStatus} ${base} by aheadby: ${branchComparison.aheadBy} behindby: ${branchComparison.behindBy} with ${branchComparison.totalCommits} total commits${ansi_styles_1.default.bold.close}`;
+            break;
+        case 'ahead':
+            compareBranches = `${ansi_styles_1.default.bold.open}${head} is ${branchComparison.branchStatus} ${base} by aheadby: ${branchComparison.aheadBy} behindby: ${branchComparison.behindBy} with ${branchComparison.totalCommits} total commits${ansi_styles_1.default.bold.close}`;
+            break;
+        case 'behind':
+            compareBranches = `${ansi_styles_1.default.bold.open}${head} is ${branchComparison.branchStatus} ${base} by aheadby: ${branchComparison.aheadBy} behindby: ${branchComparison.behindBy} with ${branchComparison.totalCommits} total commits${ansi_styles_1.default.bold.close}`;
+            break;
+        case 'identical':
+            compareBranches = `${ansi_styles_1.default.bold.open}${head} is ${branchComparison.branchStatus} ${base} by aheadby: ${branchComparison.aheadBy} behindby: ${branchComparison.behindBy} with ${branchComparison.totalCommits} total commits${ansi_styles_1.default.bold.close}`;
+            break;
+    }
     return compareBranches;
 }
 exports.logCompareBranches = logCompareBranches;
