@@ -59,7 +59,7 @@ export async function run(): Promise<void> {
       // Start output group for current branch assessment
       core.startGroup(logBranchGroupColor(branchToCheck.branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete))
       //compare branches test
-      await compareBranches(branchToCheck.branchName)
+      await compareBranches(branchToCheck.branchName, validInputs.compareBranches)
       core.info(logLastCommitColor(commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete))
 
       //Create new issue if branch is stale & existing issue is not found & issue budget is >0

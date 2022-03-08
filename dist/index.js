@@ -119,33 +119,35 @@ const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
 const get_default_branch_1 = __nccwpck_require__(8662);
 const log_compare_branches_1 = __nccwpck_require__(5396);
-function compareBranches(head) {
+function compareBranches(head, inputCompareBranches) {
     return __awaiter(this, void 0, void 0, function* () {
         const branchComparison = {};
-        const base = yield (0, get_default_branch_1.getDefaultBranch)();
-        const refAppend = 'heads/';
-        const baseFull = refAppend.concat(base);
-        const headFull = refAppend.concat(head);
-        const basehead = `${baseFull}...${headFull}`;
-        try {
-            const branchComparisonResponse = yield get_context_1.github.rest.repos.compareCommitsWithBasehead({
-                owner: get_context_1.owner,
-                repo: get_context_1.repo,
-                basehead
-            });
-            branchComparison.aheadBy = branchComparisonResponse.data.ahead_by;
-            branchComparison.behindBy = branchComparisonResponse.data.behind_by;
-            branchComparison.branchStatus = branchComparisonResponse.data.status;
-            branchComparison.totalCommits = branchComparisonResponse.data.total_commits;
-            assert.ok(branchComparison.branchStatus, 'Branch Comparison Status cannot be empty.');
-            core.info((0, log_compare_branches_1.logCompareBranches)(branchComparison, base, head));
-        }
-        catch (err) {
-            if (err instanceof Error) {
-                core.info(`Failed to retrieve branch comparison data. Error: ${err.message}`);
+        if (inputCompareBranches) {
+            const base = yield (0, get_default_branch_1.getDefaultBranch)();
+            const refAppend = 'heads/';
+            const baseFull = refAppend.concat(base);
+            const headFull = refAppend.concat(head);
+            const basehead = `${baseFull}...${headFull}`;
+            try {
+                const branchComparisonResponse = yield get_context_1.github.rest.repos.compareCommitsWithBasehead({
+                    owner: get_context_1.owner,
+                    repo: get_context_1.repo,
+                    basehead
+                });
+                branchComparison.aheadBy = branchComparisonResponse.data.ahead_by;
+                branchComparison.behindBy = branchComparisonResponse.data.behind_by;
+                branchComparison.branchStatus = branchComparisonResponse.data.status;
+                branchComparison.totalCommits = branchComparisonResponse.data.total_commits;
+                assert.ok(branchComparison.branchStatus, 'Branch Comparison Status cannot be empty.');
+                core.info((0, log_compare_branches_1.logCompareBranches)(branchComparison, base, head));
             }
-            else {
-                core.info(`Failed to retrieve branch comparison data.`);
+            catch (err) {
+                if (err instanceof Error) {
+                    core.info(`Failed to retrieve branch comparison data. Error: ${err.message}`);
+                }
+                else {
+                    core.info(`Failed to retrieve branch comparison data.`);
+                }
             }
         }
         return branchComparison;
@@ -1439,7 +1441,7 @@ function run() {
                 // Start output group for current branch assessment
                 core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchToCheck.branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
                 //compare branches test
-                yield (0, compare_branches_1.compareBranches)(branchToCheck.branchName);
+                yield (0, compare_branches_1.compareBranches)(branchToCheck.branchName, validInputs.compareBranches);
                 core.info((0, log_last_commit_color_1.logLastCommitColor)(commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
                 //Create new issue if branch is stale & existing issue is not found & issue budget is >0
                 if (commitAge > validInputs.daysBeforeStale) {
