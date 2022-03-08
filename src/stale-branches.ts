@@ -38,9 +38,6 @@ export async function run(): Promise<void> {
 
     // Assess Branches
     for (const branchToCheck of branches) {
-      //compare branches test
-      await compareBranches(branchToCheck.branchName)
-
       // Break if Rate Limit usage exceeds 95%
       const rateLimit = await getRateLimit()
       if (rateLimit.used > 95) {
@@ -61,6 +58,8 @@ export async function run(): Promise<void> {
 
       // Start output group for current branch assessment
       core.startGroup(logBranchGroupColor(branchToCheck.branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete))
+      //compare branches test
+      await compareBranches(branchToCheck.branchName)
       core.info(logLastCommitColor(commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete))
 
       //Create new issue if branch is stale & existing issue is not found & issue budget is >0

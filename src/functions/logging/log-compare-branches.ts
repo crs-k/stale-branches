@@ -7,16 +7,16 @@ export function logCompareBranches(branchComparison: BranchComparison, base: str
   compareBranches = `${styles.bold.open}${head} is ${branchComparison.branchStatus} ${base} by aheadby: ${branchComparison.aheadBy} behindby: ${branchComparison.behindBy} with ${branchComparison.totalCommits} total commits${styles.bold.close}`
   switch (branchComparison.branchStatus) {
     case 'diverged':
-      compareBranches = `${styles.bold.open}${head} is ${branchComparison.branchStatus} ${base} by aheadby: ${branchComparison.aheadBy} behindby: ${branchComparison.behindBy} with ${branchComparison.totalCommits} total commits${styles.bold.close}`
+      compareBranches = `${styles.bold.open}${head} has diverged from ${base}, and is ahead by ${branchComparison.aheadBy} commits and behind by ${branchComparison.behindBy}.${styles.bold.close}`
       break
     case 'ahead':
-      compareBranches = `${styles.bold.open}${head} is ${branchComparison.branchStatus} ${base} by aheadby: ${branchComparison.aheadBy} behindby: ${branchComparison.behindBy} with ${branchComparison.totalCommits} total commits${styles.bold.close}`
+      compareBranches = `${styles.bold.open}${head} is ahead of ${base} by ${branchComparison.aheadBy} commits.${styles.bold.close}`
       break
     case 'behind':
-      compareBranches = `${styles.bold.open}${head} is ${branchComparison.branchStatus} ${base} by aheadby: ${branchComparison.aheadBy} behindby: ${branchComparison.behindBy} with ${branchComparison.totalCommits} total commits${styles.bold.close}`
+      compareBranches = `${styles.bold.open}${head} is behind ${base} by ${branchComparison.behindBy} commits.${styles.bold.close}`
       break
     case 'identical':
-      compareBranches = `${styles.bold.open}${head} is ${branchComparison.branchStatus} ${base} by aheadby: ${branchComparison.aheadBy} behindby: ${branchComparison.behindBy} with ${branchComparison.totalCommits} total commits${styles.bold.close}`
+      compareBranches = `${styles.bold.open}${head} is identical to ${base}.${styles.bold.close}`
       break
   }
   return compareBranches
