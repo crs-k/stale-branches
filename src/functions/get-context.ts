@@ -53,6 +53,10 @@ export async function validateInputs(): Promise<Inputs> {
     const inputTagLastCommitter = core.getBooleanInput('tag-committer')
     result.tagLastCommitter = inputTagLastCommitter
 
+    //Validate and assign compare-branches
+    const inputCompareBranches = core.getBooleanInput('compare-branches')
+    result.compareBranches = inputCompareBranches
+
     //Validate and assign stale-branch-label
     const inputStaleBranchLabel = String(core.getInput('stale-branch-label'))
     if (inputStaleBranchLabel.length > 50) {

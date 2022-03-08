@@ -30,6 +30,10 @@ inputs:
     description: 'Label to be applied to issues created for stale branches.'
     required: false
     default: 'stale branch 🗑️'
+  compare-branches:
+    description: 'Compares current branch with default branch.'
+    required: false
+    default: false
 outputs:
   deleted-branches:
     description: 'List of all deleted branches.'

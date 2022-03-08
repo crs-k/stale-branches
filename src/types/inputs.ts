@@ -44,4 +44,11 @@ export interface Inputs {
    * Must be 50 characters or less.
    */
   staleBranchLabel: string
+
+  /**
+   * Compares current branch to default branch.
+   *
+   * Comparison results in "diverged" | "ahead" | "behind" | "identical".
+   */
+  compareBranches: boolean
 }
