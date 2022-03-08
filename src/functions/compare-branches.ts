@@ -12,7 +12,7 @@ export async function compareBranches(head: string): Promise<BranchComparison> {
   const baseFull = refAppend.concat(base)
   const headFull = refAppend.concat(head)
 
-  const basehead = `${baseFull}${headFull}`
+  const basehead = `${baseFull}...${headFull}`
   try {
     const branchComparisonResponse = await github.rest.repos.compareCommitsWithBasehead({
       owner,
