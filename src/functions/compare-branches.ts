@@ -22,7 +22,7 @@ export async function compareBranches(head: string): Promise<BranchComparison> {
     branchComparison.totalCommits = branchComparisonResponse.data.total_commits
 
     assert.ok(branchComparison.branchStatus, 'Branch Comparison Status cannot be empty.')
-    core.info(logCompareBranches(branchComparison.branchStatus))
+    core.info(logCompareBranches(branchComparison, base, head))
   } catch (err) {
     if (err instanceof Error) {
       core.info(`Failed to retrieve branch comparison data. Error: ${err.message}`)
