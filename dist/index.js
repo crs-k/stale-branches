@@ -1041,16 +1041,16 @@ function logCompareBranches(branchComparison, base, head) {
     compareBranches = `${ansi_styles_1.default.bold.open}${head} is ${branchComparison.branchStatus} ${base} by aheadby: ${branchComparison.aheadBy} behindby: ${branchComparison.behindBy} with ${branchComparison.totalCommits} total commits${ansi_styles_1.default.bold.close}`;
     switch (branchComparison.branchStatus) {
         case 'diverged':
-            compareBranches = `${ansi_styles_1.default.bold.open}${head} is ${branchComparison.branchStatus} ${base} by aheadby: ${branchComparison.aheadBy} behindby: ${branchComparison.behindBy} with ${branchComparison.totalCommits} total commits${ansi_styles_1.default.bold.close}`;
+            compareBranches = `${ansi_styles_1.default.bold.open}${head} has diverged from ${base}, and is ahead by ${branchComparison.aheadBy} commits and behind by ${branchComparison.behindBy}.${ansi_styles_1.default.bold.close}`;
             break;
         case 'ahead':
-            compareBranches = `${ansi_styles_1.default.bold.open}${head} is ${branchComparison.branchStatus} ${base} by aheadby: ${branchComparison.aheadBy} behindby: ${branchComparison.behindBy} with ${branchComparison.totalCommits} total commits${ansi_styles_1.default.bold.close}`;
+            compareBranches = `${ansi_styles_1.default.bold.open}${head} is ahead of ${base} by ${branchComparison.aheadBy} commits.${ansi_styles_1.default.bold.close}`;
             break;
         case 'behind':
-            compareBranches = `${ansi_styles_1.default.bold.open}${head} is ${branchComparison.branchStatus} ${base} by aheadby: ${branchComparison.aheadBy} behindby: ${branchComparison.behindBy} with ${branchComparison.totalCommits} total commits${ansi_styles_1.default.bold.close}`;
+            compareBranches = `${ansi_styles_1.default.bold.open}${head} is behind ${base} by ${branchComparison.behindBy} commits.${ansi_styles_1.default.bold.close}`;
             break;
         case 'identical':
-            compareBranches = `${ansi_styles_1.default.bold.open}${head} is ${branchComparison.branchStatus} ${base} by aheadby: ${branchComparison.aheadBy} behindby: ${branchComparison.behindBy} with ${branchComparison.totalCommits} total commits${ansi_styles_1.default.bold.close}`;
+            compareBranches = `${ansi_styles_1.default.bold.open}${head} is identical to ${base}.${ansi_styles_1.default.bold.close}`;
             break;
     }
     return compareBranches;
@@ -1419,8 +1419,6 @@ function run() {
             let lastCommitLogin = 'Unknown';
             // Assess Branches
             for (const branchToCheck of branches) {
-                //compare branches test
-                yield (0, compare_branches_1.compareBranches)(branchToCheck.branchName);
                 // Break if Rate Limit usage exceeds 95%
                 const rateLimit = yield (0, get_rate_limit_1.getRateLimit)();
                 if (rateLimit.used > 95) {
@@ -1438,6 +1436,8 @@ function run() {
                 }
                 // Start output group for current branch assessment
                 core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchToCheck.branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
+                //compare branches test
+                yield (0, compare_branches_1.compareBranches)(branchToCheck.branchName);
                 core.info((0, log_last_commit_color_1.logLastCommitColor)(commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
                 //Create new issue if branch is stale & existing issue is not found & issue budget is >0
                 if (commitAge > validInputs.daysBeforeStale) {
