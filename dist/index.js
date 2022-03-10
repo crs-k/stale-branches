@@ -633,15 +633,15 @@ function validateInputs() {
             //Validate and assign tag-committer
             const inputTagLastCommitter = core.getBooleanInput('tag-committer');
             result.tagLastCommitter = inputTagLastCommitter;
-            //Validate and assign compare-branches
-            const inputCompareBranches = core.getBooleanInput('compare-branches');
-            result.compareBranches = inputCompareBranches;
             //Validate and assign stale-branch-label
             const inputStaleBranchLabel = String(core.getInput('stale-branch-label'));
             if (inputStaleBranchLabel.length > 50) {
                 throw new Error('stale-branch-label must be 50 characters or less');
             }
             result.staleBranchLabel = inputStaleBranchLabel;
+            //Validate and assign compare-branches
+            const inputCompareBranches = core.getInput('compare-branches');
+            result.compareBranches = inputCompareBranches;
         }
         catch (err) {
             if (err instanceof Error) {
