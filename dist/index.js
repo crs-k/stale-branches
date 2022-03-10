@@ -674,6 +674,7 @@ function validateInputs() {
                 core.setFailed(`Failed to validate inputs.`);
             }
         }
+        core.info(JSON.stringify(result));
         return result;
     });
 }
