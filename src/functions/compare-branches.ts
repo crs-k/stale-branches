@@ -2,13 +2,13 @@ import * as assert from 'assert'
 import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
 import {BranchComparison} from '../types/branch-comparison'
-import {InputCompareBranches} from '../enums/input-compare-branches'
+import {CompareBranchesEnum} from '../enums/input-compare-branches'
 import {getDefaultBranch} from './get-default-branch'
 import {logCompareBranches} from './logging/log-compare-branches'
 
 export async function compareBranches(head: string, inputCompareBranches: string): Promise<BranchComparison> {
   const branchComparison = {} as unknown as BranchComparison
-  if (inputCompareBranches !== InputCompareBranches.off) {
+  if (inputCompareBranches !== CompareBranchesEnum.off) {
     const base = await getDefaultBranch()
     const refAppend = 'heads/'
     const baseFull = refAppend.concat(base)
@@ -20,6 +20,12 @@ export async function compareBranches(head: string, inputCompareBranches: string
         repo,
         basehead
       })
+
+      if (inputCompareBranches === CompareBranchesEnum.save && (branchComparisonResponse.data.status === 'ahead' || branchComparisonResponse.data.status === 'diverged')) {
+        branchComparison.save = true
+      } else {
+        branchComparison.save = false
+      }
 
       branchComparison.aheadBy = branchComparisonResponse.data.ahead_by
       branchComparison.behindBy = branchComparisonResponse.data.behind_by
