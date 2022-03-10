@@ -674,7 +674,6 @@ function validateInputs() {
                 core.setFailed(`Failed to validate inputs.`);
             }
         }
-        core.info(JSON.stringify(result));
         return result;
     });
 }
@@ -1439,6 +1438,7 @@ function run() {
         try {
             //Validate & Return input values
             const validInputs = yield (0, get_context_1.validateInputs)();
+            core.info(validInputs.daysBeforeStale.toString());
             //Collect Branches, Issue Budget, Existing Issues, & initialize lastCommitLogin
             const branches = yield (0, get_branches_1.getBranches)();
             const outputTotal = branches.length;
