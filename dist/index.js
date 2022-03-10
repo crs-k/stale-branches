@@ -1472,7 +1472,14 @@ function run() {
                 core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchToCheck.branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
                 //Compare current branch to default branch
                 const branchComparison = yield (0, compare_branches_1.compareBranches)(branchToCheck.branchName, validInputs.compareBranches);
-                core.info(branchComparison.save.valueOf.toString());
+                let testOutput = 'nothing';
+                if (branchComparison.save === true) {
+                    testOutput = 'save';
+                }
+                else {
+                    testOutput = 'kill';
+                }
+                core.info(testOutput);
                 //Log last commit age
                 core.info((0, log_last_commit_color_1.logLastCommitColor)(commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
                 //Create new issue if branch is stale & existing issue is not found & issue budget is >0
