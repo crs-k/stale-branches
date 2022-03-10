@@ -63,8 +63,8 @@ export async function validateInputs(): Promise<Inputs> {
 
     //Validate and assign compare-branches
     const inputCompareBranches = core.getInput('compare-branches')
-    if (inputCompareBranches in CompareBranches) {
-      throw new Error('compare-branches input not valid.')
+    if (!(inputCompareBranches in CompareBranches)) {
+      throw new Error(`compare-branches input of ${inputCompareBranches} not valid.`)
     }
     result.compareBranches = inputCompareBranches
   } catch (err: unknown) {
