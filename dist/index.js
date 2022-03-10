@@ -667,9 +667,11 @@ function validateInputs() {
         }
         catch (err) {
             if (err instanceof Error) {
+                core.error(`Failed to validate inputs. Error: ${err.message}`);
                 core.setFailed(`Failed to validate inputs. Error: ${err.message}`);
             }
             else {
+                core.error(`Failed to validate inputs.`);
                 core.setFailed(`Failed to validate inputs.`);
             }
         }
