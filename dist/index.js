@@ -7,13 +7,13 @@ require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.CompareBranches = void 0;
-var CompareBranches;
-(function (CompareBranches) {
-    CompareBranches["Off"] = "off";
-    CompareBranches["Info"] = "info";
-    CompareBranches["Skip"] = "skip";
-})(CompareBranches = exports.CompareBranches || (exports.CompareBranches = {}));
+exports.InputCompareBranches = void 0;
+var InputCompareBranches;
+(function (InputCompareBranches) {
+    InputCompareBranches["off"] = "off";
+    InputCompareBranches["info"] = "info";
+    InputCompareBranches["skip"] = "skip";
+})(InputCompareBranches = exports.InputCompareBranches || (exports.InputCompareBranches = {}));
 
 
 /***/ }),
@@ -134,12 +134,13 @@ exports.compareBranches = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
+const input_compare_branches_1 = __nccwpck_require__(5269);
 const get_default_branch_1 = __nccwpck_require__(8662);
 const log_compare_branches_1 = __nccwpck_require__(5396);
 function compareBranches(head, inputCompareBranches) {
     return __awaiter(this, void 0, void 0, function* () {
         const branchComparison = {};
-        if (inputCompareBranches) {
+        if (inputCompareBranches !== input_compare_branches_1.InputCompareBranches.off) {
             const base = yield (0, get_default_branch_1.getDefaultBranch)();
             const refAppend = 'heads/';
             const baseFull = refAppend.concat(base);
@@ -659,7 +660,7 @@ function validateInputs() {
             result.staleBranchLabel = inputStaleBranchLabel;
             //Validate and assign compare-branches
             const inputCompareBranches = core.getInput('compare-branches');
-            if (!(inputCompareBranches in input_compare_branches_1.CompareBranches)) {
+            if (!(inputCompareBranches in input_compare_branches_1.InputCompareBranches)) {
                 throw new Error(`compare-branches input of '${inputCompareBranches}' is not valid.`);
             }
             result.compareBranches = inputCompareBranches;
