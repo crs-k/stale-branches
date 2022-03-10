@@ -660,7 +660,7 @@ function validateInputs() {
             //Validate and assign compare-branches
             const inputCompareBranches = core.getInput('compare-branches');
             if (!(inputCompareBranches in input_compare_branches_1.CompareBranches)) {
-                throw new Error(`compare-branches input of ${inputCompareBranches} not valid.`);
+                throw new Error(`compare-branches input of '${inputCompareBranches}' is not valid.`);
             }
             result.compareBranches = inputCompareBranches;
         }
@@ -1430,12 +1430,12 @@ const update_issue_1 = __nccwpck_require__(2914);
 const get_context_1 = __nccwpck_require__(7782);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        //Validate & Return input values
-        const validInputs = yield (0, get_context_1.validateInputs)();
         //Declare output arrays
         const outputDeletes = [];
         const outputStales = [];
         try {
+            //Validate & Return input values
+            const validInputs = yield (0, get_context_1.validateInputs)();
             //Collect Branches, Issue Budget, Existing Issues, & initialize lastCommitLogin
             const branches = yield (0, get_branches_1.getBranches)();
             const outputTotal = branches.length;
