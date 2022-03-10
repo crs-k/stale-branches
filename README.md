@@ -34,6 +34,7 @@ Inputs are defined in [`action.yml`](action.yml). None are required.:
 | `max-issues` | This dictates the number of `stale branch 🗑️` issues that can exist. Also, the max number of branches that can be deleted per run. | 20 |
 | `tag-committer` | When an issue is opened, the last committer will be tagged in the comments. | false |
 | `stale-branch-label` | Label to be applied to issues created for stale branches. | `stale branch 🗑️` |
+| `compare-branches` | This compares each branch to the repo's default branch. When set to `info`, additional output describes if the current branch is ahead, behind, diverged, or identical to the base branch. The `save` option prevents branches that are ahead or diverged from being deleted.| off |
 
 ### Outputs
 Outputs are defined in [`action.yml`](action.yml):
