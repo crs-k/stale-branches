@@ -63,13 +63,6 @@ export async function run(): Promise<void> {
 
       //Compare current branch to default branch
       const branchComparison = await compareBranches(branchToCheck.branchName, validInputs.compareBranches)
-      let testOutput = 'nothing'
-      if (branchComparison.save === true) {
-        testOutput = 'save'
-      } else {
-        testOutput = 'kill'
-      }
-      core.info(testOutput)
 
       //Log last commit age
       core.info(logLastCommitColor(commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete))
