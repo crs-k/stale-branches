@@ -28,7 +28,7 @@ export interface BranchComparison {
   totalCommits: number
 
   /**
-   * If a branch has a status of ahead or diverged, this will be true.
+   * If the compare-branches input is set to 'save' AND a branch has a status of ahead or diverged, this will be true.
    */
   save: boolean
 }

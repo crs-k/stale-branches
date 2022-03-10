@@ -60,8 +60,12 @@ export async function run(): Promise<void> {
 
       // Start output group for current branch assessment
       core.startGroup(logBranchGroupColor(branchToCheck.branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete))
-      //compare branches test
-      await compareBranches(branchToCheck.branchName, validInputs.compareBranches)
+
+      //Compare current branch to default branch
+      const branchComparison = await compareBranches(branchToCheck.branchName, validInputs.compareBranches)
+      core.info(branchComparison.save.valueOf.toString())
+
+      //Log last commit age
       core.info(logLastCommitColor(commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete))
 
       //Create new issue if branch is stale & existing issue is not found & issue budget is >0
@@ -108,7 +112,7 @@ export async function run(): Promise<void> {
       }
 
       //Delete expired branches
-      if (commitAge > validInputs.daysBeforeDelete && validInputs.compareBranches !== 'save') {
+      if (commitAge > validInputs.daysBeforeDelete && branchComparison.save === false) {
         for (const issueToDelete of filteredIssue) {
           if (issueToDelete.issueTitle === issueTitleString) {
             await deleteBranch(branchToCheck.branchName)

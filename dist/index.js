@@ -140,6 +140,7 @@ const log_compare_branches_1 = __nccwpck_require__(5396);
 function compareBranches(head, inputCompareBranches) {
     return __awaiter(this, void 0, void 0, function* () {
         const branchComparison = {};
+        branchComparison.save = false;
         if (inputCompareBranches !== input_compare_branches_1.CompareBranchesEnum.off) {
             const base = yield (0, get_default_branch_1.getDefaultBranch)();
             const refAppend = 'heads/';
@@ -154,9 +155,6 @@ function compareBranches(head, inputCompareBranches) {
                 });
                 if (inputCompareBranches === input_compare_branches_1.CompareBranchesEnum.save && (branchComparisonResponse.data.status === 'ahead' || branchComparisonResponse.data.status === 'diverged')) {
                     branchComparison.save = true;
-                }
-                else {
-                    branchComparison.save = false;
                 }
                 branchComparison.aheadBy = branchComparisonResponse.data.ahead_by;
                 branchComparison.behindBy = branchComparisonResponse.data.behind_by;
@@ -1472,8 +1470,10 @@ function run() {
                 }
                 // Start output group for current branch assessment
                 core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchToCheck.branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
-                //compare branches test
-                yield (0, compare_branches_1.compareBranches)(branchToCheck.branchName, validInputs.compareBranches);
+                //Compare current branch to default branch
+                const branchComparison = yield (0, compare_branches_1.compareBranches)(branchToCheck.branchName, validInputs.compareBranches);
+                core.info(branchComparison.save.valueOf.toString());
+                //Log last commit age
                 core.info((0, log_last_commit_color_1.logLastCommitColor)(commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
                 //Create new issue if branch is stale & existing issue is not found & issue budget is >0
                 if (commitAge > validInputs.daysBeforeStale) {
@@ -1507,7 +1507,7 @@ function run() {
                     }
                 }
                 //Delete expired branches
-                if (commitAge > validInputs.daysBeforeDelete && validInputs.compareBranches !== 'save') {
+                if (commitAge > validInputs.daysBeforeDelete && branchComparison.save === false) {
                     for (const issueToDelete of filteredIssue) {
                         if (issueToDelete.issueTitle === issueTitleString) {
                             yield (0, delete_branch_1.deleteBranch)(branchToCheck.branchName);

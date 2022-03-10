@@ -8,6 +8,7 @@ import {logCompareBranches} from './logging/log-compare-branches'
 
 export async function compareBranches(head: string, inputCompareBranches: string): Promise<BranchComparison> {
   const branchComparison = {} as unknown as BranchComparison
+  branchComparison.save = false
   if (inputCompareBranches !== CompareBranchesEnum.off) {
     const base = await getDefaultBranch()
     const refAppend = 'heads/'
@@ -23,8 +24,6 @@ export async function compareBranches(head: string, inputCompareBranches: string
 
       if (inputCompareBranches === CompareBranchesEnum.save && (branchComparisonResponse.data.status === 'ahead' || branchComparisonResponse.data.status === 'diverged')) {
         branchComparison.save = true
-      } else {
-        branchComparison.save = false
       }
 
       branchComparison.aheadBy = branchComparisonResponse.data.ahead_by
