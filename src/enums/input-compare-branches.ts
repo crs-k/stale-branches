@@ -1,5 +1,5 @@
-export enum CompareBranches {
-  Off = 'off',
-  Info = 'info',
-  Skip = 'skip'
+export enum InputCompareBranches {
+  off = 'off',
+  info = 'info',
+  skip = 'skip'
 }

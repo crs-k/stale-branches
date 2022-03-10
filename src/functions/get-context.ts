@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
 import {context, getOctokit} from '@actions/github'
-import {CompareBranches} from '../enums/input-compare-branches'
+import {InputCompareBranches} from '../enums/input-compare-branches'
 import {Inputs} from '../types/inputs'
 
 const repoToken = core.getInput('repo-token')
@@ -63,7 +63,7 @@ export async function validateInputs(): Promise<Inputs> {
 
     //Validate and assign compare-branches
     const inputCompareBranches = core.getInput('compare-branches')
-    if (!(inputCompareBranches in CompareBranches)) {
+    if (!(inputCompareBranches in InputCompareBranches)) {
       throw new Error(`compare-branches input of '${inputCompareBranches}' is not valid.`)
     }
     result.compareBranches = inputCompareBranches
