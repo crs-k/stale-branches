@@ -11,7 +11,7 @@ export const {owner: owner, repo: repo} = context.repo
 export async function validateInputs(): Promise<Inputs> {
   const result = {} as unknown as Inputs
   try {
-    //Validate and assign days-before-stale & days-before-delete
+    //Validate days-before-stale & days-before-delete
     const inputDaysBeforeStale = Number(core.getInput('days-before-stale'))
     const inputDaysBeforeDelete = Number(core.getInput('days-before-delete'))
 
@@ -30,14 +30,11 @@ export async function validateInputs(): Promise<Inputs> {
     if (inputDaysBeforeStale < 0) {
       throw new Error('days-before-stale must be greater than zero')
     }
-    result.daysBeforeStale = inputDaysBeforeStale
-    result.daysBeforeDelete = inputDaysBeforeDelete
 
-    //Validate and assign comment-updates
+    //Validate comment-updates
     const inputCommentUpdates = core.getBooleanInput('comment-updates')
-    result.commentUpdates = inputCommentUpdates
 
-    //Validate and assign max-issues
+    //Validate max-issues
     const inputMaxIssues = Number(core.getInput('max-issues'))
 
     if (inputMaxIssues.toString() === 'NaN') {
@@ -48,31 +45,33 @@ export async function validateInputs(): Promise<Inputs> {
       throw new Error('max-issues must be greater than zero')
     }
 
-    result.maxIssues = inputMaxIssues
-
-    //Validate and assign tag-committer
+    //Validate tag-committer
     const inputTagLastCommitter = core.getBooleanInput('tag-committer')
-    result.tagLastCommitter = inputTagLastCommitter
 
-    //Validate and assign stale-branch-label
+    //Validate stale-branch-label
     const inputStaleBranchLabel = String(core.getInput('stale-branch-label'))
     if (inputStaleBranchLabel.length > 50) {
       throw new Error('stale-branch-label must be 50 characters or less')
     }
-    result.staleBranchLabel = inputStaleBranchLabel
 
-    //Validate and assign compare-branches
+    //Validate compare-branches
     const inputCompareBranches = core.getInput('compare-branches')
     if (!(inputCompareBranches in InputCompareBranches)) {
       throw new Error(`compare-branches input of '${inputCompareBranches}' is not valid.`)
     }
+
+    //Assign inputs
+    result.daysBeforeStale = inputDaysBeforeStale
+    result.daysBeforeDelete = inputDaysBeforeDelete
+    result.commentUpdates = inputCommentUpdates
+    result.maxIssues = inputMaxIssues
+    result.tagLastCommitter = inputTagLastCommitter
+    result.staleBranchLabel = inputStaleBranchLabel
     result.compareBranches = inputCompareBranches
   } catch (err: unknown) {
     if (err instanceof Error) {
-      core.error(`Failed to validate inputs. Error: ${err.message}`)
       core.setFailed(`Failed to validate inputs. Error: ${err.message}`)
     } else {
-      core.error(`Failed to validate inputs.`)
       core.setFailed(`Failed to validate inputs.`)
     }
   }
