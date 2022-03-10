@@ -106,6 +106,21 @@ describe('Get Context Function', () => {
 
     expect(core.setFailed).toHaveBeenCalledWith('Failed to validate inputs. Error: stale-branch-label must be 50 characters or less')
   })
+
+  test(`Expect Failure: compare-branches input of 'bleh' is not valid.`, async () => {
+    core.setFailed = jest.fn()
+    core.getInput = jest
+      .fn()
+      .mockReturnValueOnce('1') // days-before-stale
+      .mockReturnValueOnce('5') // days-before-delete
+      .mockReturnValueOnce('5') // max-issues
+      .mockReturnValueOnce('Stale Branch Label') // stale-branch-label
+      .mockReturnValueOnce('bleh') // compare-branches
+    await validateInputs()
+
+    expect(core.setFailed).toHaveBeenCalledWith(`Failed to validate inputs. Error: compare-branches input of 'bleh' is not valid.`)
+  })
+
   test('Expect Success: Proper Inputs', async () => {
     core.setFailed = jest.fn()
     core.getBooleanInput = jest.fn().mockReturnValueOnce(true).mockReturnValueOnce(true)
