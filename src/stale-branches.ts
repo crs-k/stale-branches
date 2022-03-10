@@ -28,7 +28,9 @@ export async function run(): Promise<void> {
   try {
     //Validate & Return input values
     const validInputs = await validateInputs()
-    core.info(validInputs.daysBeforeStale.toString())
+    if (validInputs.daysBeforeStale == null) {
+      throw new Error('Invalid inputs')
+    }
     //Collect Branches, Issue Budget, Existing Issues, & initialize lastCommitLogin
     const branches = await getBranches()
     const outputTotal = branches.length

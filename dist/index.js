@@ -1438,7 +1438,9 @@ function run() {
         try {
             //Validate & Return input values
             const validInputs = yield (0, get_context_1.validateInputs)();
-            core.info(validInputs.daysBeforeStale.toString());
+            if (validInputs.daysBeforeStale == null) {
+                throw new Error('Invalid inputs');
+            }
             //Collect Branches, Issue Budget, Existing Issues, & initialize lastCommitLogin
             const branches = yield (0, get_branches_1.getBranches)();
             const outputTotal = branches.length;
