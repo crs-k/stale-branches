@@ -108,7 +108,7 @@ export async function run(): Promise<void> {
       }
 
       //Delete expired branches
-      if (commitAge > validInputs.daysBeforeDelete) {
+      if (commitAge > validInputs.daysBeforeDelete && validInputs.compareBranches !== 'save') {
         for (const issueToDelete of filteredIssue) {
           if (issueToDelete.issueTitle === issueTitleString) {
             await deleteBranch(branchToCheck.branchName)
