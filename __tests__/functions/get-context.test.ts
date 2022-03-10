@@ -17,6 +17,7 @@ describe('Get Context Function', () => {
       .mockReturnValueOnce(0) // days-before-delete
       .mockReturnValueOnce(20) // max-issues
       .mockReturnValueOnce('Stale Branch Label') // stale-branch-label
+      .mockReturnValueOnce('skip') // compare-branches
     await validateInputs()
 
     expect(core.setFailed).toHaveBeenCalledWith('Failed to validate inputs. Error: days-before-stale cannot be greater than or equal to days-before-delete')
@@ -30,6 +31,7 @@ describe('Get Context Function', () => {
       .mockReturnValueOnce('5') // days-before-delete
       .mockReturnValueOnce(20) // max-issues
       .mockReturnValueOnce('Stale Branch Label') // stale-branch-label
+      .mockReturnValueOnce('skip') // compare-branches
     await validateInputs()
 
     expect(core.setFailed).toHaveBeenCalledWith('Failed to validate inputs. Error: days-before-stale must be a number')
@@ -43,6 +45,7 @@ describe('Get Context Function', () => {
       .mockReturnValueOnce('B') // days-before-delete
       .mockReturnValueOnce(20) // max-issues
       .mockReturnValueOnce('Stale Branch Label') // stale-branch-label
+      .mockReturnValueOnce('skip') // compare-branches
     await validateInputs()
 
     expect(core.setFailed).toHaveBeenCalledWith('Failed to validate inputs. Error: days-before-delete must be a number')
@@ -56,6 +59,7 @@ describe('Get Context Function', () => {
       .mockReturnValueOnce('0') // days-before-delete
       .mockReturnValueOnce(20) // max-issues
       .mockReturnValueOnce('Stale Branch Label') // stale-branch-label
+      .mockReturnValueOnce('skip') // compare-branches
     await validateInputs()
 
     expect(core.setFailed).toHaveBeenCalledWith('Failed to validate inputs. Error: days-before-stale must be greater than zero')
@@ -69,6 +73,7 @@ describe('Get Context Function', () => {
       .mockReturnValueOnce('5') // days-before-delete
       .mockReturnValueOnce('NaN') // max-issues
       .mockReturnValueOnce('Stale Branch Label') // stale-branch-label
+      .mockReturnValueOnce('skip') // compare-branches
     await validateInputs()
 
     expect(core.setFailed).toHaveBeenCalledWith('Failed to validate inputs. Error: max-issues must be a number')
@@ -82,6 +87,7 @@ describe('Get Context Function', () => {
       .mockReturnValueOnce('5') // days-before-delete
       .mockReturnValueOnce('-5') // max-issues
       .mockReturnValueOnce('Stale Branch Label') // stale-branch-label
+      .mockReturnValueOnce('skip') // compare-branches
     await validateInputs()
 
     expect(core.setFailed).toHaveBeenCalledWith('Failed to validate inputs. Error: max-issues must be greater than zero')
@@ -95,6 +101,7 @@ describe('Get Context Function', () => {
       .mockReturnValueOnce('5') // days-before-delete
       .mockReturnValueOnce('5') // max-issues
       .mockReturnValueOnce('Stale Branch Label Stale Branch Label Stale Branch Label') // stale-branch-label
+      .mockReturnValueOnce('skip') // compare-branches
     await validateInputs()
 
     expect(core.setFailed).toHaveBeenCalledWith('Failed to validate inputs. Error: stale-branch-label must be 50 characters or less')
@@ -108,6 +115,7 @@ describe('Get Context Function', () => {
       .mockReturnValueOnce('5') // days-before-delete
       .mockReturnValueOnce('5') // max-issues
       .mockReturnValueOnce('Stale Branch Label') // stale-branch-label
+      .mockReturnValueOnce('skip') // compare-branches
     await validateInputs()
 
     expect(core.getInput).toHaveBeenCalledTimes(5)
@@ -122,6 +130,7 @@ describe('Get Context Function', () => {
       .mockReturnValueOnce('5') // days-before-delete
       .mockReturnValueOnce('5') // max-issues
       .mockReturnValueOnce('Stale Branch Label') // stale-branch-label
+      .mockReturnValueOnce('skip') // compare-branches
     core.getBooleanInput = jest.fn()
     core.getBooleanInput.mockImplementation(() => {
       throw new TypeError('TypeError')
@@ -139,6 +148,7 @@ describe('Get Context Function', () => {
       .mockReturnValueOnce('5') // days-before-delete
       .mockReturnValueOnce('5') // max-issues
       .mockReturnValueOnce('Stale Branch Label') // stale-branch-label
+      .mockReturnValueOnce('skip') // compare-branches
     core.getBooleanInput = jest.fn().mockReturnValueOnce(true)
     core.getBooleanInput.mockImplementation(() => {
       throw new String('String')

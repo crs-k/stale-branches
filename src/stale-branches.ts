@@ -21,14 +21,13 @@ import {updateIssue} from './functions/update-issue'
 import {validateInputs} from './functions/get-context'
 
 export async function run(): Promise<void> {
-  //Validate & Return input values
-  const validInputs = await validateInputs()
-
   //Declare output arrays
   const outputDeletes: string[] = []
   const outputStales: string[] = []
 
   try {
+    //Validate & Return input values
+    const validInputs = await validateInputs()
     //Collect Branches, Issue Budget, Existing Issues, & initialize lastCommitLogin
     const branches = await getBranches()
     const outputTotal = branches.length
