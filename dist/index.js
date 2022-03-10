@@ -1,6 +1,23 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 5269:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CompareBranches = void 0;
+var CompareBranches;
+(function (CompareBranches) {
+    CompareBranches["Off"] = "off";
+    CompareBranches["Info"] = "info";
+    CompareBranches["Skip"] = "skip";
+})(CompareBranches = exports.CompareBranches || (exports.CompareBranches = {}));
+
+
+/***/ }),
+
 /***/ 4094:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -593,6 +610,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.validateInputs = exports.repo = exports.owner = exports.github = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github_1 = __nccwpck_require__(5438);
+const input_compare_branches_1 = __nccwpck_require__(5269);
 const repoToken = core.getInput('repo-token');
 core.setSecret(repoToken);
 exports.github = (0, github_1.getOctokit)(repoToken);
@@ -641,6 +659,9 @@ function validateInputs() {
             result.staleBranchLabel = inputStaleBranchLabel;
             //Validate and assign compare-branches
             const inputCompareBranches = core.getInput('compare-branches');
+            if (inputCompareBranches in input_compare_branches_1.CompareBranches) {
+                throw new Error('compare-branches input not valid.');
+            }
             result.compareBranches = inputCompareBranches;
         }
         catch (err) {
