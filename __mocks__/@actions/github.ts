@@ -18,7 +18,7 @@ export const validInputs: Inputs = {
   maxIssues: 30,
   tagLastCommitter: true,
   staleBranchLabel: 'stale branch 🗑️',
-  compareBranches: true
+  compareBranches: 'skip'
 }
 
 type ListIssuesResponseDataType = GetResponseTypeFromEndpointMethod<typeof githubActual.github.rest.issues.listForRepo>

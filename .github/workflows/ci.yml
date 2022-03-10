@@ -57,7 +57,7 @@ jobs:
           max-issues: 30
           tag-committer: true
           stale-branch-label: 'stale branch 🗑️'
-          compare-branches: true
+          compare-branches: 'skip'
 
 
   Build:

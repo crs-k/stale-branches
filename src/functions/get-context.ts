@@ -53,16 +53,16 @@ export async function validateInputs(): Promise<Inputs> {
     const inputTagLastCommitter = core.getBooleanInput('tag-committer')
     result.tagLastCommitter = inputTagLastCommitter
 
-    //Validate and assign compare-branches
-    const inputCompareBranches = core.getBooleanInput('compare-branches')
-    result.compareBranches = inputCompareBranches
-
     //Validate and assign stale-branch-label
     const inputStaleBranchLabel = String(core.getInput('stale-branch-label'))
     if (inputStaleBranchLabel.length > 50) {
       throw new Error('stale-branch-label must be 50 characters or less')
     }
     result.staleBranchLabel = inputStaleBranchLabel
+
+    //Validate and assign compare-branches
+    const inputCompareBranches = core.getInput('compare-branches')
+    result.compareBranches = inputCompareBranches
   } catch (err: unknown) {
     if (err instanceof Error) {
       core.setFailed(`Failed to validate inputs. Error: ${err.message}`)

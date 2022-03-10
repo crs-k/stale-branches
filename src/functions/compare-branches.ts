@@ -5,7 +5,7 @@ import {BranchComparison} from '../types/branch-comparison'
 import {getDefaultBranch} from './get-default-branch'
 import {logCompareBranches} from './logging/log-compare-branches'
 
-export async function compareBranches(head: string, inputCompareBranches: boolean): Promise<BranchComparison> {
+export async function compareBranches(head: string, inputCompareBranches: string): Promise<BranchComparison> {
   const branchComparison = {} as unknown as BranchComparison
   if (inputCompareBranches) {
     const base = await getDefaultBranch()

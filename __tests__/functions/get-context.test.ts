@@ -110,8 +110,8 @@ describe('Get Context Function', () => {
       .mockReturnValueOnce('Stale Branch Label') // stale-branch-label
     await validateInputs()
 
-    expect(core.getInput).toHaveBeenCalledTimes(4)
-    expect(core.getBooleanInput).toHaveBeenCalledTimes(3)
+    expect(core.getInput).toHaveBeenCalledTimes(5)
+    expect(core.getBooleanInput).toHaveBeenCalledTimes(2)
   })
 
   test('Expect Failure: - TypeError', async () => {
