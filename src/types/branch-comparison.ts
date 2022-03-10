@@ -26,4 +26,9 @@ export interface BranchComparison {
    * Example: 1
    */
   totalCommits: number
+
+  /**
+   * If a branch has a status of ahead or diverged, this will be true.
+   */
+  save: boolean
 }

@@ -7,13 +7,13 @@ require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.InputCompareBranches = void 0;
-var InputCompareBranches;
-(function (InputCompareBranches) {
-    InputCompareBranches["off"] = "off";
-    InputCompareBranches["info"] = "info";
-    InputCompareBranches["save"] = "save";
-})(InputCompareBranches = exports.InputCompareBranches || (exports.InputCompareBranches = {}));
+exports.CompareBranchesEnum = void 0;
+var CompareBranchesEnum;
+(function (CompareBranchesEnum) {
+    CompareBranchesEnum["off"] = "off";
+    CompareBranchesEnum["info"] = "info";
+    CompareBranchesEnum["save"] = "save";
+})(CompareBranchesEnum = exports.CompareBranchesEnum || (exports.CompareBranchesEnum = {}));
 
 
 /***/ }),
@@ -140,7 +140,7 @@ const log_compare_branches_1 = __nccwpck_require__(5396);
 function compareBranches(head, inputCompareBranches) {
     return __awaiter(this, void 0, void 0, function* () {
         const branchComparison = {};
-        if (inputCompareBranches !== input_compare_branches_1.InputCompareBranches.off) {
+        if (inputCompareBranches !== input_compare_branches_1.CompareBranchesEnum.off) {
             const base = yield (0, get_default_branch_1.getDefaultBranch)();
             const refAppend = 'heads/';
             const baseFull = refAppend.concat(base);
@@ -152,6 +152,12 @@ function compareBranches(head, inputCompareBranches) {
                     repo: get_context_1.repo,
                     basehead
                 });
+                if (inputCompareBranches === input_compare_branches_1.CompareBranchesEnum.save && (branchComparisonResponse.data.status === 'ahead' || branchComparisonResponse.data.status === 'diverged')) {
+                    branchComparison.save = true;
+                }
+                else {
+                    branchComparison.save = false;
+                }
                 branchComparison.aheadBy = branchComparisonResponse.data.ahead_by;
                 branchComparison.behindBy = branchComparisonResponse.data.behind_by;
                 branchComparison.branchStatus = branchComparisonResponse.data.status;
@@ -654,7 +660,7 @@ function validateInputs() {
             }
             //Validate compare-branches
             const inputCompareBranches = core.getInput('compare-branches');
-            if (!(inputCompareBranches in input_compare_branches_1.InputCompareBranches)) {
+            if (!(inputCompareBranches in input_compare_branches_1.CompareBranchesEnum)) {
                 throw new Error(`compare-branches input of '${inputCompareBranches}' is not valid.`);
             }
             //Assign inputs
