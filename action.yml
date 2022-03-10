@@ -31,7 +31,7 @@ inputs:
     required: false
     default: 'stale branch 🗑️'
   compare-branches:
-    description: 'Compares current branch with default branch. Options: off | info | skip'
+    description: 'Compares current branch with default branch. Options: off | info | save'
     required: false
     default: 'off'
 outputs:

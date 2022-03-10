@@ -46,7 +46,7 @@ export interface Inputs {
   staleBranchLabel: string
 
   /**
-   * Compares current branch to default branch. Options: Options: off | info | skip
+   * Compares current branch to default branch. Options: Options: off | info | save
    *
    * Comparison results in "diverged" | "ahead" | "behind" | "identical".
    */

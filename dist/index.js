@@ -12,7 +12,7 @@ var InputCompareBranches;
 (function (InputCompareBranches) {
     InputCompareBranches["off"] = "off";
     InputCompareBranches["info"] = "info";
-    InputCompareBranches["skip"] = "skip";
+    InputCompareBranches["save"] = "save";
 })(InputCompareBranches = exports.InputCompareBranches || (exports.InputCompareBranches = {}));
 
 
@@ -1501,7 +1501,7 @@ function run() {
                     }
                 }
                 //Delete expired branches
-                if (commitAge > validInputs.daysBeforeDelete) {
+                if (commitAge > validInputs.daysBeforeDelete && validInputs.compareBranches !== 'save') {
                     for (const issueToDelete of filteredIssue) {
                         if (issueToDelete.issueTitle === issueTitleString) {
                             yield (0, delete_branch_1.deleteBranch)(branchToCheck.branchName);
