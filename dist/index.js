@@ -659,8 +659,8 @@ function validateInputs() {
             result.staleBranchLabel = inputStaleBranchLabel;
             //Validate and assign compare-branches
             const inputCompareBranches = core.getInput('compare-branches');
-            if (inputCompareBranches in input_compare_branches_1.CompareBranches) {
-                throw new Error('compare-branches input not valid.');
+            if (!(inputCompareBranches in input_compare_branches_1.CompareBranches)) {
+                throw new Error(`compare-branches input of ${inputCompareBranches} not valid.`);
             }
             result.compareBranches = inputCompareBranches;
         }
