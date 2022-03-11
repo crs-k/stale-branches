@@ -1,6 +1,23 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 5269:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CompareBranchesEnum = void 0;
+var CompareBranchesEnum;
+(function (CompareBranchesEnum) {
+    CompareBranchesEnum["off"] = "off";
+    CompareBranchesEnum["info"] = "info";
+    CompareBranchesEnum["save"] = "save";
+})(CompareBranchesEnum = exports.CompareBranchesEnum || (exports.CompareBranchesEnum = {}));
+
+
+/***/ }),
+
 /***/ 4094:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -71,6 +88,94 @@ function closeIssue(issueNumber) {
     });
 }
 exports.closeIssue = closeIssue;
+
+
+/***/ }),
+
+/***/ 5466:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.compareBranches = void 0;
+const assert = __importStar(__nccwpck_require__(9491));
+const core = __importStar(__nccwpck_require__(2186));
+const get_context_1 = __nccwpck_require__(7782);
+const input_compare_branches_1 = __nccwpck_require__(5269);
+const get_default_branch_1 = __nccwpck_require__(8662);
+const log_compare_branches_1 = __nccwpck_require__(5396);
+function compareBranches(head, inputCompareBranches) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const branchComparison = {};
+        branchComparison.save = false;
+        if (inputCompareBranches !== input_compare_branches_1.CompareBranchesEnum.off) {
+            const base = yield (0, get_default_branch_1.getDefaultBranch)();
+            const refAppend = 'heads/';
+            const baseFull = refAppend.concat(base);
+            const headFull = refAppend.concat(head);
+            const basehead = `${baseFull}...${headFull}`;
+            try {
+                const branchComparisonResponse = yield get_context_1.github.rest.repos.compareCommitsWithBasehead({
+                    owner: get_context_1.owner,
+                    repo: get_context_1.repo,
+                    basehead
+                });
+                if (inputCompareBranches === input_compare_branches_1.CompareBranchesEnum.save && (branchComparisonResponse.data.status === 'ahead' || branchComparisonResponse.data.status === 'diverged')) {
+                    branchComparison.save = true;
+                }
+                branchComparison.aheadBy = branchComparisonResponse.data.ahead_by;
+                branchComparison.behindBy = branchComparisonResponse.data.behind_by;
+                branchComparison.branchStatus = branchComparisonResponse.data.status;
+                branchComparison.totalCommits = branchComparisonResponse.data.total_commits;
+                assert.ok(branchComparison.branchStatus, 'Branch Comparison Status cannot be empty.');
+                core.info((0, log_compare_branches_1.logCompareBranches)(branchComparison, base, head));
+            }
+            catch (err) {
+                if (err instanceof Error) {
+                    core.info(`Failed to retrieve branch comparison data. Error: ${err.message}`);
+                }
+                else {
+                    core.info(`Failed to retrieve branch comparison data.`);
+                }
+            }
+        }
+        return branchComparison;
+    });
+}
+exports.compareBranches = compareBranches;
 
 
 /***/ }),
@@ -510,6 +615,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.validateInputs = exports.repo = exports.owner = exports.github = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const github_1 = __nccwpck_require__(5438);
+const input_compare_branches_1 = __nccwpck_require__(5269);
 const repoToken = core.getInput('repo-token');
 core.setSecret(repoToken);
 exports.github = (0, github_1.getOctokit)(repoToken);
@@ -518,7 +624,7 @@ function validateInputs() {
     return __awaiter(this, void 0, void 0, function* () {
         const result = {};
         try {
-            //Validate and assign days-before-stale & days-before-delete
+            //Validate days-before-stale & days-before-delete
             const inputDaysBeforeStale = Number(core.getInput('days-before-stale'));
             const inputDaysBeforeDelete = Number(core.getInput('days-before-delete'));
             if (inputDaysBeforeStale >= inputDaysBeforeDelete) {
@@ -533,12 +639,9 @@ function validateInputs() {
             if (inputDaysBeforeStale < 0) {
                 throw new Error('days-before-stale must be greater than zero');
             }
-            result.daysBeforeStale = inputDaysBeforeStale;
-            result.daysBeforeDelete = inputDaysBeforeDelete;
-            //Validate and assign comment-updates
+            //Validate comment-updates
             const inputCommentUpdates = core.getBooleanInput('comment-updates');
-            result.commentUpdates = inputCommentUpdates;
-            //Validate and assign max-issues
+            //Validate max-issues
             const inputMaxIssues = Number(core.getInput('max-issues'));
             if (inputMaxIssues.toString() === 'NaN') {
                 throw new Error('max-issues must be a number');
@@ -546,16 +649,26 @@ function validateInputs() {
             if (inputMaxIssues < 0) {
                 throw new Error('max-issues must be greater than zero');
             }
-            result.maxIssues = inputMaxIssues;
-            //Validate and assign tag-committer
+            //Validate tag-committer
             const inputTagLastCommitter = core.getBooleanInput('tag-committer');
-            result.tagLastCommitter = inputTagLastCommitter;
-            //Validate and assign stale-branch-label
+            //Validate stale-branch-label
             const inputStaleBranchLabel = String(core.getInput('stale-branch-label'));
             if (inputStaleBranchLabel.length > 50) {
                 throw new Error('stale-branch-label must be 50 characters or less');
             }
+            //Validate compare-branches
+            const inputCompareBranches = core.getInput('compare-branches');
+            if (!(inputCompareBranches in input_compare_branches_1.CompareBranchesEnum)) {
+                throw new Error(`compare-branches input of '${inputCompareBranches}' is not valid.`);
+            }
+            //Assign inputs
+            result.daysBeforeStale = inputDaysBeforeStale;
+            result.daysBeforeDelete = inputDaysBeforeDelete;
+            result.commentUpdates = inputCommentUpdates;
+            result.maxIssues = inputMaxIssues;
+            result.tagLastCommitter = inputTagLastCommitter;
             result.staleBranchLabel = inputStaleBranchLabel;
+            result.compareBranches = inputCompareBranches;
         }
         catch (err) {
             if (err instanceof Error) {
@@ -569,6 +682,78 @@ function validateInputs() {
     });
 }
 exports.validateInputs = validateInputs;
+
+
+/***/ }),
+
+/***/ 8662:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getDefaultBranch = void 0;
+const assert = __importStar(__nccwpck_require__(9491));
+const core = __importStar(__nccwpck_require__(2186));
+const get_context_1 = __nccwpck_require__(7782);
+function getDefaultBranch() {
+    return __awaiter(this, void 0, void 0, function* () {
+        let result;
+        try {
+            // Get the default branch from the repo info
+            const response = yield get_context_1.github.rest.repos.get({ owner: get_context_1.owner, repo: get_context_1.repo });
+            result = response.data.default_branch;
+            assert.ok(result, 'default_branch cannot be empty');
+        }
+        catch (err) {
+            // Handle .wiki repo
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            if ((err === null || err === void 0 ? void 0 : err.status) === 404 && get_context_1.repo.toUpperCase().endsWith('.WIKI')) {
+                result = 'main';
+            }
+            // Otherwise error
+            else {
+                if (err instanceof Error)
+                    core.setFailed(`Failed to get default branch: ${err.message}`);
+                result = '';
+            }
+        }
+        return result;
+    });
+}
+exports.getDefaultBranch = getDefaultBranch;
 
 
 /***/ }),
@@ -867,6 +1052,41 @@ function logCloseIssue(issueNumber, state) {
     return closeIssue;
 }
 exports.logCloseIssue = logCloseIssue;
+
+
+/***/ }),
+
+/***/ 5396:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.logCompareBranches = void 0;
+const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+function logCompareBranches(branchComparison, base, head) {
+    let compareBranches;
+    compareBranches = `${ansi_styles_1.default.bold.open}${head} has a status of [${branchComparison.branchStatus}] in comparison to ${base}. ${head} is ahead by ${branchComparison.aheadBy} commits and behind by ${branchComparison.behindBy} commits.${ansi_styles_1.default.bold.close}`;
+    switch (branchComparison.branchStatus) {
+        case 'diverged':
+            compareBranches = `${ansi_styles_1.default.bold.open}${head} has ${ansi_styles_1.default.red.open}diverged${ansi_styles_1.default.red.close} from ${base}, and is ahead by ${ansi_styles_1.default.magenta.open}${branchComparison.aheadBy}${ansi_styles_1.default.magenta.close} commits and behind by ${ansi_styles_1.default.magenta.open}${branchComparison.behindBy}${ansi_styles_1.default.magenta.close} commits.${ansi_styles_1.default.bold.close}`;
+            break;
+        case 'ahead':
+            compareBranches = `${ansi_styles_1.default.bold.open}${head} is ${ansi_styles_1.default.yellow.open}ahead${ansi_styles_1.default.yellow.close} of ${base} by ${ansi_styles_1.default.magenta.open}${branchComparison.aheadBy}${ansi_styles_1.default.magenta.close} commits.${ansi_styles_1.default.bold.close}`;
+            break;
+        case 'behind':
+            compareBranches = `${ansi_styles_1.default.bold.open}${head} is ${ansi_styles_1.default.yellow.open}behind${ansi_styles_1.default.yellow.close} ${base} by ${ansi_styles_1.default.magenta.open}${branchComparison.behindBy}${ansi_styles_1.default.magenta.close} commits.${ansi_styles_1.default.bold.close}`;
+            break;
+        case 'identical':
+            compareBranches = `${ansi_styles_1.default.bold.open}${head} is ${ansi_styles_1.default.green.open}identical${ansi_styles_1.default.green.close} to ${base}.${ansi_styles_1.default.bold.close}`;
+            break;
+    }
+    return compareBranches;
+}
+exports.logCompareBranches = logCompareBranches;
 
 
 /***/ }),
@@ -1195,6 +1415,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const close_issue_1 = __nccwpck_require__(4094);
+const compare_branches_1 = __nccwpck_require__(5466);
 const create_issue_1 = __nccwpck_require__(9810);
 const create_issues_title_1 = __nccwpck_require__(4554);
 const delete_branch_1 = __nccwpck_require__(5294);
@@ -1215,12 +1436,15 @@ const update_issue_1 = __nccwpck_require__(2914);
 const get_context_1 = __nccwpck_require__(7782);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
-        //Validate & Return input values
-        const validInputs = yield (0, get_context_1.validateInputs)();
         //Declare output arrays
         const outputDeletes = [];
         const outputStales = [];
         try {
+            //Validate & Return input values
+            const validInputs = yield (0, get_context_1.validateInputs)();
+            if (validInputs.daysBeforeStale == null) {
+                throw new Error('Invalid inputs');
+            }
             //Collect Branches, Issue Budget, Existing Issues, & initialize lastCommitLogin
             const branches = yield (0, get_branches_1.getBranches)();
             const outputTotal = branches.length;
@@ -1246,6 +1470,9 @@ function run() {
                 }
                 // Start output group for current branch assessment
                 core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchToCheck.branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
+                //Compare current branch to default branch
+                const branchComparison = yield (0, compare_branches_1.compareBranches)(branchToCheck.branchName, validInputs.compareBranches);
+                //Log last commit age
                 core.info((0, log_last_commit_color_1.logLastCommitColor)(commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
                 //Create new issue if branch is stale & existing issue is not found & issue budget is >0
                 if (commitAge > validInputs.daysBeforeStale) {
@@ -1279,7 +1506,7 @@ function run() {
                     }
                 }
                 //Delete expired branches
-                if (commitAge > validInputs.daysBeforeDelete) {
+                if (commitAge > validInputs.daysBeforeDelete && branchComparison.save === false) {
                     for (const issueToDelete of filteredIssue) {
                         if (issueToDelete.issueTitle === issueTitleString) {
                             yield (0, delete_branch_1.deleteBranch)(branchToCheck.branchName);

@@ -1,5 +1,6 @@
 import * as core from '@actions/core'
 import {closeIssue} from './functions/close-issue'
+import {compareBranches} from './functions/compare-branches'
 import {createIssue} from './functions/create-issue'
 import {createIssueTitle} from './utils/create-issues-title'
 import {deleteBranch} from './functions/delete-branch'
@@ -20,14 +21,16 @@ import {updateIssue} from './functions/update-issue'
 import {validateInputs} from './functions/get-context'
 
 export async function run(): Promise<void> {
-  //Validate & Return input values
-  const validInputs = await validateInputs()
-
   //Declare output arrays
   const outputDeletes: string[] = []
   const outputStales: string[] = []
 
   try {
+    //Validate & Return input values
+    const validInputs = await validateInputs()
+    if (validInputs.daysBeforeStale == null) {
+      throw new Error('Invalid inputs')
+    }
     //Collect Branches, Issue Budget, Existing Issues, & initialize lastCommitLogin
     const branches = await getBranches()
     const outputTotal = branches.length
@@ -57,6 +60,11 @@ export async function run(): Promise<void> {
 
       // Start output group for current branch assessment
       core.startGroup(logBranchGroupColor(branchToCheck.branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete))
+
+      //Compare current branch to default branch
+      const branchComparison = await compareBranches(branchToCheck.branchName, validInputs.compareBranches)
+
+      //Log last commit age
       core.info(logLastCommitColor(commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete))
 
       //Create new issue if branch is stale & existing issue is not found & issue budget is >0
@@ -103,7 +111,7 @@ export async function run(): Promise<void> {
       }
 
       //Delete expired branches
-      if (commitAge > validInputs.daysBeforeDelete) {
+      if (commitAge > validInputs.daysBeforeDelete && branchComparison.save === false) {
         for (const issueToDelete of filteredIssue) {
           if (issueToDelete.issueTitle === issueTitleString) {
             await deleteBranch(branchToCheck.branchName)

@@ -17,7 +17,8 @@ export const validInputs: Inputs = {
   commentUpdates: true,
   maxIssues: 30,
   tagLastCommitter: true,
-  staleBranchLabel: 'stale branch 🗑️'
+  staleBranchLabel: 'stale branch 🗑️',
+  compareBranches: 'save'
 }
 
 type ListIssuesResponseDataType = GetResponseTypeFromEndpointMethod<typeof githubActual.github.rest.issues.listForRepo>
@@ -244,6 +245,15 @@ let getCommit = jest.fn().mockReturnValue({
   }
 })
 
+let compareCommitsWithBasehead = jest.fn().mockReturnValue({
+  data: {
+    ahead_by: 1,
+    behind_by: 2,
+    status: 'diverged',
+    total_commits: 3
+  }
+})
+
 let listForRepo = jest.fn().mockReturnValue(issues)
 
 let createComment = jest.fn().mockReturnValue({
@@ -264,7 +274,8 @@ const github = {
     repos: {
       get: jest.fn(),
       listBranches,
-      getCommit
+      getCommit,
+      compareCommitsWithBasehead
     }
   },
   paginate
