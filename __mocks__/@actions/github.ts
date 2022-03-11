@@ -245,6 +245,15 @@ let getCommit = jest.fn().mockReturnValue({
   }
 })
 
+let compareCommitsWithBasehead = jest.fn().mockReturnValue({
+  data: {
+    ahead_by: 1,
+    behind_by: 2,
+    status: 'diverged',
+    total_commits: 3
+  }
+})
+
 let listForRepo = jest.fn().mockReturnValue(issues)
 
 let createComment = jest.fn().mockReturnValue({
@@ -265,7 +274,8 @@ const github = {
     repos: {
       get: jest.fn(),
       listBranches,
-      getCommit
+      getCommit,
+      compareCommitsWithBasehead
     }
   },
   paginate
