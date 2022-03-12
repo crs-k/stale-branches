@@ -1448,7 +1448,7 @@ function run() {
             //Collect Branches, Issue Budget, Existing Issues, & initialize lastCommitLogin
             const branches = yield (0, get_branches_1.getBranches)();
             const outputTotal = branches.length;
-            const existingIssue = yield (0, get_issues_1.getIssues)(validInputs.staleBranchLabel);
+            let existingIssue = yield (0, get_issues_1.getIssues)(validInputs.staleBranchLabel);
             let issueBudgetRemaining = yield (0, get_stale_issue_budget_1.getIssueBudget)(validInputs.maxIssues, validInputs.staleBranchLabel);
             let lastCommitLogin = 'Unknown';
             // Assess Branches
@@ -1515,6 +1515,10 @@ function run() {
                         }
                     }
                 }
+                // Remove filteredIssue from existingIssue
+                core.info(`before filter: ${JSON.stringify(existingIssue)}`);
+                existingIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle !== issueTitleString);
+                core.info(`after filter: ${JSON.stringify(existingIssue)}`);
                 // Close output group for current branch assessment
                 core.endGroup();
             }

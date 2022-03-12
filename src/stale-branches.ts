@@ -34,7 +34,7 @@ export async function run(): Promise<void> {
     //Collect Branches, Issue Budget, Existing Issues, & initialize lastCommitLogin
     const branches = await getBranches()
     const outputTotal = branches.length
-    const existingIssue = await getIssues(validInputs.staleBranchLabel)
+    let existingIssue = await getIssues(validInputs.staleBranchLabel)
     let issueBudgetRemaining = await getIssueBudget(validInputs.maxIssues, validInputs.staleBranchLabel)
     let lastCommitLogin = 'Unknown'
 
@@ -120,6 +120,12 @@ export async function run(): Promise<void> {
           }
         }
       }
+
+      // Remove filteredIssue from existingIssue
+      core.info(`before filter: ${JSON.stringify(existingIssue)}`)
+      existingIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle !== issueTitleString)
+      core.info(`after filter: ${JSON.stringify(existingIssue)}`)
+
       // Close output group for current branch assessment
       core.endGroup()
     }
