@@ -1210,6 +1210,26 @@ exports.logNewIssue = logNewIssue;
 
 /***/ }),
 
+/***/ 9964:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.logOrphanedIssues = void 0;
+const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+function logOrphanedIssues(orphanCount) {
+    const orphanedIssues = `${ansi_styles_1.default.bold.open}[${ansi_styles_1.default.magenta.open}${orphanCount}${ansi_styles_1.default.magenta.close}] ${ansi_styles_1.default.blueBright.open}orphaned issues found${ansi_styles_1.default.blueBright.close}.${ansi_styles_1.default.bold.close}`;
+    return orphanedIssues;
+}
+exports.logOrphanedIssues = logOrphanedIssues;
+
+
+/***/ }),
+
 /***/ 8956:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -1429,6 +1449,7 @@ const log_active_branch_1 = __nccwpck_require__(1182);
 const log_branch_group_color_1 = __nccwpck_require__(3839);
 const log_last_commit_color_1 = __nccwpck_require__(2965);
 const log_max_issues_1 = __nccwpck_require__(5487);
+const log_orphaned_issues_1 = __nccwpck_require__(9964);
 const log_rate_limit_break_1 = __nccwpck_require__(8956);
 const log_total_assessed_1 = __nccwpck_require__(2673);
 const log_total_deleted_1 = __nccwpck_require__(4888);
@@ -1516,15 +1537,13 @@ function run() {
                     }
                 }
                 // Remove filteredIssue from existingIssue
-                core.info(`before filter: ${JSON.stringify(existingIssue)}, ${existingIssue.length}`);
                 existingIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle !== issueTitleString);
-                core.info(`after filter: ${JSON.stringify(existingIssue)}, ${existingIssue.length}`);
                 // Close output group for current branch assessment
                 core.endGroup();
             }
             // Close orphaned Issues
             if (existingIssue.length > 0) {
-                core.startGroup(`${existingIssue.length} Orphaned Issues Found`);
+                core.startGroup((0, log_orphaned_issues_1.logOrphanedIssues)(existingIssue.length));
                 for (const issueToDelete of existingIssue) {
                     yield (0, close_issue_1.closeIssue)(issueToDelete.issueNumber);
                 }
