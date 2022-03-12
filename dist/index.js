@@ -1516,9 +1516,9 @@ function run() {
                     }
                 }
                 // Remove filteredIssue from existingIssue
-                core.info(`before filter: ${JSON.stringify(existingIssue)}`);
+                core.info(`before filter: ${JSON.stringify(existingIssue)}, ${existingIssue.length}`);
                 existingIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle !== issueTitleString);
-                core.info(`after filter: ${JSON.stringify(existingIssue)}`);
+                core.info(`after filter: ${JSON.stringify(existingIssue)}, ${existingIssue.length}`);
                 // Close output group for current branch assessment
                 core.endGroup();
             }
