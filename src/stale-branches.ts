@@ -14,6 +14,7 @@ import {logActiveBranch} from './functions/logging/log-active-branch'
 import {logBranchGroupColor} from './functions/logging/log-branch-group-color'
 import {logLastCommitColor} from './functions/logging/log-last-commit-color'
 import {logMaxIssues} from './functions/logging/log-max-issues'
+import {logOrphanedIssues} from './functions/logging/log-orphaned-issues'
 import {logRateLimitBreak} from './functions/logging/log-rate-limit-break'
 import {logTotalAssessed} from './functions/logging/log-total-assessed'
 import {logTotalDeleted} from './functions/logging/log-total-deleted'
@@ -34,7 +35,7 @@ export async function run(): Promise<void> {
     //Collect Branches, Issue Budget, Existing Issues, & initialize lastCommitLogin
     const branches = await getBranches()
     const outputTotal = branches.length
-    const existingIssue = await getIssues(validInputs.staleBranchLabel)
+    let existingIssue = await getIssues(validInputs.staleBranchLabel)
     let issueBudgetRemaining = await getIssueBudget(validInputs.maxIssues, validInputs.staleBranchLabel)
     let lastCommitLogin = 'Unknown'
 
@@ -120,9 +121,30 @@ export async function run(): Promise<void> {
           }
         }
       }
+
+      // Remove filteredIssue from existingIssue
+      existingIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle !== issueTitleString)
+
       // Close output group for current branch assessment
       core.endGroup()
     }
+    // Close orphaned Issues
+    if (existingIssue.length > 0) {
+      core.startGroup(logOrphanedIssues(existingIssue.length))
+      for (const issueToDelete of existingIssue) {
+        // Break if Rate Limit usage exceeds 95%
+        const rateLimit = await getRateLimit()
+        if (rateLimit.used > 95) {
+          core.info(logRateLimitBreak(rateLimit))
+          core.setFailed('Exiting to avoid rate limit violation.')
+          break
+        } else {
+          await closeIssue(issueToDelete.issueNumber)
+        }
+      }
+      core.endGroup()
+    }
+
     core.setOutput('stale-branches', JSON.stringify(outputStales))
     core.setOutput('deleted-branches', JSON.stringify(outputDeletes))
     core.info(logTotalAssessed(outputStales.length, outputTotal))
