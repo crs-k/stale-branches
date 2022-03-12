@@ -129,7 +129,8 @@ export async function run(): Promise<void> {
       core.endGroup()
     }
     // Close orphaned Issues
-    if (existingIssue.length > 0) {
+    const rateLimit = await getRateLimit()
+    if (existingIssue.length > 0 && rateLimit.used < 95) {
       core.startGroup(logOrphanedIssues(existingIssue.length))
       for (const issueToDelete of existingIssue) {
         await closeIssue(issueToDelete.issueNumber)
