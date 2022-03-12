@@ -1522,6 +1522,14 @@ function run() {
                 // Close output group for current branch assessment
                 core.endGroup();
             }
+            // Close orphaned Issues
+            if (existingIssue.length > 0) {
+                core.startGroup(`${existingIssue.length} Orphaned Issues Found`);
+                for (const issueToDelete of existingIssue) {
+                    yield (0, close_issue_1.closeIssue)(issueToDelete.issueNumber);
+                }
+                core.endGroup();
+            }
             core.setOutput('stale-branches', JSON.stringify(outputStales));
             core.setOutput('deleted-branches', JSON.stringify(outputDeletes));
             core.info((0, log_total_assessed_1.logTotalAssessed)(outputStales.length, outputTotal));

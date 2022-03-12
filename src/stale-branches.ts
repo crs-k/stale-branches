@@ -129,6 +129,15 @@ export async function run(): Promise<void> {
       // Close output group for current branch assessment
       core.endGroup()
     }
+    // Close orphaned Issues
+    if (existingIssue.length > 0) {
+      core.startGroup(`${existingIssue.length} Orphaned Issues Found`)
+      for (const issueToDelete of existingIssue) {
+        await closeIssue(issueToDelete.issueNumber)
+      }
+      core.endGroup()
+    }
+
     core.setOutput('stale-branches', JSON.stringify(outputStales))
     core.setOutput('deleted-branches', JSON.stringify(outputDeletes))
     core.info(logTotalAssessed(outputStales.length, outputTotal))
