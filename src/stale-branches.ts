@@ -14,6 +14,7 @@ import {logActiveBranch} from './functions/logging/log-active-branch'
 import {logBranchGroupColor} from './functions/logging/log-branch-group-color'
 import {logLastCommitColor} from './functions/logging/log-last-commit-color'
 import {logMaxIssues} from './functions/logging/log-max-issues'
+import {logOrphanedIssues} from './functions/logging/log-orphaned-issues'
 import {logRateLimitBreak} from './functions/logging/log-rate-limit-break'
 import {logTotalAssessed} from './functions/logging/log-total-assessed'
 import {logTotalDeleted} from './functions/logging/log-total-deleted'
@@ -122,16 +123,14 @@ export async function run(): Promise<void> {
       }
 
       // Remove filteredIssue from existingIssue
-      core.info(`before filter: ${JSON.stringify(existingIssue)}, ${existingIssue.length}`)
       existingIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle !== issueTitleString)
-      core.info(`after filter: ${JSON.stringify(existingIssue)}, ${existingIssue.length}`)
 
       // Close output group for current branch assessment
       core.endGroup()
     }
     // Close orphaned Issues
     if (existingIssue.length > 0) {
-      core.startGroup(`${existingIssue.length} Orphaned Issues Found`)
+      core.startGroup(logOrphanedIssues(existingIssue.length))
       for (const issueToDelete of existingIssue) {
         await closeIssue(issueToDelete.issueNumber)
       }
