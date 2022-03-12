@@ -1542,7 +1542,8 @@ function run() {
                 core.endGroup();
             }
             // Close orphaned Issues
-            if (existingIssue.length > 0) {
+            const rateLimit = yield (0, get_rate_limit_1.getRateLimit)();
+            if (existingIssue.length > 0 && rateLimit.used < 95) {
                 core.startGroup((0, log_orphaned_issues_1.logOrphanedIssues)(existingIssue.length));
                 for (const issueToDelete of existingIssue) {
                     yield (0, close_issue_1.closeIssue)(issueToDelete.issueNumber);
