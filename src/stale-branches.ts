@@ -129,11 +129,18 @@ export async function run(): Promise<void> {
       core.endGroup()
     }
     // Close orphaned Issues
-    const rateLimit = await getRateLimit()
-    if (existingIssue.length > 0 && rateLimit.used < 95) {
+    if (existingIssue.length > 0) {
       core.startGroup(logOrphanedIssues(existingIssue.length))
       for (const issueToDelete of existingIssue) {
-        await closeIssue(issueToDelete.issueNumber)
+        // Break if Rate Limit usage exceeds 95%
+        const rateLimit = await getRateLimit()
+        if (rateLimit.used > 95) {
+          core.info(logRateLimitBreak(rateLimit))
+          core.setFailed('Exiting to avoid rate limit violation.')
+          break
+        } else {
+          await closeIssue(issueToDelete.issueNumber)
+        }
       }
       core.endGroup()
     }
