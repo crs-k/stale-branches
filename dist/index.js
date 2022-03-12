@@ -1542,11 +1542,19 @@ function run() {
                 core.endGroup();
             }
             // Close orphaned Issues
-            const rateLimit = yield (0, get_rate_limit_1.getRateLimit)();
-            if (existingIssue.length > 0 && rateLimit.used < 95) {
+            if (existingIssue.length > 0) {
                 core.startGroup((0, log_orphaned_issues_1.logOrphanedIssues)(existingIssue.length));
                 for (const issueToDelete of existingIssue) {
-                    yield (0, close_issue_1.closeIssue)(issueToDelete.issueNumber);
+                    // Break if Rate Limit usage exceeds 95%
+                    const rateLimit = yield (0, get_rate_limit_1.getRateLimit)();
+                    if (rateLimit.used > 95) {
+                        core.info((0, log_rate_limit_break_1.logRateLimitBreak)(rateLimit));
+                        core.setFailed('Exiting to avoid rate limit violation.');
+                        break;
+                    }
+                    else {
+                        yield (0, close_issue_1.closeIssue)(issueToDelete.issueNumber);
+                    }
                 }
                 core.endGroup();
             }
