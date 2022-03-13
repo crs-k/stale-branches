@@ -1,7 +1,7 @@
 import * as assert from 'assert'
 import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
-import {createIssueComment} from '../utils/create-issues-comment'
+import {createIssueComment} from './utils/create-issues-comment'
 import {logUpdateIssue} from './logging/log-update-issue'
 
 export async function updateIssue(

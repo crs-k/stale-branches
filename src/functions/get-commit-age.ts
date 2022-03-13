@@ -1,7 +1,7 @@
 import * as assert from 'assert'
 import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
-import {getDays} from '../utils/get-time'
+import {getDays} from './utils/get-time'
 
 export async function getRecentCommitAge(sha: string): Promise<number> {
   let commitDate: string | undefined

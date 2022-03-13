@@ -3,7 +3,7 @@ import * as core from '@actions/core'
 // eslint-disable-next-line import/named
 import {GetResponseTypeFromEndpointMethod} from '@octokit/types'
 import {RateLimit} from '../types/rate-limit'
-import {getMinutes} from '../utils/get-time'
+import {getMinutes} from './utils/get-time'
 import {github} from './get-context'
 
 type ListIssuesResponseDataType = GetResponseTypeFromEndpointMethod<typeof github.rest.rateLimit.get>

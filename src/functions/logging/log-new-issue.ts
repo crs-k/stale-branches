@@ -1,4 +1,4 @@
-import {createIssueTitle} from '../../utils/create-issues-title'
+import {createIssueTitle} from '../utils/create-issues-title'
 import styles from 'ansi-styles'
 
 export function logNewIssue(branchName): string {

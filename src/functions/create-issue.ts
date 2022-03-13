@@ -1,7 +1,7 @@
 import * as assert from 'assert'
 import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
-import {createIssueTitle} from '../utils/create-issues-title'
+import {createIssueTitle} from './utils/create-issues-title'
 import {logNewIssue} from './logging/log-new-issue'
 
 export async function createIssue(branch: string, commitAge: number, lastCommitter: string, daysBeforeDelete: number, staleBranchLabel: string, tagLastCommitter: boolean): Promise<number> {
