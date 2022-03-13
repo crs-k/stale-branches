@@ -180,6 +180,110 @@ exports.compareBranches = compareBranches;
 
 /***/ }),
 
+/***/ 6922:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createIssueComment = void 0;
+const assert = __importStar(__nccwpck_require__(9491));
+const core = __importStar(__nccwpck_require__(2186));
+const get_context_1 = __nccwpck_require__(7782);
+const create_comment_string_1 = __nccwpck_require__(9576);
+const log_update_issue_1 = __nccwpck_require__(8045);
+/**
+ * @description
+ * Creates comment on existing GitHub issue
+ *
+ * @param {number} issueNumber GitHub issue number
+ *
+ * @param {string} branch The branch currently being worked on
+ *
+ * @param {number} commitAge The age (in days) of the last commit to a branch
+ *
+ * @param {string} lastCommitter The username that last committed to the branch
+ *
+ * @param {number} daysBeforeDelete The amount of days before a branch is to be deleted
+ *
+ * @param {string} staleBranchLabel The label to be used to identify issues related to this Action
+ *
+ * @param {boolean} tagLastCommitter If true, the user that last committed to this branch will be tagged
+ *
+ * @return {string} `createdAt` - The time the comment was created
+ */
+function createIssueComment(issueNumber, branch, commitAge, lastCommitter, commentUpdates, daysBeforeDelete, staleBranchLabel, tagLastCommitter) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let createdAt = '';
+        let commentUrl;
+        let bodyString;
+        if (commentUpdates === true) {
+            bodyString = (0, create_comment_string_1.createCommentString)(branch, lastCommitter, commitAge, daysBeforeDelete, commentUpdates, tagLastCommitter);
+            try {
+                const issueResponse = yield get_context_1.github.rest.issues.createComment({
+                    owner: get_context_1.owner,
+                    repo: get_context_1.repo,
+                    issue_number: issueNumber,
+                    body: bodyString,
+                    labels: [
+                        {
+                            name: staleBranchLabel,
+                            color: 'B60205',
+                            description: 'Used by Stale Branches Action to label issues'
+                        }
+                    ]
+                });
+                createdAt = issueResponse.data.created_at;
+                commentUrl = issueResponse.data.html_url;
+                assert.ok(createdAt, 'Created At cannot be empty');
+                core.info((0, log_update_issue_1.logUpdateIssue)(issueNumber, createdAt, commentUrl));
+            }
+            catch (err) {
+                if (err instanceof Error)
+                    core.info(`No existing issue returned for issue number: ${issueNumber}. Error: ${err.message}`);
+                createdAt = '';
+            }
+        }
+        return createdAt;
+    });
+}
+exports.createIssueComment = createIssueComment;
+
+
+/***/ }),
+
 /***/ 9810:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -222,14 +326,14 @@ exports.createIssue = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
-const create_issues_title_1 = __nccwpck_require__(8787);
+const create_issues_title_string_1 = __nccwpck_require__(7594);
 const log_new_issue_1 = __nccwpck_require__(2344);
 function createIssue(branch, commitAge, lastCommitter, daysBeforeDelete, staleBranchLabel, tagLastCommitter) {
     return __awaiter(this, void 0, void 0, function* () {
         let issueId;
         let bodyString;
         const daysUntilDelete = Math.max(0, daysBeforeDelete - commitAge);
-        const issueTitleString = (0, create_issues_title_1.createIssueTitle)(branch);
+        const issueTitleString = (0, create_issues_title_string_1.createIssueTitleString)(branch);
         switch (tagLastCommitter) {
             case true:
                 bodyString = `@${lastCommitter}, \r \r ${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days.`;
@@ -1198,10 +1302,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.logNewIssue = void 0;
-const create_issues_title_1 = __nccwpck_require__(8787);
+const create_issues_title_string_1 = __nccwpck_require__(7594);
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logNewIssue(branchName) {
-    const issueTitleString = (0, create_issues_title_1.createIssueTitle)(branchName);
+    const issueTitleString = (0, create_issues_title_string_1.createIssueTitleString)(branchName);
     const newIssue = `${ansi_styles_1.default.bold.open}New issue created:${ansi_styles_1.default.bold.close} ${ansi_styles_1.default.magentaBright.open}${issueTitleString}${ansi_styles_1.default.magentaBright.close}.`;
     return newIssue;
 }
@@ -1310,98 +1414,14 @@ exports.logUpdateIssue = logUpdateIssue;
 
 /***/ }),
 
-/***/ 2914:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.updateIssue = void 0;
-const assert = __importStar(__nccwpck_require__(9491));
-const core = __importStar(__nccwpck_require__(2186));
-const get_context_1 = __nccwpck_require__(7782);
-const create_issues_comment_1 = __nccwpck_require__(6148);
-const log_update_issue_1 = __nccwpck_require__(8045);
-function updateIssue(issueNumber, branch, commitAge, lastCommitter, commentUpdates, daysBeforeDelete, staleBranchLabel, tagLastCommitter) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let createdAt = '';
-        let commentUrl;
-        let bodyString;
-        if (commentUpdates === true) {
-            bodyString = (0, create_issues_comment_1.createIssueComment)(branch, lastCommitter, commitAge, daysBeforeDelete, commentUpdates, tagLastCommitter);
-            try {
-                const issueResponse = yield get_context_1.github.rest.issues.createComment({
-                    owner: get_context_1.owner,
-                    repo: get_context_1.repo,
-                    issue_number: issueNumber,
-                    body: bodyString,
-                    labels: [
-                        {
-                            name: staleBranchLabel,
-                            color: 'B60205',
-                            description: 'Used by Stale Branches Action to label issues'
-                        }
-                    ]
-                });
-                createdAt = issueResponse.data.created_at;
-                commentUrl = issueResponse.data.html_url;
-                assert.ok(createdAt, 'Created At cannot be empty');
-                core.info((0, log_update_issue_1.logUpdateIssue)(issueNumber, createdAt, commentUrl));
-            }
-            catch (err) {
-                if (err instanceof Error)
-                    core.info(`No existing issue returned for issue number: ${issueNumber}. Error: ${err.message}`);
-                createdAt = '';
-            }
-        }
-        return createdAt;
-    });
-}
-exports.updateIssue = updateIssue;
-
-
-/***/ }),
-
-/***/ 6148:
+/***/ 9576:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createIssueComment = void 0;
-function createIssueComment(branch, lastCommitter, commitAge, daysBeforeDelete, commentUpdates, tagLastCommitter) {
+exports.createCommentString = void 0;
+function createCommentString(branch, lastCommitter, commitAge, daysBeforeDelete, commentUpdates, tagLastCommitter) {
     const daysUntilDelete = Math.max(0, daysBeforeDelete - commitAge);
     let bodyString;
     switch (tagLastCommitter) {
@@ -1414,22 +1434,22 @@ function createIssueComment(branch, lastCommitter, commitAge, daysBeforeDelete, 
     }
     return bodyString;
 }
-exports.createIssueComment = createIssueComment;
+exports.createCommentString = createCommentString;
 
 
 /***/ }),
 
-/***/ 8787:
+/***/ 7594:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createIssueTitle = void 0;
-function createIssueTitle(branchName) {
+exports.createIssueTitleString = void 0;
+function createIssueTitleString(branchName) {
     return `[${branchName}] is STALE`;
 }
-exports.createIssueTitle = createIssueTitle;
+exports.createIssueTitleString = createIssueTitleString;
 
 
 /***/ }),
@@ -1515,7 +1535,8 @@ const core = __importStar(__nccwpck_require__(2186));
 const close_issue_1 = __nccwpck_require__(4094);
 const compare_branches_1 = __nccwpck_require__(5466);
 const create_issue_1 = __nccwpck_require__(9810);
-const create_issues_title_1 = __nccwpck_require__(8787);
+const create_issue_comment_1 = __nccwpck_require__(6922);
+const create_issues_title_string_1 = __nccwpck_require__(7594);
 const delete_branch_1 = __nccwpck_require__(5294);
 const get_branches_1 = __nccwpck_require__(6204);
 const get_stale_issue_budget_1 = __nccwpck_require__(7705);
@@ -1531,7 +1552,6 @@ const log_orphaned_issues_1 = __nccwpck_require__(9964);
 const log_rate_limit_break_1 = __nccwpck_require__(8956);
 const log_total_assessed_1 = __nccwpck_require__(2673);
 const log_total_deleted_1 = __nccwpck_require__(4888);
-const update_issue_1 = __nccwpck_require__(2914);
 const get_context_1 = __nccwpck_require__(7782);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -1561,7 +1581,7 @@ function run() {
                 }
                 //Get age of last commit, generate issue title, and filter existing issues to current branch
                 const commitAge = yield (0, get_commit_age_1.getRecentCommitAge)(branchToCheck.commmitSha);
-                const issueTitleString = (0, create_issues_title_1.createIssueTitle)(branchToCheck.branchName);
+                const issueTitleString = (0, create_issues_title_string_1.createIssueTitleString)(branchToCheck.branchName);
                 const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === issueTitleString);
                 // Skip looking for last commit's login if input is set to false
                 if (validInputs.tagLastCommitter === true) {
@@ -1597,7 +1617,7 @@ function run() {
                 if (commitAge > validInputs.daysBeforeStale) {
                     for (const issueToUpdate of filteredIssue) {
                         if (issueToUpdate.issueTitle === issueTitleString) {
-                            yield (0, update_issue_1.updateIssue)(issueToUpdate.issueNumber, branchToCheck.branchName, commitAge, lastCommitLogin, validInputs.commentUpdates, validInputs.daysBeforeDelete, validInputs.staleBranchLabel, validInputs.tagLastCommitter);
+                            yield (0, create_issue_comment_1.createIssueComment)(issueToUpdate.issueNumber, branchToCheck.branchName, commitAge, lastCommitLogin, validInputs.commentUpdates, validInputs.daysBeforeDelete, validInputs.staleBranchLabel, validInputs.tagLastCommitter);
                             if (!outputStales.includes(branchToCheck.branchName)) {
                                 outputStales.push(branchToCheck.branchName);
                             }
