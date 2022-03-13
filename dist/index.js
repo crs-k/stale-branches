@@ -222,7 +222,7 @@ exports.createIssue = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
-const create_issues_title_1 = __nccwpck_require__(4554);
+const create_issues_title_1 = __nccwpck_require__(8787);
 const log_new_issue_1 = __nccwpck_require__(2344);
 function createIssue(branch, commitAge, lastCommitter, daysBeforeDelete, staleBranchLabel, tagLastCommitter) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -465,7 +465,7 @@ exports.getRecentCommitAge = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
-const get_time_1 = __nccwpck_require__(2249);
+const get_time_1 = __nccwpck_require__(2643);
 function getRecentCommitAge(sha) {
     return __awaiter(this, void 0, void 0, function* () {
         let commitDate;
@@ -872,7 +872,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getRateLimit = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
-const get_time_1 = __nccwpck_require__(2249);
+const get_time_1 = __nccwpck_require__(2643);
 const get_context_1 = __nccwpck_require__(7782);
 function getRateLimit() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -1198,7 +1198,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.logNewIssue = void 0;
-const create_issues_title_1 = __nccwpck_require__(4554);
+const create_issues_title_1 = __nccwpck_require__(8787);
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logNewIssue(branchName) {
     const issueTitleString = (0, create_issues_title_1.createIssueTitle)(branchName);
@@ -1352,7 +1352,7 @@ exports.updateIssue = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
-const create_issues_comment_1 = __nccwpck_require__(9670);
+const create_issues_comment_1 = __nccwpck_require__(6148);
 const log_update_issue_1 = __nccwpck_require__(8045);
 function updateIssue(issueNumber, branch, commitAge, lastCommitter, commentUpdates, daysBeforeDelete, staleBranchLabel, tagLastCommitter) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -1390,6 +1390,84 @@ function updateIssue(issueNumber, branch, commitAge, lastCommitter, commentUpdat
     });
 }
 exports.updateIssue = updateIssue;
+
+
+/***/ }),
+
+/***/ 6148:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createIssueComment = void 0;
+function createIssueComment(branch, lastCommitter, commitAge, daysBeforeDelete, commentUpdates, tagLastCommitter) {
+    const daysUntilDelete = Math.max(0, daysBeforeDelete - commitAge);
+    let bodyString;
+    switch (tagLastCommitter) {
+        case true:
+            bodyString = `@${lastCommitter}, \r \r ${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \r \r This issue was last updated on ${new Date().toString()}`;
+            break;
+        case false:
+            bodyString = `${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \r \r This issue was last updated on ${new Date().toString()}`;
+            break;
+    }
+    return bodyString;
+}
+exports.createIssueComment = createIssueComment;
+
+
+/***/ }),
+
+/***/ 8787:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createIssueTitle = void 0;
+function createIssueTitle(branchName) {
+    return `[${branchName}] is STALE`;
+}
+exports.createIssueTitle = createIssueTitle;
+
+
+/***/ }),
+
+/***/ 2643:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getMinutes = exports.getDays = void 0;
+function getDays(date1, date2) {
+    const diffMs = Math.abs(date2 - date1);
+    const days = Math.round(diffMs / (1000 * 60 * 60 * 24));
+    return days;
+}
+exports.getDays = getDays;
+function getMinutes(date1, date2) {
+    const diffMs = Math.abs(date2 - date1);
+    const minutes = Math.round(diffMs / (1000 * 60));
+    return minutes;
+}
+exports.getMinutes = getMinutes;
+/* USED FOR TESTING
+export function getHours(date1, date2): number {
+  const diffMs = Math.abs(date2 - date1)
+  const hours = Math.round(diffMs / (1000 * 60 * 60))
+  return hours
+}
+
+
+
+export function getnSeconds(date1, date2): number {
+  const diffMs = Math.abs(date2 - date1)
+  const seconds = Math.round(diffMs / 1000)
+  return seconds
+}
+ */
 
 
 /***/ }),
@@ -1437,7 +1515,7 @@ const core = __importStar(__nccwpck_require__(2186));
 const close_issue_1 = __nccwpck_require__(4094);
 const compare_branches_1 = __nccwpck_require__(5466);
 const create_issue_1 = __nccwpck_require__(9810);
-const create_issues_title_1 = __nccwpck_require__(4554);
+const create_issues_title_1 = __nccwpck_require__(8787);
 const delete_branch_1 = __nccwpck_require__(5294);
 const get_branches_1 = __nccwpck_require__(6204);
 const get_stale_issue_budget_1 = __nccwpck_require__(7705);
@@ -1570,84 +1648,6 @@ function run() {
     });
 }
 exports.run = run;
-
-
-/***/ }),
-
-/***/ 9670:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createIssueComment = void 0;
-function createIssueComment(branch, lastCommitter, commitAge, daysBeforeDelete, commentUpdates, tagLastCommitter) {
-    const daysUntilDelete = Math.max(0, daysBeforeDelete - commitAge);
-    let bodyString;
-    switch (tagLastCommitter) {
-        case true:
-            bodyString = `@${lastCommitter}, \r \r ${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \r \r This issue was last updated on ${new Date().toString()}`;
-            break;
-        case false:
-            bodyString = `${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \r \r This issue was last updated on ${new Date().toString()}`;
-            break;
-    }
-    return bodyString;
-}
-exports.createIssueComment = createIssueComment;
-
-
-/***/ }),
-
-/***/ 4554:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createIssueTitle = void 0;
-function createIssueTitle(branchName) {
-    return `[${branchName}] is STALE`;
-}
-exports.createIssueTitle = createIssueTitle;
-
-
-/***/ }),
-
-/***/ 2249:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getMinutes = exports.getDays = void 0;
-function getDays(date1, date2) {
-    const diffMs = Math.abs(date2 - date1);
-    const days = Math.round(diffMs / (1000 * 60 * 60 * 24));
-    return days;
-}
-exports.getDays = getDays;
-function getMinutes(date1, date2) {
-    const diffMs = Math.abs(date2 - date1);
-    const minutes = Math.round(diffMs / (1000 * 60));
-    return minutes;
-}
-exports.getMinutes = getMinutes;
-/* USED FOR TESTING
-export function getHours(date1, date2): number {
-  const diffMs = Math.abs(date2 - date1)
-  const hours = Math.round(diffMs / (1000 * 60 * 60))
-  return hours
-}
-
-
-
-export function getnSeconds(date1, date2): number {
-  const diffMs = Math.abs(date2 - date1)
-  const seconds = Math.round(diffMs / 1000)
-  return seconds
-}
- */
 
 
 /***/ }),
