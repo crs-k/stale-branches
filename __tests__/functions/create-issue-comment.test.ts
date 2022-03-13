@@ -5,7 +5,7 @@ jest.mock('../../src/functions/get-context')
 
 const core = require('@actions/core')
 const assert = require('assert')
-import {updateIssue} from '../../src/functions/update-issue'
+import {createIssueComment} from '../../src/functions/create-issue-comment'
 import {github} from '../../src/functions/get-context'
 
 let issueNumber = 20
@@ -19,13 +19,13 @@ let tagLastCommitter = true
 
 describe('Update Issue Function', () => {
   test('updateIssue endpoint is called with tag committer enabled', async () => {
-    await updateIssue(issueNumber, branchName, commitAge, lastCommitter, commentUpdates, daysBeforeDelete, staleBranchLabel, tagLastCommitter)
+    await createIssueComment(issueNumber, branchName, commitAge, lastCommitter, commentUpdates, daysBeforeDelete, staleBranchLabel, tagLastCommitter)
     expect(github.rest.issues.createComment).toHaveBeenCalled()
   })
 
   test('updateIssue endpoint is called with tag committer disabled', async () => {
     let tagLastCommitter = false
-    await updateIssue(issueNumber, branchName, commitAge, lastCommitter, commentUpdates, daysBeforeDelete, staleBranchLabel, tagLastCommitter)
+    await createIssueComment(issueNumber, branchName, commitAge, lastCommitter, commentUpdates, daysBeforeDelete, staleBranchLabel, tagLastCommitter)
     expect(github.rest.issues.createComment).toHaveBeenCalled()
   })
 
@@ -36,7 +36,7 @@ describe('Update Issue Function', () => {
       throw new Error('Created At cannot be empty')
     })
 
-    await updateIssue(issueNumber, branchName, commitAge, lastCommitter, commentUpdates, daysBeforeDelete, staleBranchLabel, tagLastCommitter)
+    await createIssueComment(issueNumber, branchName, commitAge, lastCommitter, commentUpdates, daysBeforeDelete, staleBranchLabel, tagLastCommitter)
     expect(core.info).toHaveBeenCalledWith(`No existing issue returned for issue number: 20. Error: Created At cannot be empty`)
   })
 })

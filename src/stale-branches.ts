@@ -2,7 +2,8 @@ import * as core from '@actions/core'
 import {closeIssue} from './functions/close-issue'
 import {compareBranches} from './functions/compare-branches'
 import {createIssue} from './functions/create-issue'
-import {createIssueTitle} from './functions/utils/create-issues-title'
+import {createIssueComment} from './functions/create-issue-comment'
+import {createIssueTitleString} from './functions/utils/create-issues-title-string'
 import {deleteBranch} from './functions/delete-branch'
 import {getBranches} from './functions/get-branches'
 import {getIssueBudget} from './functions/get-stale-issue-budget'
@@ -18,7 +19,6 @@ import {logOrphanedIssues} from './functions/logging/log-orphaned-issues'
 import {logRateLimitBreak} from './functions/logging/log-rate-limit-break'
 import {logTotalAssessed} from './functions/logging/log-total-assessed'
 import {logTotalDeleted} from './functions/logging/log-total-deleted'
-import {updateIssue} from './functions/update-issue'
 import {validateInputs} from './functions/get-context'
 
 export async function run(): Promise<void> {
@@ -51,7 +51,7 @@ export async function run(): Promise<void> {
 
       //Get age of last commit, generate issue title, and filter existing issues to current branch
       const commitAge = await getRecentCommitAge(branchToCheck.commmitSha)
-      const issueTitleString = createIssueTitle(branchToCheck.branchName)
+      const issueTitleString = createIssueTitleString(branchToCheck.branchName)
       const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === issueTitleString)
 
       // Skip looking for last commit's login if input is set to false
@@ -94,7 +94,7 @@ export async function run(): Promise<void> {
       if (commitAge > validInputs.daysBeforeStale) {
         for (const issueToUpdate of filteredIssue) {
           if (issueToUpdate.issueTitle === issueTitleString) {
-            await updateIssue(
+            await createIssueComment(
               issueToUpdate.issueNumber,
               branchToCheck.branchName,
               commitAge,

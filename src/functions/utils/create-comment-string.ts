@@ -1,4 +1,4 @@
-export function createIssueComment(branch: string, lastCommitter: string, commitAge: number, daysBeforeDelete: number, commentUpdates: boolean, tagLastCommitter: boolean): string {
+export function createCommentString(branch: string, lastCommitter: string, commitAge: number, daysBeforeDelete: number, commentUpdates: boolean, tagLastCommitter: boolean): string {
   const daysUntilDelete = Math.max(0, daysBeforeDelete - commitAge)
 
   let bodyString: string

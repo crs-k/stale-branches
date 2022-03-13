@@ -1,14 +1,14 @@
 import * as assert from 'assert'
 import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
-import {createIssueTitle} from './utils/create-issues-title'
+import {createIssueTitleString} from './utils/create-issues-title-string'
 import {logNewIssue} from './logging/log-new-issue'
 
 export async function createIssue(branch: string, commitAge: number, lastCommitter: string, daysBeforeDelete: number, staleBranchLabel: string, tagLastCommitter: boolean): Promise<number> {
   let issueId: number
   let bodyString: string
   const daysUntilDelete = Math.max(0, daysBeforeDelete - commitAge)
-  const issueTitleString = createIssueTitle(branch)
+  const issueTitleString = createIssueTitleString(branch)
 
   switch (tagLastCommitter) {
     case true:
