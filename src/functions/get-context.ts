@@ -11,7 +11,7 @@ export const {owner: owner, repo: repo} = context.repo
 /**
  * Validates the Action's inputs and assigns them to the Inputs type
  *
- * @return {Inputs} Valid inputs
+ * @returns {Inputs} Valid inputs @see {@link Inputs}
  */
 export async function validateInputs(): Promise<Inputs> {
   const result = {} as unknown as Inputs

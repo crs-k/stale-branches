@@ -11,7 +11,7 @@ import {logMaxIssues} from './logging/log-max-issues'
  *
  * @param {string} staleBranchLabel The label to be used to identify issues related to this Action
  *
- * @return {string} The maximum amount of issues that can be created during a workflow run
+ * @returns {string} The maximum amount of issues that can be created during a workflow run
  */
 export async function getIssueBudget(maxIssues: number, staleBranchLabel: string): Promise<number> {
   let issues: IssueResponse[]

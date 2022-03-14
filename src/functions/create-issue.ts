@@ -19,7 +19,7 @@ import {logNewIssue} from './logging/log-new-issue'
  *
  * @param {boolean} tagLastCommitter If true, the user that last committed to this branch will be tagged
  *
- * @return {number} The ID of the issue created
+ * @returns {number} The ID of the issue created
  */
 export async function createIssue(branch: string, commitAge: number, lastCommitter: string, daysBeforeDelete: number, staleBranchLabel: string, tagLastCommitter: boolean): Promise<number> {
   let issueId: number

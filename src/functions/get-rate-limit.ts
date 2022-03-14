@@ -11,7 +11,7 @@ type ListIssuesResponseDataType = GetResponseTypeFromEndpointMethod<typeof githu
 /**
  * Returns data on current rate limit usage for this repository
  *
- * @return {RateLimit} data related to current rate limit usage
+ * @returns {RateLimit} data related to current rate limit usage @see {@link RateLimit}
  */
 export async function getRateLimit(): Promise<RateLimit> {
   let rateLimit = {} as unknown as ListIssuesResponseDataType

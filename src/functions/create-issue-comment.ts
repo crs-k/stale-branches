@@ -23,7 +23,7 @@ import {logUpdateIssue} from './logging/log-update-issue'
  *
  * @param {boolean} tagLastCommitter If true, the user that last committed to this branch will be tagged
  *
- * @return {string} The time the comment was created
+ * @returns {string} The time the comment was created
  */
 export async function createIssueComment(
   issueNumber: number,

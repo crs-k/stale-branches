@@ -8,7 +8,7 @@ import {logCloseIssue} from './logging/log-close-issue'
  *
  * @param {number} issueNumber GitHub issue number
  *
- * @return {string} The state of an issue (i.e. closed)
+ * @returns {string} The state of an issue (i.e. closed)
  */
 export async function closeIssue(issueNumber: number): Promise<string> {
   let state: string

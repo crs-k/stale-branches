@@ -7,7 +7,7 @@ import {logGetBranches} from './logging/log-get-branches'
 /**
  * Retrieves all branches in a repository
  *
- * @return {BranchResponse} A subset of data on all branches in a repository
+ * @returns {BranchResponse} A subset of data on all branches in a repository @see {@link BranchResponse}
  */
 export async function getBranches(): Promise<BranchResponse[]> {
   let branches: BranchResponse[]

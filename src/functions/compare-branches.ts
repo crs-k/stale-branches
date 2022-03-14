@@ -11,9 +11,9 @@ import {logCompareBranches} from './logging/log-compare-branches'
  *
  * @param {string} head The name of the head branch
  *
- * @param {string} inputCompareBranches The value from the compare-branches input @see {@link https://github.com/crs-k/stale-branches#inputs}
+ * @param {string} inputCompareBranches The value from the compare-branches input
  *
- * @return {BranchComparison} The status of the HEAD branch vs. BASE branch @see {@link BranchComparison}
+ * @returns {BranchComparison} The status of the HEAD branch vs. BASE branch @see {@link BranchComparison}
  */
 export async function compareBranches(head: string, inputCompareBranches: string): Promise<BranchComparison> {
   const branchComparison = {} as unknown as BranchComparison

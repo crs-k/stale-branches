@@ -5,7 +5,7 @@
  *
  * @param {number} date2 Time value in milliseconds.
  *
- * @return {number} The number of days between two dates
+ * @returns {number} The number of days between two dates
  */
 export function getDays(date1: number, date2: number): number {
   const diffMs = Math.abs(date2 - date1)

@@ -8,7 +8,7 @@ import {logDeleteBranch} from './logging/log-delete-branch'
  *
  * @param {string} name The name of a branch.
  *
- * @return {number} HTTP response code (ex: 204)
+ * @returns {number} HTTP response code (ex: 204)
  */
 export async function deleteBranch(name: string): Promise<number> {
   let confirm: number

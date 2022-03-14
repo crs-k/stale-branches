@@ -7,7 +7,7 @@ import {github, owner, repo} from './get-context'
  *
  * @param {string} sha The SHA of the last commit
  *
- * @return {string} The last committer's username
+ * @returns {string} The last committers username
  */
 export async function getRecentCommitLogin(sha: string): Promise<string> {
   let lastCommitter: string | undefined

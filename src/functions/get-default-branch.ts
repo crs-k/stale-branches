@@ -5,7 +5,7 @@ import {github, owner, repo} from './get-context'
 /**
  * Retrieves the default branch for the repository
  *
- * @return {string} The default branch
+ * @returns {string} The default branch
  */
 export async function getDefaultBranch(): Promise<string> {
   let result: string
