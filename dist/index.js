@@ -66,7 +66,7 @@ const log_close_issue_1 = __nccwpck_require__(3730);
  *
  * @param {number} issueNumber GitHub issue number
  *
- * @return {string} The state of an issue (i.e. closed)
+ * @returns {string} The state of an issue (i.e. closed)
  */
 function closeIssue(issueNumber) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -151,7 +151,7 @@ const log_compare_branches_1 = __nccwpck_require__(5396);
  *
  * @param {string} inputCompareBranches The value from the compare-branches input @see {@link https://github.com/crs-k/stale-branches#inputs}
  *
- * @return {BranchComparison} The status of the HEAD branch vs. BASE branch @see {@link BranchComparison}
+ * @returns {BranchComparison} The status of the HEAD branch vs. BASE branch @see {@link BranchComparison}
  */
 function compareBranches(head, inputCompareBranches) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -259,7 +259,7 @@ const log_update_issue_1 = __nccwpck_require__(8045);
  *
  * @param {boolean} tagLastCommitter If true, the user that last committed to this branch will be tagged
  *
- * @return {string} The time the comment was created
+ * @returns {string} The time the comment was created
  */
 function createIssueComment(issueNumber, branch, commitAge, lastCommitter, commentUpdates, daysBeforeDelete, staleBranchLabel, tagLastCommitter) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -360,7 +360,7 @@ const log_new_issue_1 = __nccwpck_require__(2344);
  *
  * @param {boolean} tagLastCommitter If true, the user that last committed to this branch will be tagged
  *
- * @return {number} The ID of the issue created
+ * @returns {number} The ID of the issue created
  */
 function createIssue(branch, commitAge, lastCommitter, daysBeforeDelete, staleBranchLabel, tagLastCommitter) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -459,7 +459,7 @@ const log_delete_branch_1 = __nccwpck_require__(4083);
  *
  * @param {string} name The name of a branch.
  *
- * @return {number} HTTP response code (ex: 204)
+ * @returns {number} HTTP response code (ex: 204)
  */
 function deleteBranch(name) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -540,7 +540,7 @@ const log_get_branches_1 = __nccwpck_require__(2611);
 /**
  * Retrieves all branches in a repository
  *
- * @return {BranchResponse} A subset of data on all branches in a repository
+ * @returns {BranchResponse} A subset of data on all branches in a repository @see {@link BranchResponse}
  */
 function getBranches() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -621,7 +621,7 @@ const get_time_1 = __nccwpck_require__(2643);
  *
  * @param {string} sha The SHA of the last commit
  *
- * @return {number} The age of the commit
+ * @returns {number} The age of the commit
  */
 function getRecentCommitAge(sha) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -704,7 +704,7 @@ const get_context_1 = __nccwpck_require__(7782);
  *
  * @param {string} sha The SHA of the last commit
  *
- * @return {string} The last committer's username
+ * @returns {string} The last committers username
  */
 function getRecentCommitLogin(sha) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -787,7 +787,7 @@ _a = github_1.context.repo, exports.owner = _a.owner, exports.repo = _a.repo;
 /**
  * Validates the Action's inputs and assigns them to the Inputs type
  *
- * @return {Inputs} Valid inputs
+ * @returns {Inputs} Valid inputs @see {@link Inputs}
  */
 function validateInputs() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -900,7 +900,7 @@ const get_context_1 = __nccwpck_require__(7782);
 /**
  * Retrieves the default branch for the repository
  *
- * @return {string} The default branch
+ * @returns {string} The default branch
  */
 function getDefaultBranch() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -979,7 +979,7 @@ const get_context_1 = __nccwpck_require__(7782);
  *
  * @param {string} staleBranchLabel The label to be used to identify issues related to this Action
  *
- * @return {IssueResponse} A subset of the issue data
+ * @returns {IssueResponse} A subset of the issue data @see {@link IssueResponse}
  */
 function getIssues(staleBranchLabel) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -1058,7 +1058,7 @@ const get_context_1 = __nccwpck_require__(7782);
 /**
  * Returns data on current rate limit usage for this repository
  *
- * @return {RateLimit} data related to current rate limit usage
+ * @returns {RateLimit} data related to current rate limit usage @see {@link RateLimit}
  */
 function getRateLimit() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -1143,7 +1143,7 @@ const log_max_issues_1 = __nccwpck_require__(5487);
  *
  * @param {string} staleBranchLabel The label to be used to identify issues related to this Action
  *
- * @return {string} The maximum amount of issues that can be created during a workflow run
+ * @returns {string} The maximum amount of issues that can be created during a workflow run
  */
 function getIssueBudget(maxIssues, staleBranchLabel) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -1525,7 +1525,7 @@ exports.createCommentString = void 0;
  *
  * @param {boolean} tagLastCommitter If true, the user that last committed to this branch will be tagged
  *
- * @return A string to use as a comment on a GitHub issue
+ * @returns A string to use as a comment on a GitHub issue
  */
 function createCommentString(branch, lastCommitter, commitAge, daysBeforeDelete, tagLastCommitter) {
     const daysUntilDelete = Math.max(0, daysBeforeDelete - commitAge);
@@ -1557,7 +1557,7 @@ exports.createIssueTitleString = void 0;
  *
  * @param {string} branchName The name of a branch.
  *
- * @return `[${branchName}] is STALE`
+ * @returns `[${branchName}] is STALE`
  */
 function createIssueTitleString(branchName) {
     return `[${branchName}] is STALE`;
@@ -1581,7 +1581,7 @@ exports.getMinutes = exports.getDays = void 0;
  *
  * @param {number} date2 Time value in milliseconds.
  *
- * @return {number} The number of days between two dates
+ * @returns {number} The number of days between two dates
  */
 function getDays(date1, date2) {
     const diffMs = Math.abs(date2 - date1);
