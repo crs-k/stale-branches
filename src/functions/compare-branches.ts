@@ -6,6 +6,15 @@ import {CompareBranchesEnum} from '../enums/input-compare-branches'
 import {getDefaultBranch} from './get-default-branch'
 import {logCompareBranches} from './logging/log-compare-branches'
 
+/**
+ * Compares HEAD branch to BASE branch
+ *
+ * @param {string} head The name of the head branch
+ *
+ * @param {string} inputCompareBranches The value from the compare-branches input
+ *
+ * @returns {BranchComparison} The status of the HEAD branch vs. BASE branch @see {@link BranchComparison}
+ */
 export async function compareBranches(head: string, inputCompareBranches: string): Promise<BranchComparison> {
   const branchComparison = {} as unknown as BranchComparison
   branchComparison.save = false

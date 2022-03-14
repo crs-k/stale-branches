@@ -3,6 +3,13 @@ import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
 import {IssueResponse} from '../types/issues'
 
+/**
+ * Retrieves GitHub issues with the `staleBranchLabel` label attached
+ *
+ * @param {string} staleBranchLabel The label to be used to identify issues related to this Action
+ *
+ * @returns {IssueResponse} A subset of the issue data @see {@link IssueResponse}
+ */
 export async function getIssues(staleBranchLabel: string): Promise<IssueResponse[]> {
   let issues: IssueResponse[]
 

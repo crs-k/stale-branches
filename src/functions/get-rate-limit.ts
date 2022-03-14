@@ -3,11 +3,16 @@ import * as core from '@actions/core'
 // eslint-disable-next-line import/named
 import {GetResponseTypeFromEndpointMethod} from '@octokit/types'
 import {RateLimit} from '../types/rate-limit'
-import {getMinutes} from '../utils/get-time'
+import {getMinutes} from './utils/get-time'
 import {github} from './get-context'
 
 type ListIssuesResponseDataType = GetResponseTypeFromEndpointMethod<typeof github.rest.rateLimit.get>
 
+/**
+ * Returns data on current rate limit usage for this repository
+ *
+ * @returns {RateLimit} data related to current rate limit usage @see {@link RateLimit}
+ */
 export async function getRateLimit(): Promise<RateLimit> {
   let rateLimit = {} as unknown as ListIssuesResponseDataType
   const rateLimitResponse = {} as unknown as RateLimit

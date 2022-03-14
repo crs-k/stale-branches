@@ -1,4 +1,4 @@
-import * as timeFuncs from '../../src/utils/get-time'
+import * as timeFuncs from '../../src/functions/utils/get-time'
 
 describe('Get Time Functions', () => {
   let startDate = new Date('2022-01-24T01:45:30.000Z').getTime()

@@ -61,6 +61,13 @@ const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
 const log_close_issue_1 = __nccwpck_require__(3730);
+/**
+ * Closes a GitHub issue
+ *
+ * @param {number} issueNumber GitHub issue number
+ *
+ * @returns {string} The state of an issue (i.e. closed)
+ */
 function closeIssue(issueNumber) {
     return __awaiter(this, void 0, void 0, function* () {
         let state;
@@ -137,6 +144,15 @@ const get_context_1 = __nccwpck_require__(7782);
 const input_compare_branches_1 = __nccwpck_require__(5269);
 const get_default_branch_1 = __nccwpck_require__(8662);
 const log_compare_branches_1 = __nccwpck_require__(5396);
+/**
+ * Compares HEAD branch to BASE branch
+ *
+ * @param {string} head The name of the head branch
+ *
+ * @param {string} inputCompareBranches The value from the compare-branches input
+ *
+ * @returns {BranchComparison} The status of the HEAD branch vs. BASE branch @see {@link BranchComparison}
+ */
 function compareBranches(head, inputCompareBranches) {
     return __awaiter(this, void 0, void 0, function* () {
         const branchComparison = {};
@@ -176,6 +192,111 @@ function compareBranches(head, inputCompareBranches) {
     });
 }
 exports.compareBranches = compareBranches;
+
+
+/***/ }),
+
+/***/ 6922:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createIssueComment = void 0;
+const assert = __importStar(__nccwpck_require__(9491));
+const core = __importStar(__nccwpck_require__(2186));
+const get_context_1 = __nccwpck_require__(7782);
+const create_comment_string_1 = __nccwpck_require__(9576);
+const log_update_issue_1 = __nccwpck_require__(8045);
+/**
+ * Creates comment on existing GitHub issue
+ *
+ * @param {number} issueNumber GitHub issue number
+ *
+ * @param {string} branch The branch currently being worked on
+ *
+ * @param {number} commitAge The age (in days) of the last commit to a branch
+ *
+ * @param {string} lastCommitter The username that last committed to the branch
+ *
+ * @param {boolean} commentUpdates If true, a comment will be made on the target issue
+ *
+ * @param {number} daysBeforeDelete The amount of days before a branch is to be deleted
+ *
+ * @param {string} staleBranchLabel The label to be used to identify issues related to this Action
+ *
+ * @param {boolean} tagLastCommitter If true, the user that last committed to this branch will be tagged
+ *
+ * @returns {string} The time the comment was created
+ */
+function createIssueComment(issueNumber, branch, commitAge, lastCommitter, commentUpdates, daysBeforeDelete, staleBranchLabel, tagLastCommitter) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let createdAt = '';
+        let commentUrl;
+        let bodyString;
+        if (commentUpdates === true) {
+            bodyString = (0, create_comment_string_1.createCommentString)(branch, lastCommitter, commitAge, daysBeforeDelete, tagLastCommitter);
+            try {
+                const issueResponse = yield get_context_1.github.rest.issues.createComment({
+                    owner: get_context_1.owner,
+                    repo: get_context_1.repo,
+                    issue_number: issueNumber,
+                    body: bodyString,
+                    labels: [
+                        {
+                            name: staleBranchLabel,
+                            color: 'B60205',
+                            description: 'Used by Stale Branches Action to label issues'
+                        }
+                    ]
+                });
+                createdAt = issueResponse.data.created_at;
+                commentUrl = issueResponse.data.html_url;
+                assert.ok(createdAt, 'Created At cannot be empty');
+                core.info((0, log_update_issue_1.logUpdateIssue)(issueNumber, createdAt, commentUrl));
+            }
+            catch (err) {
+                if (err instanceof Error)
+                    core.info(`No existing issue returned for issue number: ${issueNumber}. Error: ${err.message}`);
+                createdAt = '';
+            }
+        }
+        return createdAt;
+    });
+}
+exports.createIssueComment = createIssueComment;
 
 
 /***/ }),
@@ -222,14 +343,31 @@ exports.createIssue = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
-const create_issues_title_1 = __nccwpck_require__(4554);
+const create_issues_title_string_1 = __nccwpck_require__(7594);
 const log_new_issue_1 = __nccwpck_require__(2344);
+/**
+ * Creates a GitHub issue
+ *
+ * @param {string} branch The branch currently being worked on
+ *
+ * @param {number} commitAge The age (in days) of the last commit to a branch
+ *
+ * @param {string} lastCommitter The username that last committed to the branch
+ *
+ * @param {number} daysBeforeDelete The amount of days before a branch is to be deleted
+ *
+ * @param {string} staleBranchLabel The label to be used to identify issues related to this Action
+ *
+ * @param {boolean} tagLastCommitter If true, the user that last committed to this branch will be tagged
+ *
+ * @returns {number} The ID of the issue created
+ */
 function createIssue(branch, commitAge, lastCommitter, daysBeforeDelete, staleBranchLabel, tagLastCommitter) {
     return __awaiter(this, void 0, void 0, function* () {
         let issueId;
         let bodyString;
         const daysUntilDelete = Math.max(0, daysBeforeDelete - commitAge);
-        const issueTitleString = (0, create_issues_title_1.createIssueTitle)(branch);
+        const issueTitleString = (0, create_issues_title_string_1.createIssueTitleString)(branch);
         switch (tagLastCommitter) {
             case true:
                 bodyString = `@${lastCommitter}, \r \r ${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days.`;
@@ -316,6 +454,13 @@ const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
 const log_delete_branch_1 = __nccwpck_require__(4083);
+/**
+ * Deletes a branch in a repository
+ *
+ * @param {string} name The name of a branch.
+ *
+ * @returns {number} HTTP response code (ex: 204)
+ */
 function deleteBranch(name) {
     return __awaiter(this, void 0, void 0, function* () {
         let confirm;
@@ -392,6 +537,11 @@ const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
 const log_get_branches_1 = __nccwpck_require__(2611);
+/**
+ * Retrieves all branches in a repository
+ *
+ * @returns {BranchResponse} A subset of data on all branches in a repository @see {@link BranchResponse}
+ */
 function getBranches() {
     return __awaiter(this, void 0, void 0, function* () {
         let branches;
@@ -465,7 +615,14 @@ exports.getRecentCommitAge = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
-const get_time_1 = __nccwpck_require__(2249);
+const get_time_1 = __nccwpck_require__(2643);
+/**
+ * Calcualtes the age of a commit in days
+ *
+ * @param {string} sha The SHA of the last commit
+ *
+ * @returns {number} The age of the commit
+ */
 function getRecentCommitAge(sha) {
     return __awaiter(this, void 0, void 0, function* () {
         let commitDate;
@@ -542,6 +699,13 @@ exports.getRecentCommitLogin = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
+/**
+ * Retrieves last committer's username
+ *
+ * @param {string} sha The SHA of the last commit
+ *
+ * @returns {string} The last committers username
+ */
 function getRecentCommitLogin(sha) {
     return __awaiter(this, void 0, void 0, function* () {
         let lastCommitter;
@@ -620,6 +784,11 @@ const repoToken = core.getInput('repo-token');
 core.setSecret(repoToken);
 exports.github = (0, github_1.getOctokit)(repoToken);
 _a = github_1.context.repo, exports.owner = _a.owner, exports.repo = _a.repo;
+/**
+ * Validates the Action's inputs and assigns them to the Inputs type
+ *
+ * @returns {Inputs} Valid inputs @see {@link Inputs}
+ */
 function validateInputs() {
     return __awaiter(this, void 0, void 0, function* () {
         const result = {};
@@ -728,6 +897,11 @@ exports.getDefaultBranch = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
+/**
+ * Retrieves the default branch for the repository
+ *
+ * @returns {string} The default branch
+ */
 function getDefaultBranch() {
     return __awaiter(this, void 0, void 0, function* () {
         let result;
@@ -800,6 +974,13 @@ exports.getIssues = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
+/**
+ * Retrieves GitHub issues with the `staleBranchLabel` label attached
+ *
+ * @param {string} staleBranchLabel The label to be used to identify issues related to this Action
+ *
+ * @returns {IssueResponse} A subset of the issue data @see {@link IssueResponse}
+ */
 function getIssues(staleBranchLabel) {
     return __awaiter(this, void 0, void 0, function* () {
         let issues;
@@ -872,8 +1053,13 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getRateLimit = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
-const get_time_1 = __nccwpck_require__(2249);
+const get_time_1 = __nccwpck_require__(2643);
 const get_context_1 = __nccwpck_require__(7782);
+/**
+ * Returns data on current rate limit usage for this repository
+ *
+ * @returns {RateLimit} data related to current rate limit usage @see {@link RateLimit}
+ */
 function getRateLimit() {
     return __awaiter(this, void 0, void 0, function* () {
         let rateLimit = {};
@@ -950,6 +1136,15 @@ const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
 const log_max_issues_1 = __nccwpck_require__(5487);
+/**
+ * Calculates the amount of issues that can be created during this workflow run
+ *
+ * @param {number} maxIssues The total number of issues that can exist for this action
+ *
+ * @param {string} staleBranchLabel The label to be used to identify issues related to this Action
+ *
+ * @returns {string} The maximum amount of issues that can be created during a workflow run
+ */
 function getIssueBudget(maxIssues, staleBranchLabel) {
     return __awaiter(this, void 0, void 0, function* () {
         let issues;
@@ -1198,10 +1393,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.logNewIssue = void 0;
-const create_issues_title_1 = __nccwpck_require__(4554);
+const create_issues_title_string_1 = __nccwpck_require__(7594);
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logNewIssue(branchName) {
-    const issueTitleString = (0, create_issues_title_1.createIssueTitle)(branchName);
+    const issueTitleString = (0, create_issues_title_string_1.createIssueTitleString)(branchName);
     const newIssue = `${ansi_styles_1.default.bold.open}New issue created:${ansi_styles_1.default.bold.close} ${ansi_styles_1.default.magentaBright.open}${issueTitleString}${ansi_styles_1.default.magentaBright.close}.`;
     return newIssue;
 }
@@ -1310,86 +1505,120 @@ exports.logUpdateIssue = logUpdateIssue;
 
 /***/ }),
 
-/***/ 2914:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+/***/ 9576:
+/***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
 
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.updateIssue = void 0;
-const assert = __importStar(__nccwpck_require__(9491));
-const core = __importStar(__nccwpck_require__(2186));
-const get_context_1 = __nccwpck_require__(7782);
-const create_issues_comment_1 = __nccwpck_require__(9670);
-const log_update_issue_1 = __nccwpck_require__(8045);
-function updateIssue(issueNumber, branch, commitAge, lastCommitter, commentUpdates, daysBeforeDelete, staleBranchLabel, tagLastCommitter) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let createdAt = '';
-        let commentUrl;
-        let bodyString;
-        if (commentUpdates === true) {
-            bodyString = (0, create_issues_comment_1.createIssueComment)(branch, lastCommitter, commitAge, daysBeforeDelete, commentUpdates, tagLastCommitter);
-            try {
-                const issueResponse = yield get_context_1.github.rest.issues.createComment({
-                    owner: get_context_1.owner,
-                    repo: get_context_1.repo,
-                    issue_number: issueNumber,
-                    body: bodyString,
-                    labels: [
-                        {
-                            name: staleBranchLabel,
-                            color: 'B60205',
-                            description: 'Used by Stale Branches Action to label issues'
-                        }
-                    ]
-                });
-                createdAt = issueResponse.data.created_at;
-                commentUrl = issueResponse.data.html_url;
-                assert.ok(createdAt, 'Created At cannot be empty');
-                core.info((0, log_update_issue_1.logUpdateIssue)(issueNumber, createdAt, commentUrl));
-            }
-            catch (err) {
-                if (err instanceof Error)
-                    core.info(`No existing issue returned for issue number: ${issueNumber}. Error: ${err.message}`);
-                createdAt = '';
-            }
-        }
-        return createdAt;
-    });
+exports.createCommentString = void 0;
+/**
+ * Creates comment string string for GitHub issues
+ *
+ * @param {string} branch The name of a branch.
+ *
+ * @param {string} lastCommitter The username that last committed to the branch
+ *
+ * @param {number} commitAge The age (in days) of the last commit to a branch
+ *
+ * @param {number} daysBeforeDelete The amount of days before a branch is to be deleted
+ *
+ * @param {boolean} tagLastCommitter If true, the user that last committed to this branch will be tagged
+ *
+ * @returns A string to use as a comment on a GitHub issue
+ */
+function createCommentString(branch, lastCommitter, commitAge, daysBeforeDelete, tagLastCommitter) {
+    const daysUntilDelete = Math.max(0, daysBeforeDelete - commitAge);
+    let bodyString;
+    switch (tagLastCommitter) {
+        case true:
+            bodyString = `@${lastCommitter}, \r \r ${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \r \r This issue was last updated on ${new Date().toString()}`;
+            break;
+        case false:
+            bodyString = `${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \r \r This issue was last updated on ${new Date().toString()}`;
+            break;
+    }
+    return bodyString;
 }
-exports.updateIssue = updateIssue;
+exports.createCommentString = createCommentString;
+
+
+/***/ }),
+
+/***/ 7594:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.createIssueTitleString = void 0;
+/**
+ * Creates title string for GitHub issues
+ *
+ * @param {string} branchName The name of a branch.
+ *
+ * @returns `[${branchName}] is STALE`
+ */
+function createIssueTitleString(branchName) {
+    return `[${branchName}] is STALE`;
+}
+exports.createIssueTitleString = createIssueTitleString;
+
+
+/***/ }),
+
+/***/ 2643:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getMinutes = exports.getDays = void 0;
+/**
+ * Calcualtes the number of days between two dates
+ *
+ * @param {number} date1 Time value in milliseconds.
+ *
+ * @param {number} date2 Time value in milliseconds.
+ *
+ * @returns {number} The number of days between two dates
+ */
+function getDays(date1, date2) {
+    const diffMs = Math.abs(date2 - date1);
+    const days = Math.round(diffMs / (1000 * 60 * 60 * 24));
+    return days;
+}
+exports.getDays = getDays;
+/**
+ * Calcualtes the number of minutes between two dates
+ *
+ * @param {number} date1 Time value in milliseconds.
+ *
+ * @param {number} date2 Time value in milliseconds.
+ *
+ * @return {number} The number of minutes between two dates
+ */
+function getMinutes(date1, date2) {
+    const diffMs = Math.abs(date2 - date1);
+    const minutes = Math.round(diffMs / (1000 * 60));
+    return minutes;
+}
+exports.getMinutes = getMinutes;
+/* USED FOR TESTING
+export function getHours(date1, date2): number {
+  const diffMs = Math.abs(date2 - date1)
+  const hours = Math.round(diffMs / (1000 * 60 * 60))
+  return hours
+}
+
+
+
+export function getnSeconds(date1, date2): number {
+  const diffMs = Math.abs(date2 - date1)
+  const seconds = Math.round(diffMs / 1000)
+  return seconds
+}
+ */
 
 
 /***/ }),
@@ -1437,7 +1666,8 @@ const core = __importStar(__nccwpck_require__(2186));
 const close_issue_1 = __nccwpck_require__(4094);
 const compare_branches_1 = __nccwpck_require__(5466);
 const create_issue_1 = __nccwpck_require__(9810);
-const create_issues_title_1 = __nccwpck_require__(4554);
+const create_issue_comment_1 = __nccwpck_require__(6922);
+const create_issues_title_string_1 = __nccwpck_require__(7594);
 const delete_branch_1 = __nccwpck_require__(5294);
 const get_branches_1 = __nccwpck_require__(6204);
 const get_stale_issue_budget_1 = __nccwpck_require__(7705);
@@ -1453,7 +1683,6 @@ const log_orphaned_issues_1 = __nccwpck_require__(9964);
 const log_rate_limit_break_1 = __nccwpck_require__(8956);
 const log_total_assessed_1 = __nccwpck_require__(2673);
 const log_total_deleted_1 = __nccwpck_require__(4888);
-const update_issue_1 = __nccwpck_require__(2914);
 const get_context_1 = __nccwpck_require__(7782);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -1483,7 +1712,7 @@ function run() {
                 }
                 //Get age of last commit, generate issue title, and filter existing issues to current branch
                 const commitAge = yield (0, get_commit_age_1.getRecentCommitAge)(branchToCheck.commmitSha);
-                const issueTitleString = (0, create_issues_title_1.createIssueTitle)(branchToCheck.branchName);
+                const issueTitleString = (0, create_issues_title_string_1.createIssueTitleString)(branchToCheck.branchName);
                 const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === issueTitleString);
                 // Skip looking for last commit's login if input is set to false
                 if (validInputs.tagLastCommitter === true) {
@@ -1519,7 +1748,7 @@ function run() {
                 if (commitAge > validInputs.daysBeforeStale) {
                     for (const issueToUpdate of filteredIssue) {
                         if (issueToUpdate.issueTitle === issueTitleString) {
-                            yield (0, update_issue_1.updateIssue)(issueToUpdate.issueNumber, branchToCheck.branchName, commitAge, lastCommitLogin, validInputs.commentUpdates, validInputs.daysBeforeDelete, validInputs.staleBranchLabel, validInputs.tagLastCommitter);
+                            yield (0, create_issue_comment_1.createIssueComment)(issueToUpdate.issueNumber, branchToCheck.branchName, commitAge, lastCommitLogin, validInputs.commentUpdates, validInputs.daysBeforeDelete, validInputs.staleBranchLabel, validInputs.tagLastCommitter);
                             if (!outputStales.includes(branchToCheck.branchName)) {
                                 outputStales.push(branchToCheck.branchName);
                             }
@@ -1570,84 +1799,6 @@ function run() {
     });
 }
 exports.run = run;
-
-
-/***/ }),
-
-/***/ 9670:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createIssueComment = void 0;
-function createIssueComment(branch, lastCommitter, commitAge, daysBeforeDelete, commentUpdates, tagLastCommitter) {
-    const daysUntilDelete = Math.max(0, daysBeforeDelete - commitAge);
-    let bodyString;
-    switch (tagLastCommitter) {
-        case true:
-            bodyString = `@${lastCommitter}, \r \r ${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \r \r This issue was last updated on ${new Date().toString()}`;
-            break;
-        case false:
-            bodyString = `${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \r \r This issue was last updated on ${new Date().toString()}`;
-            break;
-    }
-    return bodyString;
-}
-exports.createIssueComment = createIssueComment;
-
-
-/***/ }),
-
-/***/ 4554:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createIssueTitle = void 0;
-function createIssueTitle(branchName) {
-    return `[${branchName}] is STALE`;
-}
-exports.createIssueTitle = createIssueTitle;
-
-
-/***/ }),
-
-/***/ 2249:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getMinutes = exports.getDays = void 0;
-function getDays(date1, date2) {
-    const diffMs = Math.abs(date2 - date1);
-    const days = Math.round(diffMs / (1000 * 60 * 60 * 24));
-    return days;
-}
-exports.getDays = getDays;
-function getMinutes(date1, date2) {
-    const diffMs = Math.abs(date2 - date1);
-    const minutes = Math.round(diffMs / (1000 * 60));
-    return minutes;
-}
-exports.getMinutes = getMinutes;
-/* USED FOR TESTING
-export function getHours(date1, date2): number {
-  const diffMs = Math.abs(date2 - date1)
-  const hours = Math.round(diffMs / (1000 * 60 * 60))
-  return hours
-}
-
-
-
-export function getnSeconds(date1, date2): number {
-  const diffMs = Math.abs(date2 - date1)
-  const seconds = Math.round(diffMs / 1000)
-  return seconds
-}
- */
 
 
 /***/ }),

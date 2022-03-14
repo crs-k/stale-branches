@@ -3,6 +3,13 @@ import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
 import {logCloseIssue} from './logging/log-close-issue'
 
+/**
+ * Closes a GitHub issue
+ *
+ * @param {number} issueNumber GitHub issue number
+ *
+ * @returns {string} The state of an issue (i.e. closed)
+ */
 export async function closeIssue(issueNumber: number): Promise<string> {
   let state: string
 

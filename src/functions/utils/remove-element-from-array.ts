@@ -1,5 +1,12 @@
 import * as core from '@actions/core'
 
+/**
+ * Removes an element from a string array
+ *
+ * @param {string[]} stringArray The array to assess
+ *
+ * @param {string} element The element to remove
+ */
 export function removeElementFromStringArray(stringArray: string[], element: string): void {
   try {
     let index = 0
