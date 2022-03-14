@@ -149,7 +149,7 @@ const log_compare_branches_1 = __nccwpck_require__(5396);
  *
  * @param {string} head The name of the head branch
  *
- * @param {string} inputCompareBranches The value from the compare-branches input @see {@link https://github.com/crs-k/stale-branches#inputs}
+ * @param {string} inputCompareBranches The value from the compare-branches input
  *
  * @returns {BranchComparison} The status of the HEAD branch vs. BASE branch @see {@link BranchComparison}
  */
