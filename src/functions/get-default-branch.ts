@@ -2,6 +2,11 @@ import * as assert from 'assert'
 import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
 
+/**
+ * Retrieves the default branch for the repository
+ *
+ * @return {string} The default branch
+ */
 export async function getDefaultBranch(): Promise<string> {
   let result: string
   try {

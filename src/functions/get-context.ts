@@ -8,6 +8,11 @@ core.setSecret(repoToken)
 export const github = getOctokit(repoToken)
 export const {owner: owner, repo: repo} = context.repo
 
+/**
+ * Validates the Action's inputs and assigns them to the Inputs type
+ *
+ * @return {Inputs} Valid inputs
+ */
 export async function validateInputs(): Promise<Inputs> {
   const result = {} as unknown as Inputs
   try {

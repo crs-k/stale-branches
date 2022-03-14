@@ -8,6 +8,11 @@ import {github} from './get-context'
 
 type ListIssuesResponseDataType = GetResponseTypeFromEndpointMethod<typeof github.rest.rateLimit.get>
 
+/**
+ * Returns data on current rate limit usage for this repository
+ *
+ * @return {RateLimit} data related to current rate limit usage
+ */
 export async function getRateLimit(): Promise<RateLimit> {
   let rateLimit = {} as unknown as ListIssuesResponseDataType
   const rateLimitResponse = {} as unknown as RateLimit

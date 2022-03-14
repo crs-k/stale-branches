@@ -5,7 +5,6 @@ import {createCommentString} from './utils/create-comment-string'
 import {logUpdateIssue} from './logging/log-update-issue'
 
 /**
- * @description
  * Creates comment on existing GitHub issue
  *
  * @param {number} issueNumber GitHub issue number
@@ -16,13 +15,15 @@ import {logUpdateIssue} from './logging/log-update-issue'
  *
  * @param {string} lastCommitter The username that last committed to the branch
  *
+ * @param {boolean} commentUpdates If true, a comment will be made on the target issue
+ *
  * @param {number} daysBeforeDelete The amount of days before a branch is to be deleted
  *
  * @param {string} staleBranchLabel The label to be used to identify issues related to this Action
  *
  * @param {boolean} tagLastCommitter If true, the user that last committed to this branch will be tagged
  *
- * @return {string} `createdAt` - The time the comment was created
+ * @return {string} The time the comment was created
  */
 export async function createIssueComment(
   issueNumber: number,
@@ -39,7 +40,7 @@ export async function createIssueComment(
   let bodyString: string
 
   if (commentUpdates === true) {
-    bodyString = createCommentString(branch, lastCommitter, commitAge, daysBeforeDelete, commentUpdates, tagLastCommitter)
+    bodyString = createCommentString(branch, lastCommitter, commitAge, daysBeforeDelete, tagLastCommitter)
 
     try {
       const issueResponse = await github.rest.issues.createComment({

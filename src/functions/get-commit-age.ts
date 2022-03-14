@@ -3,6 +3,13 @@ import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
 import {getDays} from './utils/get-time'
 
+/**
+ * Calcualtes the age of a commit in days
+ *
+ * @param {string} sha The SHA of the last commit
+ *
+ * @return {number} The age of the commit
+ */
 export async function getRecentCommitAge(sha: string): Promise<number> {
   let commitDate: string | undefined
   const currentDate = new Date().getTime()

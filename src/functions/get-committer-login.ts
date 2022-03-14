@@ -2,6 +2,13 @@ import * as assert from 'assert'
 import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
 
+/**
+ * Retrieves last committer's username
+ *
+ * @param {string} sha The SHA of the last commit
+ *
+ * @return {string} The last committer's username
+ */
 export async function getRecentCommitLogin(sha: string): Promise<string> {
   let lastCommitter: string | undefined
   try {

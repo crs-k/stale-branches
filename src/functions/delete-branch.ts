@@ -3,6 +3,13 @@ import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
 import {logDeleteBranch} from './logging/log-delete-branch'
 
+/**
+ * Deletes a branch in a repository
+ *
+ * @param {string} name The name of a branch.
+ *
+ * @return {number} HTTP response code (ex: 204)
+ */
 export async function deleteBranch(name: string): Promise<number> {
   let confirm: number
   const refAppend = 'heads/'
