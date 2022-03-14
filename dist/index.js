@@ -61,6 +61,13 @@ const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
 const log_close_issue_1 = __nccwpck_require__(3730);
+/**
+ * Closes a GitHub issue
+ *
+ * @param {number} issueNumber GitHub issue number
+ *
+ * @return {string} The state of an issue (i.e. closed)
+ */
 function closeIssue(issueNumber) {
     return __awaiter(this, void 0, void 0, function* () {
         let state;
@@ -137,6 +144,15 @@ const get_context_1 = __nccwpck_require__(7782);
 const input_compare_branches_1 = __nccwpck_require__(5269);
 const get_default_branch_1 = __nccwpck_require__(8662);
 const log_compare_branches_1 = __nccwpck_require__(5396);
+/**
+ * Compares HEAD branch to BASE branch
+ *
+ * @param {string} head The name of the head branch
+ *
+ * @param {string} inputCompareBranches The value from the compare-branches input @see {@link https://github.com/crs-k/stale-branches#inputs}
+ *
+ * @return {BranchComparison} The status of the HEAD branch vs. BASE branch @see {@link BranchComparison}
+ */
 function compareBranches(head, inputCompareBranches) {
     return __awaiter(this, void 0, void 0, function* () {
         const branchComparison = {};
@@ -225,7 +241,6 @@ const get_context_1 = __nccwpck_require__(7782);
 const create_comment_string_1 = __nccwpck_require__(9576);
 const log_update_issue_1 = __nccwpck_require__(8045);
 /**
- * @description
  * Creates comment on existing GitHub issue
  *
  * @param {number} issueNumber GitHub issue number
@@ -236,13 +251,15 @@ const log_update_issue_1 = __nccwpck_require__(8045);
  *
  * @param {string} lastCommitter The username that last committed to the branch
  *
+ * @param {boolean} commentUpdates If true, a comment will be made on the target issue
+ *
  * @param {number} daysBeforeDelete The amount of days before a branch is to be deleted
  *
  * @param {string} staleBranchLabel The label to be used to identify issues related to this Action
  *
  * @param {boolean} tagLastCommitter If true, the user that last committed to this branch will be tagged
  *
- * @return {string} `createdAt` - The time the comment was created
+ * @return {string} The time the comment was created
  */
 function createIssueComment(issueNumber, branch, commitAge, lastCommitter, commentUpdates, daysBeforeDelete, staleBranchLabel, tagLastCommitter) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -250,7 +267,7 @@ function createIssueComment(issueNumber, branch, commitAge, lastCommitter, comme
         let commentUrl;
         let bodyString;
         if (commentUpdates === true) {
-            bodyString = (0, create_comment_string_1.createCommentString)(branch, lastCommitter, commitAge, daysBeforeDelete, commentUpdates, tagLastCommitter);
+            bodyString = (0, create_comment_string_1.createCommentString)(branch, lastCommitter, commitAge, daysBeforeDelete, tagLastCommitter);
             try {
                 const issueResponse = yield get_context_1.github.rest.issues.createComment({
                     owner: get_context_1.owner,
@@ -328,6 +345,23 @@ const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
 const create_issues_title_string_1 = __nccwpck_require__(7594);
 const log_new_issue_1 = __nccwpck_require__(2344);
+/**
+ * Creates a GitHub issue
+ *
+ * @param {string} branch The branch currently being worked on
+ *
+ * @param {number} commitAge The age (in days) of the last commit to a branch
+ *
+ * @param {string} lastCommitter The username that last committed to the branch
+ *
+ * @param {number} daysBeforeDelete The amount of days before a branch is to be deleted
+ *
+ * @param {string} staleBranchLabel The label to be used to identify issues related to this Action
+ *
+ * @param {boolean} tagLastCommitter If true, the user that last committed to this branch will be tagged
+ *
+ * @return {number} The ID of the issue created
+ */
 function createIssue(branch, commitAge, lastCommitter, daysBeforeDelete, staleBranchLabel, tagLastCommitter) {
     return __awaiter(this, void 0, void 0, function* () {
         let issueId;
@@ -420,6 +454,13 @@ const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
 const log_delete_branch_1 = __nccwpck_require__(4083);
+/**
+ * Deletes a branch in a repository
+ *
+ * @param {string} name The name of a branch.
+ *
+ * @return {number} HTTP response code (ex: 204)
+ */
 function deleteBranch(name) {
     return __awaiter(this, void 0, void 0, function* () {
         let confirm;
@@ -496,6 +537,11 @@ const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
 const log_get_branches_1 = __nccwpck_require__(2611);
+/**
+ * Retrieves all branches in a repository
+ *
+ * @return {BranchResponse} A subset of data on all branches in a repository
+ */
 function getBranches() {
     return __awaiter(this, void 0, void 0, function* () {
         let branches;
@@ -570,6 +616,13 @@ const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
 const get_time_1 = __nccwpck_require__(2643);
+/**
+ * Calcualtes the age of a commit in days
+ *
+ * @param {string} sha The SHA of the last commit
+ *
+ * @return {number} The age of the commit
+ */
 function getRecentCommitAge(sha) {
     return __awaiter(this, void 0, void 0, function* () {
         let commitDate;
@@ -646,6 +699,13 @@ exports.getRecentCommitLogin = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
+/**
+ * Retrieves last committer's username
+ *
+ * @param {string} sha The SHA of the last commit
+ *
+ * @return {string} The last committer's username
+ */
 function getRecentCommitLogin(sha) {
     return __awaiter(this, void 0, void 0, function* () {
         let lastCommitter;
@@ -724,6 +784,11 @@ const repoToken = core.getInput('repo-token');
 core.setSecret(repoToken);
 exports.github = (0, github_1.getOctokit)(repoToken);
 _a = github_1.context.repo, exports.owner = _a.owner, exports.repo = _a.repo;
+/**
+ * Validates the Action's inputs and assigns them to the Inputs type
+ *
+ * @return {Inputs} Valid inputs
+ */
 function validateInputs() {
     return __awaiter(this, void 0, void 0, function* () {
         const result = {};
@@ -832,6 +897,11 @@ exports.getDefaultBranch = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
+/**
+ * Retrieves the default branch for the repository
+ *
+ * @return {string} The default branch
+ */
 function getDefaultBranch() {
     return __awaiter(this, void 0, void 0, function* () {
         let result;
@@ -904,6 +974,13 @@ exports.getIssues = void 0;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
+/**
+ * Retrieves GitHub issues with the `staleBranchLabel` label attached
+ *
+ * @param {string} staleBranchLabel The label to be used to identify issues related to this Action
+ *
+ * @return {IssueResponse} A subset of the issue data
+ */
 function getIssues(staleBranchLabel) {
     return __awaiter(this, void 0, void 0, function* () {
         let issues;
@@ -978,6 +1055,11 @@ const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_time_1 = __nccwpck_require__(2643);
 const get_context_1 = __nccwpck_require__(7782);
+/**
+ * Returns data on current rate limit usage for this repository
+ *
+ * @return {RateLimit} data related to current rate limit usage
+ */
 function getRateLimit() {
     return __awaiter(this, void 0, void 0, function* () {
         let rateLimit = {};
@@ -1054,6 +1136,15 @@ const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
 const log_max_issues_1 = __nccwpck_require__(5487);
+/**
+ * Calculates the amount of issues that can be created during this workflow run
+ *
+ * @param {number} maxIssues The total number of issues that can exist for this action
+ *
+ * @param {string} staleBranchLabel The label to be used to identify issues related to this Action
+ *
+ * @return {string} The maximum amount of issues that can be created during a workflow run
+ */
 function getIssueBudget(maxIssues, staleBranchLabel) {
     return __awaiter(this, void 0, void 0, function* () {
         let issues;
@@ -1421,7 +1512,22 @@ exports.logUpdateIssue = logUpdateIssue;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createCommentString = void 0;
-function createCommentString(branch, lastCommitter, commitAge, daysBeforeDelete, commentUpdates, tagLastCommitter) {
+/**
+ * Creates comment string string for GitHub issues
+ *
+ * @param {string} branch The name of a branch.
+ *
+ * @param {string} lastCommitter The username that last committed to the branch
+ *
+ * @param {number} commitAge The age (in days) of the last commit to a branch
+ *
+ * @param {number} daysBeforeDelete The amount of days before a branch is to be deleted
+ *
+ * @param {boolean} tagLastCommitter If true, the user that last committed to this branch will be tagged
+ *
+ * @return A string to use as a comment on a GitHub issue
+ */
+function createCommentString(branch, lastCommitter, commitAge, daysBeforeDelete, tagLastCommitter) {
     const daysUntilDelete = Math.max(0, daysBeforeDelete - commitAge);
     let bodyString;
     switch (tagLastCommitter) {
@@ -1446,6 +1552,13 @@ exports.createCommentString = createCommentString;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createIssueTitleString = void 0;
+/**
+ * Creates title string for GitHub issues
+ *
+ * @param {string} branchName The name of a branch.
+ *
+ * @return `[${branchName}] is STALE`
+ */
 function createIssueTitleString(branchName) {
     return `[${branchName}] is STALE`;
 }
@@ -1461,12 +1574,30 @@ exports.createIssueTitleString = createIssueTitleString;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getMinutes = exports.getDays = void 0;
+/**
+ * Calcualtes the number of days between two dates
+ *
+ * @param {number} date1 Time value in milliseconds.
+ *
+ * @param {number} date2 Time value in milliseconds.
+ *
+ * @return {number} The number of days between two dates
+ */
 function getDays(date1, date2) {
     const diffMs = Math.abs(date2 - date1);
     const days = Math.round(diffMs / (1000 * 60 * 60 * 24));
     return days;
 }
 exports.getDays = getDays;
+/**
+ * Calcualtes the number of minutes between two dates
+ *
+ * @param {number} date1 Time value in milliseconds.
+ *
+ * @param {number} date2 Time value in milliseconds.
+ *
+ * @return {number} The number of minutes between two dates
+ */
 function getMinutes(date1, date2) {
     const diffMs = Math.abs(date2 - date1);
     const minutes = Math.round(diffMs / (1000 * 60));
