@@ -45,7 +45,7 @@
     "ansi-styles": "5.2.0",
     "eslint": "8.17.0",
     "eslint-plugin-github": "4.3.6",
-    "eslint-plugin-jest": "26.4.6",
+    "eslint-plugin-jest": "26.5.3",
     "js-yaml": "4.1.0",
     "npm-package-json-lint": "6.3.0",
     "prettier": "2.6.2",
