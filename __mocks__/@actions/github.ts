@@ -542,10 +542,7 @@ let branches: ListBranchesResponseDataType = {
       },
       protected: true,
       protection: {
-        required_status_checks: {
-          enforcement_level: 'non_admins',
-          contexts: ['ci-test', 'linter']
-        }
+
       },
       protection_url: 'https://api.github.com/repos/octocat/hello-world/branches/master/protection'
     }
