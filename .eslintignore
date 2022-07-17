@@ -3,3 +3,4 @@ lib/
 node_modules/
 src/functions/__mocks__
 jest.config.js
+__mocks__/
