@@ -39,11 +39,11 @@
   },
   "devDependencies": {
     "@types/jest": "28.1.6",
-    "@types/node": "18.7.2",
+    "@types/node": "18.7.5",
     "@typescript-eslint/parser": "5.33.0",
     "@vercel/ncc": "0.34.0",
     "ansi-styles": "5.2.0",
-    "eslint": "8.21.0",
+    "eslint": "8.22.0",
     "eslint-plugin-github": "4.3.7",
     "eslint-plugin-jest": "26.8.3",
     "js-yaml": "4.1.0",
