@@ -25,3 +25,4 @@ jobs:
         days-before-delete: 180
         max-issues: 20
         stale-branch-label: 'stale branch 🗑️'
+        extra-protected-branches: 'branch1'
