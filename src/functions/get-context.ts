@@ -65,6 +65,9 @@ export async function validateInputs(): Promise<Inputs> {
       throw new Error(`compare-branches input of '${inputCompareBranches}' is not valid.`)
     }
 
+    // Validate extra-protected-branches
+    const extraProtectedBranches = core.getInput('extra-protected-branches').split(',')
+
     //Assign inputs
     result.daysBeforeStale = inputDaysBeforeStale
     result.daysBeforeDelete = inputDaysBeforeDelete
@@ -73,6 +76,7 @@ export async function validateInputs(): Promise<Inputs> {
     result.tagLastCommitter = inputTagLastCommitter
     result.staleBranchLabel = inputStaleBranchLabel
     result.compareBranches = inputCompareBranches
+    result.extraProtectedBranches = extraProtectedBranches
   } catch (err: unknown) {
     if (err instanceof Error) {
       core.setFailed(`Failed to validate inputs. Error: ${err.message}`)

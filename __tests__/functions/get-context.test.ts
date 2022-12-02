@@ -133,7 +133,7 @@ describe('Get Context Function', () => {
       .mockReturnValueOnce('save') // compare-branches
     await validateInputs()
 
-    expect(core.getInput).toHaveBeenCalledTimes(5)
+    expect(core.getInput).toHaveBeenCalledTimes(6)
     expect(core.getBooleanInput).toHaveBeenCalledTimes(2)
   })
 

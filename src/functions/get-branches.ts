@@ -9,7 +9,7 @@ import {logGetBranches} from './logging/log-get-branches'
  *
  * @returns {BranchResponse} A subset of data on all branches in a repository @see {@link BranchResponse}
  */
-export async function getBranches(): Promise<BranchResponse[]> {
+export async function getBranches(extraProtectedBranches: string[]): Promise<BranchResponse[]> {
   let branches: BranchResponse[]
   try {
     const branchResponse = await github.paginate(
@@ -22,7 +22,11 @@ export async function getBranches(): Promise<BranchResponse[]> {
       },
       response => response.data.map(branch => ({branchName: branch.name, commmitSha: branch.commit.sha} as BranchResponse))
     )
-    branches = branchResponse
+    if (extraProtectedBranches.length > 0) {
+      branches = branchResponse.filter(branch => !extraProtectedBranches.includes(branch.branchName))
+    } else {
+      branches = branchResponse
+    }
 
     assert.ok(branches, 'Response cannot be empty.')
     core.info(logGetBranches(branches.length))

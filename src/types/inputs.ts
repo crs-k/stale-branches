@@ -1,4 +1,5 @@
 export interface Inputs {
+  extraProtectedBranches: string[]
   /**
    * Number of days a branch has been inactive before it is considered stale.
    *

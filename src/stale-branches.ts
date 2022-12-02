@@ -33,7 +33,7 @@ export async function run(): Promise<void> {
       throw new Error('Invalid inputs')
     }
     //Collect Branches, Issue Budget, Existing Issues, & initialize lastCommitLogin
-    const branches = await getBranches()
+    const branches = await getBranches(validInputs.extraProtectedBranches)
     const outputTotal = branches.length
     let existingIssue = await getIssues(validInputs.staleBranchLabel)
     let issueBudgetRemaining = await getIssueBudget(validInputs.maxIssues, validInputs.staleBranchLabel)
