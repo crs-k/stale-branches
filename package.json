@@ -33,7 +33,7 @@
     "@actions/core": "1.10.0",
     "@actions/github": "5.1.1",
     "@octokit/plugin-paginate-rest": "5.0.1",
-    "@octokit/types": "7.5.1",
+    "@octokit/types": "8.1.1",
     "@types/semver": "7.3.13",
     "assert": "2.0.0"
   },
