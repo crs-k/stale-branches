@@ -34,7 +34,7 @@
     "@actions/github": "5.1.1",
     "@octokit/plugin-paginate-rest": "6.0.0",
     "@octokit/types": "9.2.1",
-    "@types/semver": "7.3.13",
+    "@types/semver": "7.5.0",
     "assert": "2.0.0"
   },
   "devDependencies": {
