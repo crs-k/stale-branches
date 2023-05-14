@@ -20,7 +20,7 @@ import {logRateLimitBreak} from './functions/logging/log-rate-limit-break'
 import {logTotalAssessed} from './functions/logging/log-total-assessed'
 import {logTotalDeleted} from './functions/logging/log-total-deleted'
 import {validateInputs} from './functions/get-context'
-import { filterBranches } from './functions/filter-branches'
+import {filterBranches} from './functions/filter-branches'
 
 export async function run(): Promise<void> {
   //Declare output arrays
