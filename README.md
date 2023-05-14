@@ -106,7 +106,7 @@ jobs:
         tag-committer: false
         stale-branch-label: 'stale branch 🗑️'
         compare-branches: 'info'
-        branches-filter-regex: '^((?!dependabot/).)*$'
+        branches-filter-regex: '^((?!dependabot))'
         
 
 ```
