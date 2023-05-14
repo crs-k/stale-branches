@@ -1,6 +1,3 @@
-jest.mock('@actions/core')
-jest.mock('@actions/github')
-
 import {filterBranches} from '../../src/functions/filter-branches'
 
 describe('Filter Branches Function', () => {
