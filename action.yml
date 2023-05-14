@@ -34,6 +34,10 @@ inputs:
     description: 'Compares current branch with default branch. Options: off | info | save'
     required: false
     default: 'off'
+  branches-filter-regex:
+    description: 'An optional Regex that will be used to filter branches from this action.'
+    required: false
+    default: ''
 outputs:
   deleted-branches:
     description: 'List of all deleted branches.'
