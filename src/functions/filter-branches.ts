@@ -10,11 +10,11 @@ import {logFilterBranches} from './logging/log-filter-branches'
  * @returns {BranchResponse[]} A filtered list of branches that do not meet the passed in RegEx @see {@link BranchResponse}
  */
 export async function filterBranches(branches, ignoreBranchesRegex): Promise<BranchResponse[]> {
-    if (ignoreBranchesRegex !== null && ignoreBranchesRegex !== '') {
-        const pattern = new RegExp(`${ignoreBranchesRegex}`)
-        core.info(logFilterBranches(branches.length))
-        return branches.filter((branch => pattern.test(branch.branchName)))
-    }
+  if (ignoreBranchesRegex !== null && ignoreBranchesRegex !== '') {
+    const pattern = new RegExp(`${ignoreBranchesRegex}`)
+    core.info(logFilterBranches(branches.length))
+    return branches.filter(branch => pattern.test(branch.branchName))
+  }
 
-    return branches
+  return branches
 }
