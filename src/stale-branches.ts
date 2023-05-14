@@ -35,7 +35,7 @@ export async function run(): Promise<void> {
     }
     //Collect Branches, Issue Budget, Existing Issues, & initialize lastCommitLogin
     const unFilteredbranches = await getBranches()
-    const branches = await filterBranches(unFilteredbranches, validInputs.ignoreBranchesRegex)
+    const branches = await filterBranches(unFilteredbranches, validInputs.branchesFilterRegex)
     const outputTotal = branches.length
     let existingIssue = await getIssues(validInputs.staleBranchLabel)
     let issueBudgetRemaining = await getIssueBudget(validInputs.maxIssues, validInputs.staleBranchLabel)

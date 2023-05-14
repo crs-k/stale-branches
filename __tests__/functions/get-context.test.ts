@@ -131,7 +131,7 @@ describe('Get Context Function', () => {
       .mockReturnValueOnce('5') // max-issues
       .mockReturnValueOnce('Stale Branch Label') // stale-branch-label
       .mockReturnValueOnce('save') // compare-branches
-      .mockReturnValueOnce('^((?!dependabot).)*$') // ignore-branches-regex
+      .mockReturnValueOnce('^((?!dependabot).)*$') // branches-filter-regex
     await validateInputs()
 
     expect(core.getInput).toHaveBeenCalledTimes(6)

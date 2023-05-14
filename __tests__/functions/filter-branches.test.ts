@@ -1,34 +1,32 @@
 jest.mock('@actions/core')
 jest.mock('@actions/github')
 
-const core = require('@actions/core')
 import {filterBranches} from '../../src/functions/filter-branches'
-import styles from 'ansi-styles'
 
 describe('Filter Branches Function', () => {
-    test('ignoreBranchesRegex is empty', async () => {
+    test('branchesFilterRegex is empty', async () => {
         const branches = [{branchName: 'dependabot/npm_and_yarn/test/ms'}, {branchName: 'JIRA-123'}, {branchName: 'dependabot/npm_and_yarn/123'}, {branchName: 'David'}]
-        const ignoreBranchesRegex = ''
+        const branchesFilterRegex = ''
 
-        const filteredBranches = await filterBranches(branches, ignoreBranchesRegex)
+        const filteredBranches = await filterBranches(branches, branchesFilterRegex)
         expect(filteredBranches).toEqual(branches)
     })
 
-    test('ignoreBranchesRegex is null', async () => {
+    test('branchesFilterRegex is null', async () => {
         const branches = [{branchName: 'dependabot/npm_and_yarn/test/ms'}, {branchName: 'JIRA-123'}, {branchName: 'dependabot/npm_and_yarn/123'}, {branchName: 'David'}]
-        const ignoreBranchesRegex = null
+        const branchesFilterRegex = null
 
-        const filteredBranches = await filterBranches(branches, ignoreBranchesRegex)
+        const filteredBranches = await filterBranches(branches, branchesFilterRegex)
         expect(filteredBranches).toEqual(branches)
     })
 
-    test('ignoreBranchesRegex is wants to ignore dependabot', async () => {
-        const branches = [{branchName: 'dependabot/npm_and_yarn/test/ms'}, {branchName: 'JIRA-123'}, {branchName: 'dependabot/npm_and_yarn/123'}, {branchName: 'David'}]
-        const ignoreBranchesRegex = `^((?!dependabot/).)*$`
+    test('branchesFilterRegex to ignore dependabot', async () => {
+        const branches = [{branchName: 'dependabot/npm_and_yarn/test/ms'}, {branchName: 'JIRA-123'}, {branchName: 'mybranch/dependabot/123'}, {branchName: 'David'}]
+        const branchesFilterRegex = `^((?!dependabot))`
 
-        const expectedBranches = [{branchName: 'JIRA-123'}, {branchName: 'David'}] 
+        const expectedBranches = [{branchName: 'JIRA-123'}, {branchName: 'mybranch/dependabot/123'}, {branchName: 'David'}] 
 
-        const filteredBranches = await filterBranches(branches, ignoreBranchesRegex)
+        const filteredBranches = await filterBranches(branches, branchesFilterRegex)
         expect(filteredBranches).toEqual(expectedBranches)
     })
 })

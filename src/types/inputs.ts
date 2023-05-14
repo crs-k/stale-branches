@@ -53,9 +53,9 @@ export interface Inputs {
   compareBranches: string
 
   /**
-   * A Regex that will be used to ignore branches from this action.
+   * A Regex that will be used to filter branches in this action.
    *
    * Must be 50 characters or less.
    */
-  ignoreBranchesRegex?: string
+  branchesFilterRegex?: string
 }
