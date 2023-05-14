@@ -51,4 +51,11 @@ export interface Inputs {
    * Comparison results in "diverged" | "ahead" | "behind" | "identical".
    */
   compareBranches: string
+
+  /**
+   * A Regex that will be used to filter branches from this action.
+   *
+   * Must be 50 characters or less.
+   */
+  branchesFilterRegex?: string
 }

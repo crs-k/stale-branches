@@ -20,6 +20,7 @@ import {logRateLimitBreak} from './functions/logging/log-rate-limit-break'
 import {logTotalAssessed} from './functions/logging/log-total-assessed'
 import {logTotalDeleted} from './functions/logging/log-total-deleted'
 import {validateInputs} from './functions/get-context'
+import {filterBranches} from './functions/filter-branches'
 
 export async function run(): Promise<void> {
   //Declare output arrays
@@ -33,7 +34,8 @@ export async function run(): Promise<void> {
       throw new Error('Invalid inputs')
     }
     //Collect Branches, Issue Budget, Existing Issues, & initialize lastCommitLogin
-    const branches = await getBranches()
+    const unFilteredbranches = await getBranches()
+    const branches = await filterBranches(unFilteredbranches, validInputs.branchesFilterRegex)
     const outputTotal = branches.length
     let existingIssue = await getIssues(validInputs.staleBranchLabel)
     let issueBudgetRemaining = await getIssueBudget(validInputs.maxIssues, validInputs.staleBranchLabel)

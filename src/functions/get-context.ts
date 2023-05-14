@@ -65,6 +65,12 @@ export async function validateInputs(): Promise<Inputs> {
       throw new Error(`compare-branches input of '${inputCompareBranches}' is not valid.`)
     }
 
+    //Validate branches-filter-regex
+    const branchesFilterRegex = String(core.getInput('branches-filter-regex'))
+    if (branchesFilterRegex.length > 50) {
+      throw new Error('branches-filter-regex must be 50 characters or less')
+    }
+
     //Assign inputs
     result.daysBeforeStale = inputDaysBeforeStale
     result.daysBeforeDelete = inputDaysBeforeDelete
@@ -73,6 +79,7 @@ export async function validateInputs(): Promise<Inputs> {
     result.tagLastCommitter = inputTagLastCommitter
     result.staleBranchLabel = inputStaleBranchLabel
     result.compareBranches = inputCompareBranches
+    result.branchesFilterRegex = branchesFilterRegex
   } catch (err: unknown) {
     if (err instanceof Error) {
       core.setFailed(`Failed to validate inputs. Error: ${err.message}`)
