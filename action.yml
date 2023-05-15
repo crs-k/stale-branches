@@ -44,7 +44,7 @@ outputs:
   stale-branches:
     description: 'List of all stale branches.'
 runs:
-  using: 'node12'
+  using: 'node16'
   main: 'dist/index.js'
 branding:
   icon: 'delete'
