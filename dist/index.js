@@ -1324,7 +1324,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.logFilterBranches = void 0;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logFilterBranches(branchLength) {
-    return `${ansi_styles_1.default.bold.open}[${ansi_styles_1.default.magenta.open}${branchLength}${ansi_styles_1.default.magenta.close}] ${ansi_styles_1.default.blueBright.open}branches found after filtering${ansi_styles_1.default.blueBright.close}.${ansi_styles_1.default.bold.close}`;
+    return `${ansi_styles_1.default.bold.open}[${ansi_styles_1.default.magenta.open}${branchLength}${ansi_styles_1.default.magenta.close}] ${ansi_styles_1.default.blueBright.open}passed the RegEx filter${ansi_styles_1.default.blueBright.close}.${ansi_styles_1.default.bold.close}`;
 }
 exports.logFilterBranches = logFilterBranches;
 
@@ -1644,8 +1644,9 @@ function filterBranches(branches, branchesFilterRegex) {
     return __awaiter(this, void 0, void 0, function* () {
         if (branchesFilterRegex !== null && branchesFilterRegex !== '') {
             const pattern = new RegExp(`${branchesFilterRegex}`);
-            core.info((0, log_filter_branches_1.logFilterBranches)(branches.length));
-            return branches.filter(branch => pattern.test(branch.branchName));
+            const filteredBranches = branches.filter(branch => pattern.test(branch.branchName));
+            core.info((0, log_filter_branches_1.logFilterBranches)(filteredBranches.length));
+            return filteredBranches;
         }
         return branches;
     });
