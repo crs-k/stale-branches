@@ -75,7 +75,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Stale Branches
-      uses: crs-k/stale-branches@v2.0.1
+      uses: crs-k/stale-branches@v3.0.0
 ```
 ### With Inputs
 ```yaml
@@ -96,7 +96,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Stale Branches
-      uses: crs-k/stale-branches@v2.0.1
+      uses: crs-k/stale-branches@v3.0.0
       with:
         repo-token: '${{ secrets.GITHUB_TOKEN }}'
         days-before-stale: 120
