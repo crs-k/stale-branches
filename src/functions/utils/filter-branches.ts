@@ -1,6 +1,6 @@
 import * as core from '@actions/core'
-import {BranchResponse} from '../types/branches'
-import {logFilterBranches} from './logging/log-filter-branches'
+import {BranchResponse} from '../../types/branches'
+import {logFilterBranches} from '../logging/log-filter-branches'
 
 /**
  * Retrieves filtered list of branches

@@ -1,4 +1,4 @@
-import {filterBranches} from '../../src/functions/filter-branches'
+import {filterBranches} from '../../src/functions/utils/filter-branches'
 
 describe('Filter Branches Function', () => {
     test('branchesFilterRegex is empty', async () => {
