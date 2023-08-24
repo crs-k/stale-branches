@@ -50,7 +50,7 @@
     "npm-package-json-lint": "7.0.0",
     "prettier": "2.8.8",
     "ts-jest": "29.1.1",
-    "typescript": "5.1.6"
+    "typescript": "5.2.2"
   },
   "engines": {
     "node": ">=14.0.0"
