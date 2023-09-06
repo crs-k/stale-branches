@@ -41,7 +41,7 @@
     "@types/jest": "29.5.4",
     "@types/node": "20.5.9",
     "@typescript-eslint/parser": "5.62.0",
-    "@vercel/ncc": "0.36.1",
+    "@vercel/ncc": "0.38.0",
     "ansi-styles": "5.2.0",
     "eslint": "8.48.0",
     "eslint-plugin-github": "4.9.0",
