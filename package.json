@@ -30,7 +30,7 @@
   ],
 
   "dependencies": {
-    "@actions/core": "1.10.0",
+    "@actions/core": "1.10.1",
     "@actions/github": "5.1.1",
     "@octokit/plugin-paginate-rest": "8.0.0",
     "@octokit/types": "9.3.0",
