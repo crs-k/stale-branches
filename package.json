@@ -32,7 +32,7 @@
   "dependencies": {
     "@actions/core": "1.10.1",
     "@actions/github": "5.1.1",
-    "@octokit/plugin-paginate-rest": "8.0.0",
+    "@octokit/plugin-paginate-rest": "9.0.0",
     "@octokit/types": "9.3.0",
     "@types/semver": "7.5.3",
     "assert": "2.1.0"
