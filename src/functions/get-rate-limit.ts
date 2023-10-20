@@ -1,6 +1,6 @@
 import * as assert from 'assert'
 import * as core from '@actions/core'
-// eslint-disable-next-line import/named
+// eslint-disable-next-line import/no-unresolved
 import {GetResponseTypeFromEndpointMethod} from '@octokit/types'
 import {RateLimit} from '../types/rate-limit'
 import {getMinutes} from './utils/get-time'

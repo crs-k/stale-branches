@@ -31,21 +31,21 @@
 
   "dependencies": {
     "@actions/core": "1.10.1",
-    "@actions/github": "5.1.1",
-    "@octokit/plugin-paginate-rest": "8.0.0",
-    "@octokit/types": "9.3.0",
+    "@actions/github": "6.0.0",
+    "@octokit/plugin-paginate-rest": "9.0.0",
+    "@octokit/types": "12.0.0",
     "@types/semver": "7.5.3",
     "assert": "2.1.0"
   },
   "devDependencies": {
     "@types/jest": "29.5.5",
-    "@types/node": "20.7.1",
+    "@types/node": "20.8.4",
     "@typescript-eslint/parser": "5.62.0",
     "@vercel/ncc": "0.38.0",
     "ansi-styles": "5.2.0",
-    "eslint": "8.50.0",
+    "eslint": "8.51.0",
     "eslint-plugin-github": "4.9.0",
-    "eslint-plugin-jest": "27.4.0",
+    "eslint-plugin-jest": "27.4.2",
     "js-yaml": "4.1.0",
     "npm-package-json-lint": "7.0.0",
     "prettier": "3.0.3",
