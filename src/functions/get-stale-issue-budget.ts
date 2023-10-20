@@ -27,7 +27,7 @@ export async function getIssueBudget(maxIssues: number, staleBranchLabel: string
         labels: staleBranchLabel,
         per_page: 100
       },
-      response => response.data.map(issue => ({issueTitle: issue.title, issueNumber: issue.number} as IssueResponse))
+      response => response.data.map(issue => ({issueTitle: issue.title, issueNumber: issue.number}) as IssueResponse)
     )
     issues = issueResponse
     issueCount = new Set(issues.map(filteredIssues => filteredIssues.issueNumber)).size

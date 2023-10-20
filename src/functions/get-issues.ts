@@ -23,7 +23,7 @@ export async function getIssues(staleBranchLabel: string): Promise<IssueResponse
         labels: staleBranchLabel,
         per_page: 100
       },
-      response => response.data.map(issue => ({issueTitle: issue.title, issueNumber: issue.number} as IssueResponse))
+      response => response.data.map(issue => ({issueTitle: issue.title, issueNumber: issue.number}) as IssueResponse)
     )
     issues = issueResponse
 
