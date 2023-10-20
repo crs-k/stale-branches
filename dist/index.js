@@ -831,8 +831,8 @@ function validateInputs() {
                 throw new Error(`compare-branches input of '${inputCompareBranches}' is not valid.`);
             }
             //Validate branches-filter-regex
-            const branchesFilterRegex = String(core.getInput('branches-filter-regex'));
-            if (branchesFilterRegex.length > 50) {
+            const inputBranchesFilterRegex = String(core.getInput('branches-filter-regex'));
+            if (inputBranchesFilterRegex.length > 50) {
                 throw new Error('branches-filter-regex must be 50 characters or less');
             }
             //Assign inputs
@@ -843,7 +843,7 @@ function validateInputs() {
             result.tagLastCommitter = inputTagLastCommitter;
             result.staleBranchLabel = inputStaleBranchLabel;
             result.compareBranches = inputCompareBranches;
-            result.branchesFilterRegex = branchesFilterRegex;
+            result.branchesFilterRegex = inputBranchesFilterRegex;
         }
         catch (err) {
             if (err instanceof Error) {
