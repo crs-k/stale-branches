@@ -66,8 +66,8 @@ export async function validateInputs(): Promise<Inputs> {
     }
 
     //Validate branches-filter-regex
-    const branchesFilterRegex = String(core.getInput('branches-filter-regex'))
-    if (branchesFilterRegex.length > 50) {
+    const inputBranchesFilterRegex = String(core.getInput('branches-filter-regex'))
+    if (inputBranchesFilterRegex.length > 50) {
       throw new Error('branches-filter-regex must be 50 characters or less')
     }
 
@@ -79,7 +79,7 @@ export async function validateInputs(): Promise<Inputs> {
     result.tagLastCommitter = inputTagLastCommitter
     result.staleBranchLabel = inputStaleBranchLabel
     result.compareBranches = inputCompareBranches
-    result.branchesFilterRegex = branchesFilterRegex
+    result.branchesFilterRegex = inputBranchesFilterRegex
   } catch (err: unknown) {
     if (err instanceof Error) {
       core.setFailed(`Failed to validate inputs. Error: ${err.message}`)
