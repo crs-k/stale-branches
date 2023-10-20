@@ -120,6 +120,7 @@ let defaultBranchResponse: ListDefaultBranchResponseDataType = {
     has_wiki: true,
     has_pages: false,
     has_downloads: true,
+    has_discussions: true,
     archived: false,
     disabled: false,
     visibility: 'public',
