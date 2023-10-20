@@ -13,7 +13,7 @@ var CompareBranchesEnum;
     CompareBranchesEnum["off"] = "off";
     CompareBranchesEnum["info"] = "info";
     CompareBranchesEnum["save"] = "save";
-})(CompareBranchesEnum = exports.CompareBranchesEnum || (exports.CompareBranchesEnum = {}));
+})(CompareBranchesEnum || (exports.CompareBranchesEnum = CompareBranchesEnum = {}));
 
 
 /***/ }),
@@ -2451,7 +2451,7 @@ class OidcClient {
                 .catch(error => {
                 throw new Error(`Failed to get ID Token. \n 
         Error Code : ${error.statusCode}\n 
-        Error Message: ${error.result.message}`);
+        Error Message: ${error.message}`);
             });
             const id_token = (_a = res.result) === null || _a === void 0 ? void 0 : _a.value;
             if (!id_token) {
