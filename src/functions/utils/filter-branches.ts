@@ -11,7 +11,7 @@ import {logFilterBranches} from '../logging/log-filter-branches'
  */
 export async function filterBranches(branches, branchesFilterRegex): Promise<BranchResponse[]> {
   if (branchesFilterRegex !== null && branchesFilterRegex !== '') {
-    const pattern = new RegExp(branchesFilterRegex)
+    const pattern = new RegExp(`\\b(${branchesFilterRegex})\\b`)
     const filteredBranches = branches.filter(branch => pattern.test(branch.branchName))
     core.info(logFilterBranches(filteredBranches.length))
     return filteredBranches
