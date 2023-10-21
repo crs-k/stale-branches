@@ -1643,7 +1643,7 @@ const log_filter_branches_1 = __nccwpck_require__(46);
 function filterBranches(branches, branchesFilterRegex) {
     return __awaiter(this, void 0, void 0, function* () {
         if (branchesFilterRegex !== null && branchesFilterRegex !== '') {
-            const pattern = new RegExp(branchesFilterRegex);
+            const pattern = new RegExp(`\\b(${branchesFilterRegex})\\b`);
             const filteredBranches = branches.filter(branch => pattern.test(branch.branchName));
             core.info((0, log_filter_branches_1.logFilterBranches)(filteredBranches.length));
             return filteredBranches;
