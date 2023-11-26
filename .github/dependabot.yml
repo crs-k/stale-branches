@@ -17,3 +17,22 @@ updates:
       timezone: "America/New_York"
     labels:
       - "dependencies 🛠"
+    grooups:
+      production-dependencies:
+        dependency-type: "production"
+      development-dependencies:
+        dependency-type: "development"
+      patch:
+        update-types:
+          - patch
+      eslint:
+        patterns:
+          - '*eslint*'
+      typescript:
+        patterns:
+          - '*typescript*'
+          - '@types*'
+      github:
+        patterns:
+          - '@actions*'
+          - '@octokit*'
