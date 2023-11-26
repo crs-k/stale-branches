@@ -18,13 +18,6 @@ updates:
     labels:
       - "dependencies 🛠"
     groups:
-      production-dependencies:
-        dependency-type: "production"
-      development-dependencies:
-        dependency-type: "development"
-      patch:
-        update-types:
-          - patch
       eslint:
         patterns:
           - '*eslint*'
