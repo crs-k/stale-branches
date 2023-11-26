@@ -17,7 +17,7 @@ updates:
       timezone: "America/New_York"
     labels:
       - "dependencies 🛠"
-    grooups:
+    groups:
       production-dependencies:
         dependency-type: "production"
       development-dependencies:
