@@ -17,15 +17,3 @@ updates:
       timezone: "America/New_York"
     labels:
       - "dependencies 🛠"
-    groups:
-      eslint:
-        patterns:
-          - '*eslint*'
-      typescript:
-        patterns:
-          - '*typescript*'
-          - '@types*'
-      github:
-        patterns:
-          - '@actions*'
-          - '@octokit*'
