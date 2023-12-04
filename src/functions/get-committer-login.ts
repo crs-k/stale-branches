@@ -19,7 +19,8 @@ export async function getRecentCommitLogin(sha: string): Promise<string> {
       per_page: 1,
       page: 1
     })
-    lastCommitter = commitResponse.data.committer!.login
+    const commitData = commitResponse.data;
+    lastCommitter = commitData.committer?.login || commitData.author!.login;
     assert.ok(lastCommitter, 'Committer cannot be empty.')
   } catch (err) {
     if (err instanceof Error) {
