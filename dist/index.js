@@ -707,6 +707,7 @@ const get_context_1 = __nccwpck_require__(7782);
  * @returns {string} The last committers username
  */
 function getRecentCommitLogin(sha) {
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         let lastCommitter;
         try {
@@ -717,7 +718,8 @@ function getRecentCommitLogin(sha) {
                 per_page: 1,
                 page: 1
             });
-            lastCommitter = commitResponse.data.committer.login;
+            const commitData = commitResponse.data;
+            lastCommitter = ((_a = commitData.committer) === null || _a === void 0 ? void 0 : _a.login) || commitData.author.login;
             assert.ok(lastCommitter, 'Committer cannot be empty.');
         }
         catch (err) {
@@ -6212,7 +6214,7 @@ __export(dist_src_exports, {
 module.exports = __toCommonJS(dist_src_exports);
 
 // pkg/dist-src/version.js
-var VERSION = "9.0.0";
+var VERSION = "9.1.4";
 
 // pkg/dist-src/normalize-paginated-list-response.js
 function normalizePaginatedListResponse(response) {
@@ -6381,9 +6383,11 @@ var paginatingEndpoints = [
   "GET /orgs/{org}/personal-access-tokens",
   "GET /orgs/{org}/personal-access-tokens/{pat_id}/repositories",
   "GET /orgs/{org}/projects",
+  "GET /orgs/{org}/properties/values",
   "GET /orgs/{org}/public_members",
   "GET /orgs/{org}/repos",
   "GET /orgs/{org}/rulesets",
+  "GET /orgs/{org}/rulesets/rule-suites",
   "GET /orgs/{org}/secret-scanning/alerts",
   "GET /orgs/{org}/security-advisories",
   "GET /orgs/{org}/teams",
@@ -6475,6 +6479,7 @@ var paginatingEndpoints = [
   "GET /repos/{owner}/{repo}/releases/{release_id}/reactions",
   "GET /repos/{owner}/{repo}/rules/branches/{branch}",
   "GET /repos/{owner}/{repo}/rulesets",
+  "GET /repos/{owner}/{repo}/rulesets/rule-suites",
   "GET /repos/{owner}/{repo}/secret-scanning/alerts",
   "GET /repos/{owner}/{repo}/secret-scanning/alerts/{alert_number}/locations",
   "GET /repos/{owner}/{repo}/security-advisories",
