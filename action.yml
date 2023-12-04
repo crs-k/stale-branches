@@ -17,7 +17,7 @@ inputs:
   comment-updates:
     description: 'If this is enabled, a comment with updated information will be added to existing issues each workflow run.'
     required: false
-    default: 'false'
+    default: false
   max-issues:
     description: 'This dictates the number of Stale issues that can exist. It also limits the number of branches that can be deleted per run.'
     required: false
@@ -25,7 +25,7 @@ inputs:
   tag-committer:
     description: 'When an issue is opened, this will tag the stale branchs last committer in the comments.'
     required: false
-    default: 'false'
+    default: false
   stale-branch-label:
     description: 'Label to be applied to issues created for stale branches.'
     required: false
@@ -41,7 +41,7 @@ inputs:
   rete-limit:
     description: 'If this is enabled, the action will stop if it exceeds 95% of the GitHub API rate limit.'
     required: false
-    default: 'true'
+    default: true
 outputs:
   deleted-branches:
     description: 'List of all deleted branches.'
