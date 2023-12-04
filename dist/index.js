@@ -837,6 +837,7 @@ function validateInputs() {
             if (branchesFilterRegex.length > 50) {
                 throw new Error('branches-filter-regex must be 50 characters or less');
             }
+            const inputRateLimit = core.getBooleanInput('rate-limit');
             //Assign inputs
             result.daysBeforeStale = inputDaysBeforeStale;
             result.daysBeforeDelete = inputDaysBeforeDelete;
@@ -846,6 +847,7 @@ function validateInputs() {
             result.staleBranchLabel = inputStaleBranchLabel;
             result.compareBranches = inputCompareBranches;
             result.branchesFilterRegex = branchesFilterRegex;
+            result.rateLimit = inputRateLimit;
         }
         catch (err) {
             if (err instanceof Error) {
@@ -1797,11 +1799,13 @@ function run() {
             // Assess Branches
             for (const branchToCheck of branches) {
                 // Break if Rate Limit usage exceeds 95%
-                const rateLimit = yield (0, get_rate_limit_1.getRateLimit)();
-                if (rateLimit.used > 95) {
-                    core.info((0, log_rate_limit_break_1.logRateLimitBreak)(rateLimit));
-                    core.setFailed('Exiting to avoid rate limit violation.');
-                    break;
+                if (validInputs.rateLimit) {
+                    const rateLimit = yield (0, get_rate_limit_1.getRateLimit)();
+                    if (rateLimit.used > 95) {
+                        core.info((0, log_rate_limit_break_1.logRateLimitBreak)(rateLimit));
+                        core.setFailed('Exiting to avoid rate limit violation.');
+                        break;
+                    }
                 }
                 //Get age of last commit, generate issue title, and filter existing issues to current branch
                 const commitAge = yield (0, get_commit_age_1.getRecentCommitAge)(branchToCheck.commmitSha);
