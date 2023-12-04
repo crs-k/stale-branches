@@ -707,7 +707,7 @@ const get_context_1 = __nccwpck_require__(7782);
  * @returns {string} The last committers username
  */
 function getRecentCommitLogin(sha) {
-    var _a, _b, _c, _d, _e;
+    var _a, _b, _c, _d, _e, _f;
     return __awaiter(this, void 0, void 0, function* () {
         let lastCommitter;
         try {
@@ -719,7 +719,7 @@ function getRecentCommitLogin(sha) {
                 page: 1
             });
             const commitData = commitResponse.data;
-            lastCommitter = ((_a = commitData.committer) === null || _a === void 0 ? void 0 : _a.login) || commitData.author.login || ((_c = (_b = commitData.commit) === null || _b === void 0 ? void 0 : _b.committer) === null || _c === void 0 ? void 0 : _c.name) || ((_e = (_d = commitData.commit) === null || _d === void 0 ? void 0 : _d.author) === null || _e === void 0 ? void 0 : _e.name);
+            lastCommitter = ((_a = commitData.committer) === null || _a === void 0 ? void 0 : _a.login) || ((_b = commitData.author) === null || _b === void 0 ? void 0 : _b.login) || ((_d = (_c = commitData.commit) === null || _c === void 0 ? void 0 : _c.committer) === null || _d === void 0 ? void 0 : _d.name) || ((_f = (_e = commitData.commit) === null || _e === void 0 ? void 0 : _e.author) === null || _f === void 0 ? void 0 : _f.name);
             assert.ok(lastCommitter, 'Committer cannot be empty.');
         }
         catch (err) {
