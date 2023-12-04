@@ -58,4 +58,13 @@ export interface Inputs {
    * Must be 50 characters or less.
    */
   branchesFilterRegex?: string
+
+  /**
+   * If this is enabled, the action will stop if it exceeds 95% of the GitHub API rate limit.
+   *
+   * Must meet YAML 1.2 "Core Schema" specification.
+   *
+   * Support boolean input list: `true | True | TRUE | false | False | FALSE`.
+   */
+  rateLimit: boolean
 }
