@@ -71,6 +71,8 @@ export async function validateInputs(): Promise<Inputs> {
       throw new Error('branches-filter-regex must be 50 characters or less')
     }
 
+    const inputRateLimit = core.getBooleanInput('rate-limit')
+
     //Assign inputs
     result.daysBeforeStale = inputDaysBeforeStale
     result.daysBeforeDelete = inputDaysBeforeDelete
@@ -80,6 +82,7 @@ export async function validateInputs(): Promise<Inputs> {
     result.staleBranchLabel = inputStaleBranchLabel
     result.compareBranches = inputCompareBranches
     result.branchesFilterRegex = branchesFilterRegex
+    result.rateLimit = inputRateLimit
   } catch (err: unknown) {
     if (err instanceof Error) {
       core.setFailed(`Failed to validate inputs. Error: ${err.message}`)

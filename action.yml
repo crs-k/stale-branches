@@ -38,6 +38,10 @@ inputs:
     description: 'An optional Regex that will be used to filter branches from this action.'
     required: false
     default: ''
+  rate-limit:
+    description: 'If this is enabled, the action will stop if it exceeds 95% of the GitHub API rate limit.'
+    required: false
+    default: true
 outputs:
   deleted-branches:
     description: 'List of all deleted branches.'
