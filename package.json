@@ -31,14 +31,14 @@
   "dependencies": {
     "@actions/core": "1.10.1",
     "@actions/github": "6.0.0",
-    "@octokit/plugin-paginate-rest": "9.1.4",
-    "@octokit/types": "12.3.0",
+    "@octokit/plugin-paginate-rest": "9.1.5",
+    "@octokit/types": "12.4.0",
     "@types/semver": "7.5.6",
     "assert": "2.1.0"
   },
   "devDependencies": {
     "@types/jest": "29.5.10",
-    "@types/node": "20.10.2",
+    "@types/node": "20.10.3",
     "@typescript-eslint/parser": "5.62.0",
     "@vercel/ncc": "0.38.1",
     "ansi-styles": "5.2.0",
