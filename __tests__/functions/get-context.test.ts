@@ -135,7 +135,7 @@ describe('Get Context Function', () => {
     await validateInputs()
 
     expect(core.getInput).toHaveBeenCalledTimes(6)
-    expect(core.getBooleanInput).toHaveBeenCalledTimes(2)
+    expect(core.getBooleanInput).toHaveBeenCalledTimes(3)
   })
 
   test('Expect Failure: - TypeError', async () => {
