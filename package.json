@@ -48,7 +48,7 @@
     "eslint-plugin-prettier": "5.0.1",
     "js-yaml": "4.1.0",
     "npm-package-json-lint": "7.1.0",
-    "prettier": "3.1.0",
+    "prettier": "3.1.1",
     "ts-jest": "29.1.1",
     "typescript": "5.3.3"
   },
