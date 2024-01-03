@@ -18,7 +18,12 @@ export async function getBranches(): Promise<BranchResponse[]> {
         owner,
         repo,
         protection: {
-          enabled: false
+          enabled: false,
+          required_status_checks: {
+            enforcement_level: 'off',
+            contexts: [],
+            checks: []
+          }
         },
         per_page: 100
       },
