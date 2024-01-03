@@ -17,7 +17,9 @@ export async function getBranches(): Promise<BranchResponse[]> {
       {
         owner,
         repo,
-        protected: false,
+        protection: {
+          enabled: false
+        },
         per_page: 100
       },
       response => response.data.map(branch => ({branchName: branch.name, commmitSha: branch.commit.sha}) as BranchResponse)
