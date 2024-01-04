@@ -58,8 +58,6 @@ jobs:
           tag-committer: true
           stale-branch-label: 'stale branch 🗑️'
           compare-branches: 'info'
-          branches-filter-regex: '^((?!dependabot))'
-
 
   Build:
     name: Build
