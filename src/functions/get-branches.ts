@@ -20,7 +20,6 @@ export async function getBranches(): Promise<BranchResponse[]> {
         protection: {
           enabled: false,
           required_status_checks: {
-            enforcement_level: 'off',
             contexts: [],
             checks: []
           }

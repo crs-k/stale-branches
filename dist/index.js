@@ -552,7 +552,6 @@ function getBranches() {
                 protection: {
                     enabled: false,
                     required_status_checks: {
-                        enforcement_level: 'off',
                         contexts: [],
                         checks: []
                     }
