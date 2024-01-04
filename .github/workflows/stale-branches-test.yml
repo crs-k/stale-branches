@@ -25,4 +25,3 @@ jobs:
         days-before-delete: 180
         max-issues: 20
         stale-branch-label: 'stale branch 🗑️'
-        branches-filter-regex: '^((?!dependabot))'
