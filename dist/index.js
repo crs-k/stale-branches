@@ -549,14 +549,15 @@ function getBranches() {
             const branchResponse = yield get_context_1.github.paginate(get_context_1.github.rest.repos.listBranches, {
                 owner: get_context_1.owner,
                 repo: get_context_1.repo,
-                protection: {
-                    enabled: false,
-                    required_status_checks: {
-                        enforcement_level: 'off',
-                        contexts: [],
-                        checks: []
-                    }
-                },
+                protected: false,
+                // protection: {
+                //   enabled: false,
+                //   required_status_checks: {
+                //     enforcement_level: 'off',
+                //     contexts: [],
+                //     checks: []
+                //   }
+                // },
                 per_page: 100
             }, response => response.data.map(branch => ({ branchName: branch.name, commmitSha: branch.commit.sha })));
             branches = branchResponse;
