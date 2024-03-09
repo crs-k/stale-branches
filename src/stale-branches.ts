@@ -21,6 +21,9 @@ import {logTotalAssessed} from './functions/logging/log-total-assessed'
 import {logTotalDeleted} from './functions/logging/log-total-deleted'
 import {validateInputs} from './functions/get-context'
 import {filterBranches} from './functions/utils/filter-branches'
+import {getPr} from './functions/get-pr'
+import {logSkippedBranch} from './functions/logging/log-skipped-branch'
+import {logBranchGroupColorSkip} from './functions/logging/log-branch-group-color-skip'
 
 export async function run(): Promise<void> {
   //Declare output arrays
@@ -50,6 +53,17 @@ export async function run(): Promise<void> {
           core.info(logRateLimitBreak(rateLimit))
           core.setFailed('Exiting to avoid rate limit violation.')
           break
+        }
+      }
+
+      // Check for active pull requests if prCheck is true
+      if (validInputs.prCheck) {
+        const activePrs = await getPr(branchToCheck.branchName)
+        if (activePrs > 0) {
+          core.startGroup(logBranchGroupColorSkip(branchToCheck.branchName))
+          core.info(logSkippedBranch(branchToCheck.branchName, activePrs))
+          core.endGroup()
+          continue
         }
       }
 

@@ -59,6 +59,7 @@ jobs:
           stale-branch-label: 'stale branch 🗑️'
           compare-branches: 'info'
           branches-filter-regex: '^((?!dependabot))'
+          pr-check: true
 
 
   Build:
