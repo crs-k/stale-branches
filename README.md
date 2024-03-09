@@ -5,9 +5,9 @@
 
 # Stale Branches
 
-Creates issues for branches that have become stale. By default it aligns with [this](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-branches-in-your-repository/viewing-branches-in-your-repository) definition, but can be configured for other use cases.
+Finds and deletes stale branches. By default it aligns with [this](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-branches-in-your-repository/viewing-branches-in-your-repository) definition, but can be configured for other use cases.
 
-When a branch has been inactive for more than the `days-before-stale` input, an issue is opened with the title `[branch-name] is STALE`. The branch will be deleted once it has been inactive longer than `days-before-delete`.
+When a branch has been inactive for more than the `days-before-stale` input, it is considered stale. The branch will be deleted once it has been inactive longer than `days-before-delete`.
 
 * By default, a stale branch is defined as a branch that:
   * has had no commits in the last 120 days.
@@ -28,7 +28,7 @@ Inputs are defined in [`action.yml`](action.yml). None are required.:
 | Name | Description | Default |
 | --------------- | ---- | --- |
 | `repo-token` | Token used to authenticate with GitHub's API. Can be passed in using [`${{ secrets.GITHUB_TOKEN }}`](https://docs.github.com/en/actions/security-guides/automatic-token-authentication#about-the-github_token-secret). | [`${{ github.token }}`](https://docs.github.com/en/actions/learn-github-actions/contexts#github-context) |
-| `days-before-stale` | Number of days a branch has been inactive before it is stale. | 120 days |
+| `days-before-stale` | Number of days a branch has been inactive before it is considered stale. | 120 days |
 | `days-before-delete` | Number of days a branch has been inactive before it is deleted. | 180 days |
 | `comment-updates` | A comment with updated information will be added to existing issues each workflow run. | false |
 | `max-issues` | This dictates the number of `stale branch 🗑️` issues that can exist. Also, the max number of branches that can be deleted per run. | 20 |
@@ -37,6 +37,7 @@ Inputs are defined in [`action.yml`](action.yml). None are required.:
 | `compare-branches` | This compares each branch to the repo's default branch. <ul><li>When set to `info`, additional output describes if the current branch is ahead, behind, diverged, or identical to the default branch.<br>![image](https://user-images.githubusercontent.com/26232872/157590411-7c97806c-a509-4002-b7a5-a1e4a5da08eb.png)</li> <li>When set to `save`, this prevents branches from being deleted if they are ahead of or diverged from the default branch.</li> <li>When set to `off`, no additional calls are made.</li></ul> | off |
 | `branches-filter-regex` | An optional Regex that will be used to filter branches from this action. | '' |
 | `rate-limit` | If this is enabled, the action will stop if it exceeds 95% of the GitHub API rate limit. | true |
+| `pr-check` | If this is enabled, the action will first check for active pull requests against the branch. If a branch has an active pr, it will not be ignored. | false |
 
 ### Outputs
 Outputs are defined in [`action.yml`](action.yml):
@@ -51,6 +52,7 @@ Outputs are defined in [`action.yml`](action.yml):
   * Active branches are green
   * Stale branches are yellow
   * Dead branches are red
+  * Skipped branches are blue
   
 ![image](https://user-images.githubusercontent.com/26232872/155919116-50a2ded9-2839-4957-aaa2-caa9c40c91c9.png)
 
@@ -76,7 +78,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Stale Branches
-      uses: crs-k/stale-branches@v3.0.0
+      uses: crs-k/stale-branches@v4.1.0
 ```
 ### With Inputs
 ```yaml
@@ -97,7 +99,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Stale Branches
-      uses: crs-k/stale-branches@v3.0.0
+      uses: crs-k/stale-branches@v4.1.0
       with:
         repo-token: '${{ secrets.GITHUB_TOKEN }}'
         days-before-stale: 120
@@ -109,6 +111,7 @@ jobs:
         compare-branches: 'info'
         branches-filter-regex: '^((?!dependabot))'
         rate-limit: false
+        pr-check: false
         
 
 ```
