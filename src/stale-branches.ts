@@ -22,6 +22,7 @@ import {logTotalDeleted} from './functions/logging/log-total-deleted'
 import {validateInputs} from './functions/get-context'
 import {filterBranches} from './functions/utils/filter-branches'
 import {getPr} from './functions/get-pr'
+import {logSkippedBranch} from './functions/logging/log-skipped-branch'
 
 export async function run(): Promise<void> {
   //Declare output arrays
@@ -58,7 +59,7 @@ export async function run(): Promise<void> {
       if (validInputs.prCheck) {
         const activePrs = await getPr(branchToCheck.branchName)
         if (activePrs > 0) {
-          core.info(`Skipping ${branchToCheck.branchName} due to active pull request(s).`)
+          core.info(logSkippedBranch(branchToCheck.branchName))
           continue
         }
       }

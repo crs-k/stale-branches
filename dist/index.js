@@ -1550,6 +1550,26 @@ exports.logRateLimitBreak = logRateLimitBreak;
 
 /***/ }),
 
+/***/ 3433:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.logSkippedBranch = void 0;
+const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
+function logSkippedBranch(branchName) {
+    const skippedBranch = `[${ansi_styles_1.default.blueBright.open}${branchName}${ansi_styles_1.default.blueBright.close}] Skipped due to active pull request(s).`;
+    return skippedBranch;
+}
+exports.logSkippedBranch = logSkippedBranch;
+
+
+/***/ }),
+
 /***/ 2673:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -1855,6 +1875,7 @@ const log_total_deleted_1 = __nccwpck_require__(4888);
 const get_context_1 = __nccwpck_require__(7782);
 const filter_branches_1 = __nccwpck_require__(6261);
 const get_pr_1 = __nccwpck_require__(2376);
+const log_skipped_branch_1 = __nccwpck_require__(3433);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         //Declare output arrays
@@ -1888,7 +1909,7 @@ function run() {
                 if (validInputs.prCheck) {
                     const activePrs = yield (0, get_pr_1.getPr)(branchToCheck.branchName);
                     if (activePrs > 0) {
-                        core.info(`Skipping ${branchToCheck.branchName} due to active pull request(s).`);
+                        core.info((0, log_skipped_branch_1.logSkippedBranch)(branchToCheck.branchName));
                         continue;
                     }
                 }
