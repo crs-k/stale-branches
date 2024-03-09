@@ -72,6 +72,7 @@ export async function validateInputs(): Promise<Inputs> {
     }
 
     const inputRateLimit = core.getBooleanInput('rate-limit')
+    const inputPrCheck = core.getBooleanInput('pr-check')
 
     //Assign inputs
     result.daysBeforeStale = inputDaysBeforeStale
@@ -83,6 +84,7 @@ export async function validateInputs(): Promise<Inputs> {
     result.compareBranches = inputCompareBranches
     result.branchesFilterRegex = branchesFilterRegex
     result.rateLimit = inputRateLimit
+    result.prCheck = inputPrCheck
   } catch (err: unknown) {
     if (err instanceof Error) {
       core.setFailed(`Failed to validate inputs. Error: ${err.message}`)

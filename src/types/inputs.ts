@@ -67,4 +67,13 @@ export interface Inputs {
    * Support boolean input list: `true | True | TRUE | false | False | FALSE`.
    */
   rateLimit: boolean
+
+  /**
+   * If this is enabled, the action will first check for active pull requests against the branch. If a branch has an active pr, it will not be ignored.
+   *
+   * Must meet YAML 1.2 "Core Schema" specification.
+   *
+   * Support boolean input list: `true | True | TRUE | false | False | FALSE`.
+   */
+  prCheck: boolean
 }
