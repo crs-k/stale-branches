@@ -1582,7 +1582,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.logSkippedBranch = void 0;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logSkippedBranch(branchName, activePrs) {
-    const skippedBranch = `${ansi_styles_1.default.bold.open}${branchName}${ansi_styles_1.default.bold.close} Skipped due to ${ansi_styles_1.default.magenta.open}${activePrs}${ansi_styles_1.default.magenta.close} active pull request(s).`;
+    const skippedBranch = `${ansi_styles_1.default.bold.open}${branchName}${ansi_styles_1.default.bold.close} was skipped due to ${ansi_styles_1.default.magenta.open}${activePrs}${ansi_styles_1.default.magenta.close} active pull request(s).`;
     return skippedBranch;
 }
 exports.logSkippedBranch = logSkippedBranch;
