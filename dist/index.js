@@ -1068,7 +1068,7 @@ const get_context_1 = __nccwpck_require__(7782);
 /**
  * Retrieves all pull requests for a branch in a repository
  *
- * @returns {BranchResponse} A subset of data on all branches in a repository @see {@link BranchResponse}
+ * @returns {pullRequests} A count of active pull requests for a branch
  */
 function getPr(branch) {
     return __awaiter(this, void 0, void 0, function* () {

@@ -4,7 +4,7 @@ import {github, owner, repo} from './get-context'
 /**
  * Retrieves all pull requests for a branch in a repository
  *
- * @returns {BranchResponse} A subset of data on all branches in a repository @see {@link BranchResponse}
+ * @returns {pullRequests} A count of active pull requests for a branch
  */
 export async function getPr(branch: string): Promise<number> {
   let pullRequests = 0
