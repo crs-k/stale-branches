@@ -1063,7 +1063,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getPr = void 0;
-const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
 const log_get_pr_1 = __nccwpck_require__(7006);
@@ -1082,7 +1081,6 @@ function getPr(branch) {
                 base: branch
             });
             pullRequests = prResponse.data.length;
-            assert.ok(pullRequests, 'Response cannot be empty.');
             core.info((0, log_get_pr_1.logGetPr)(pullRequests));
         }
         catch (err) {

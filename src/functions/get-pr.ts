@@ -1,4 +1,3 @@
-import * as assert from 'assert'
 import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
 import {logGetPr} from './logging/log-get-pr'
@@ -19,7 +18,6 @@ export async function getPr(branch: string): Promise<number> {
 
     pullRequests = prResponse.data.length
 
-    assert.ok(pullRequests, 'Response cannot be empty.')
     core.info(logGetPr(pullRequests))
   } catch (err) {
     if (err instanceof Error) {
