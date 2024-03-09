@@ -12,7 +12,6 @@ When a branch has been inactive for more than the `days-before-stale` input, it 
 * By default, a stale branch is defined as a branch that:
   * has had no commits in the last 120 days.
   * has no protection rules.
-  * has no open pull requests.
   * is not the default branch of the repository. 
   * See [inputs](https://github.com/crs-k/stale-branches#inputs) for more info.
 * See [example workflow](https://github.com/crs-k/stale-branches#example-workflow).
