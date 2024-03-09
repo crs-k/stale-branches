@@ -1065,7 +1065,6 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getPr = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
-const log_get_pr_1 = __nccwpck_require__(7006);
 /**
  * Retrieves all pull requests for a branch in a repository
  *
@@ -1081,7 +1080,6 @@ function getPr(branch) {
                 base: branch
             });
             pullRequests = prResponse.data.length;
-            core.info((0, log_get_pr_1.logGetPr)(pullRequests));
         }
         catch (err) {
             if (err instanceof Error) {
@@ -1429,26 +1427,6 @@ function logGetBranches(branchLength) {
     return getBranches;
 }
 exports.logGetBranches = logGetBranches;
-
-
-/***/ }),
-
-/***/ 7006:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.logGetPr = void 0;
-const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
-function logGetPr(prLength) {
-    const getPr = `${ansi_styles_1.default.bold.open}[${ansi_styles_1.default.magenta.open}${prLength}${ansi_styles_1.default.magenta.close}] ${ansi_styles_1.default.blueBright.open}pull requests found${ansi_styles_1.default.blueBright.close}.${ansi_styles_1.default.bold.close}`;
-    return getPr;
-}
-exports.logGetPr = logGetPr;
 
 
 /***/ }),

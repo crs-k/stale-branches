@@ -1,6 +1,5 @@
 import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
-import {logGetPr} from './logging/log-get-pr'
 
 /**
  * Retrieves all pull requests for a branch in a repository
@@ -17,8 +16,6 @@ export async function getPr(branch: string): Promise<number> {
     })
 
     pullRequests = prResponse.data.length
-
-    core.info(logGetPr(pullRequests))
   } catch (err) {
     if (err instanceof Error) {
       core.setFailed(`Failed to retrieve pull requests for ${branch}. Error: ${err.message}`)
