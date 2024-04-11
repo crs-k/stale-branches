@@ -59,6 +59,7 @@ export async function run(): Promise<void> {
       // Check for active pull requests if prCheck is true
       if (validInputs.prCheck) {
         const activePrs = await getPr(branchToCheck.branchName)
+        core.info(`Number of pull requests for branch ${branchToCheck}: ${activePrs}`)
         if (activePrs > 0) {
           core.startGroup(logBranchGroupColorSkip(branchToCheck.branchName))
           core.info(logSkippedBranch(branchToCheck.branchName, activePrs))
