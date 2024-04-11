@@ -26,3 +26,4 @@ jobs:
         max-issues: 20
         stale-branch-label: 'stale branch 🗑️'
         branches-filter-regex: '^((?!dependabot))'
+        pr-check: true
