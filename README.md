@@ -3,7 +3,7 @@
   <a href="https://github.com/crs-k/stale-branches/actions"><img alt="ci status" src="https://github.com/crs-k/stale-branches/actions/workflows/codeql-analysis.yml/badge.svg"></a>
 </p>
 
-# Stale Branches
+# Stale Branches66
 
 Creates issues for branches that have become stale. By default it aligns with [this](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-branches-in-your-repository/viewing-branches-in-your-repository) definition, but can be configured for other use cases.
 
