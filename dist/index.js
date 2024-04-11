@@ -1077,8 +1077,7 @@ function getPr(branch) {
             const prResponse = yield get_context_1.github.rest.pulls.list({
                 owner: get_context_1.owner,
                 repo: get_context_1.repo,
-                base: branch,
-                draft: true
+                base: branch
             });
             pullRequests = prResponse.data.length;
         }

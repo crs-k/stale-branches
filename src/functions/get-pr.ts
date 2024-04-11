@@ -12,8 +12,7 @@ export async function getPr(branch: string): Promise<number> {
     const prResponse = await github.rest.pulls.list({
       owner,
       repo,
-      base: branch,
-      draft: true
+      base: branch
     })
 
     pullRequests = prResponse.data.length
