@@ -1074,15 +1074,28 @@ function getPr(branch) {
     return __awaiter(this, void 0, void 0, function* () {
         let pullRequests = 0;
         try {
-            const prResponse = yield get_context_1.github.rest.pulls.list({
+            // Check for incoming PRs
+            const incomingPrResponse = yield get_context_1.github.rest.pulls.list({
                 owner: get_context_1.owner,
                 repo: get_context_1.repo,
                 base: branch
             });
-            pullRequests = prResponse.data.length;
+            // Check for outgoing PRs
+            const outgoingPrResponse = yield get_context_1.github.rest.pulls.list({
+                owner: get_context_1.owner,
+                repo: get_context_1.repo,
+                head: `${get_context_1.owner}:${branch}`
+            });
+            pullRequests = incomingPrResponse.data.length + outgoingPrResponse.data.length;
+            // Log incoming PRs
             // eslint-disable-next-line github/array-foreach
-            prResponse.data.forEach(pr => {
-                core.info(`PR: ${pr.title}, Draft: ${pr.draft}`);
+            incomingPrResponse.data.forEach(pr => {
+                core.info(`Incoming PR: ${pr.title}, Draft: ${pr.draft}`);
+            });
+            // Log outgoing PRs
+            // eslint-disable-next-line github/array-foreach
+            outgoingPrResponse.data.forEach(pr => {
+                core.info(`Outgoing PR: ${pr.title}, Draft: ${pr.draft}`);
             });
         }
         catch (err) {

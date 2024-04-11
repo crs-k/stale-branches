@@ -9,16 +9,32 @@ import {github, owner, repo} from './get-context'
 export async function getPr(branch: string): Promise<number> {
   let pullRequests = 0
   try {
-    const prResponse = await github.rest.pulls.list({
+    // Check for incoming PRs
+    const incomingPrResponse = await github.rest.pulls.list({
       owner,
       repo,
       base: branch
     })
 
-    pullRequests = prResponse.data.length
+    // Check for outgoing PRs
+    const outgoingPrResponse = await github.rest.pulls.list({
+      owner,
+      repo,
+      head: `${owner}:${branch}`
+    })
+
+    pullRequests = incomingPrResponse.data.length + outgoingPrResponse.data.length
+
+    // Log incoming PRs
     // eslint-disable-next-line github/array-foreach
-    prResponse.data.forEach(pr => {
-      core.info(`PR: ${pr.title}, Draft: ${pr.draft}`)
+    incomingPrResponse.data.forEach(pr => {
+      core.info(`Incoming PR: ${pr.title}, Draft: ${pr.draft}`)
+    })
+
+    // Log outgoing PRs
+    // eslint-disable-next-line github/array-foreach
+    outgoingPrResponse.data.forEach(pr => {
+      core.info(`Outgoing PR: ${pr.title}, Draft: ${pr.draft}`)
     })
   } catch (err) {
     if (err instanceof Error) {
