@@ -1080,6 +1080,10 @@ function getPr(branch) {
                 base: branch
             });
             pullRequests = prResponse.data.length;
+            // eslint-disable-next-line github/array-foreach
+            prResponse.data.forEach(pr => {
+                core.info(`PR: ${pr.title}, Draft: ${pr.draft}`);
+            });
         }
         catch (err) {
             if (err instanceof Error) {
@@ -1929,7 +1933,6 @@ function run() {
                 // Check for active pull requests if prCheck is true
                 if (validInputs.prCheck) {
                     const activePrs = yield (0, get_pr_1.getPr)(branchToCheck.branchName);
-                    core.info(`Number of pull requests for branch ${branchToCheck.branchName}: ${activePrs}`);
                     if (activePrs > 0) {
                         core.startGroup((0, log_branch_group_color_skip_1.logBranchGroupColorSkip)(branchToCheck.branchName));
                         core.info((0, log_skipped_branch_1.logSkippedBranch)(branchToCheck.branchName, activePrs));

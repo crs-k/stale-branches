@@ -16,6 +16,10 @@ export async function getPr(branch: string): Promise<number> {
     })
 
     pullRequests = prResponse.data.length
+    // eslint-disable-next-line github/array-foreach
+    prResponse.data.forEach(pr => {
+      core.info(`PR: ${pr.title}, Draft: ${pr.draft}`)
+    })
   } catch (err) {
     if (err instanceof Error) {
       core.setFailed(`Failed to retrieve pull requests for ${branch}. Error: ${err.message}`)
