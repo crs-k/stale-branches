@@ -1087,16 +1087,6 @@ function getPr(branch) {
                 head: `${get_context_1.owner}:${branch}`
             });
             pullRequests = incomingPrResponse.data.length + outgoingPrResponse.data.length;
-            // Log incoming PRs
-            // eslint-disable-next-line github/array-foreach
-            incomingPrResponse.data.forEach(pr => {
-                core.info(`Incoming PR: ${pr.title}, Draft: ${pr.draft}`);
-            });
-            // Log outgoing PRs
-            // eslint-disable-next-line github/array-foreach
-            outgoingPrResponse.data.forEach(pr => {
-                core.info(`Outgoing PR: ${pr.title}, Draft: ${pr.draft}`);
-            });
         }
         catch (err) {
             if (err instanceof Error) {
