@@ -12,10 +12,12 @@ export async function getPr(branch: string): Promise<number> {
     const prResponse = await github.rest.pulls.list({
       owner,
       repo,
-      base: branch
+      base: branch,
+      draft: true
     })
 
     pullRequests = prResponse.data.length
+    core.info(`Number of pull requests for branch ${branch}: ${pullRequests}`)
   } catch (err) {
     if (err instanceof Error) {
       core.setFailed(`Failed to retrieve pull requests for ${branch}. Error: ${err.message}`)
