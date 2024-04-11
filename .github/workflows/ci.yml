@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  issues: write
+  contents: write
+
 jobs:
   Lint:
     name: Format & Lint
