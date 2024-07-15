@@ -186,7 +186,7 @@ export async function run(): Promise<void> {
             break
           }
         }
-        await closeIssueWrappedLogs(issueToDelete.issueNumber, validInputs, "Oprhaned Issue")
+        await closeIssueWrappedLogs(issueToDelete.issueNumber, validInputs, "Orphaned Issue")
       }
       core.endGroup()
     }
