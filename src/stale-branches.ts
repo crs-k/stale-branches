@@ -24,7 +24,6 @@ import {filterBranches} from './functions/utils/filter-branches'
 import {getPr} from './functions/get-pr'
 import {logSkippedBranch} from './functions/logging/log-skipped-branch'
 import {logBranchGroupColorSkip} from './functions/logging/log-branch-group-color-skip'
-import { valid } from 'semver'
 import {Inputs} from './types/inputs'
 
 async function closeIssueWrappedLogs(issueNumber: number, validInputs: Inputs, branchName: string): Promise<string> {
