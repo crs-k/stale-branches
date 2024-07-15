@@ -76,4 +76,21 @@ export interface Inputs {
    * Support boolean input list: `true | True | TRUE | false | False | FALSE`.
    */
   prCheck: boolean
+
+  /**
+   * If this is enabled, the action will not delete branches or create issues.
+   *
+   * Must meet YAML 1.2 "Core Schema" specification.
+   *
+   * Support boolean input list: `true | True | TRUE | false | False | FALSE`.
+   */
+  dryRun: boolean
+  /**
+   * If this is enabled, the action will ignore any issue interactions.
+   *
+   * Must meet YAML 1.2 "Core Schema" specification.
+   *
+   * Support boolean input list: `true | True | TRUE | false | False | FALSE`.
+   */
+  ignoreIssueInteraction: boolean
 }
