@@ -2021,7 +2021,7 @@ function run() {
                             break;
                         }
                     }
-                    yield closeIssueWrappedLogs(issueToDelete.issueNumber, validInputs, "Oprhaned Issue");
+                    yield closeIssueWrappedLogs(issueToDelete.issueNumber, validInputs, "Orphaned Issue");
                 }
                 core.endGroup();
             }
