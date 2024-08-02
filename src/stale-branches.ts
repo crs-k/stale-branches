@@ -24,7 +24,18 @@ import {filterBranches} from './functions/utils/filter-branches'
 import {getPr} from './functions/get-pr'
 import {logSkippedBranch} from './functions/logging/log-skipped-branch'
 import {logBranchGroupColorSkip} from './functions/logging/log-branch-group-color-skip'
+import {Inputs} from './types/inputs'
 
+async function closeIssueWrappedLogs(issueNumber: number, validInputs: Inputs, branchName: string): Promise<string> {
+  if (!validInputs.ignoreIssueInteraction && !validInputs.dryRun) {
+    return await closeIssue(issueNumber)
+  } else if (validInputs.dryRun) {
+    core.info(`Dry Run: Issue would be closed for branch: ${branchName}`)
+  } else if (validInputs.ignoreIssueInteraction) {
+    core.info(`Ignoring issue interaction: Issue would be closed for branch: ${branchName}`)
+  }
+  return ""
+}
 export async function run(): Promise<void> {
   //Declare output arrays
   const outputDeletes: string[] = []
@@ -89,7 +100,13 @@ export async function run(): Promise<void> {
       //Create new issue if branch is stale & existing issue is not found & issue budget is >0
       if (commitAge > validInputs.daysBeforeStale) {
         if (!filteredIssue.find(findIssue => findIssue.issueTitle === issueTitleString) && issueBudgetRemaining > 0) {
-          await createIssue(branchToCheck.branchName, commitAge, lastCommitLogin, validInputs.daysBeforeDelete, validInputs.staleBranchLabel, validInputs.tagLastCommitter)
+          if (!validInputs.dryRun && !validInputs.ignoreIssueInteraction) {
+            await createIssue(branchToCheck.branchName, commitAge, lastCommitLogin, validInputs.daysBeforeDelete, validInputs.staleBranchLabel, validInputs.tagLastCommitter)
+          } else if (validInputs.dryRun) {
+            core.info(`Dry Run: Issue would be created for branch: ${branchToCheck.branchName}`)
+          } else if (validInputs.ignoreIssueInteraction) {
+            core.info(`Ignoring issue interaction: Issue would be created for branch: ${branchToCheck.branchName}`)
+          }
           issueBudgetRemaining--
           core.info(logMaxIssues(issueBudgetRemaining))
           if (!outputStales.includes(branchToCheck.branchName)) {
@@ -103,7 +120,7 @@ export async function run(): Promise<void> {
         for (const issueToClose of filteredIssue) {
           if (issueToClose.issueTitle === issueTitleString) {
             core.info(logActiveBranch(branchToCheck.branchName))
-            await closeIssue(issueToClose.issueNumber)
+            await closeIssueWrappedLogs(issueToClose.issueNumber, validInputs, branchToCheck.branchName)
           }
         }
       }
@@ -112,16 +129,22 @@ export async function run(): Promise<void> {
       if (commitAge > validInputs.daysBeforeStale) {
         for (const issueToUpdate of filteredIssue) {
           if (issueToUpdate.issueTitle === issueTitleString) {
-            await createIssueComment(
-              issueToUpdate.issueNumber,
-              branchToCheck.branchName,
-              commitAge,
-              lastCommitLogin,
-              validInputs.commentUpdates,
-              validInputs.daysBeforeDelete,
-              validInputs.staleBranchLabel,
-              validInputs.tagLastCommitter
-            )
+            if (!validInputs.dryRun && !validInputs.ignoreIssueInteraction) {
+              await createIssueComment(
+                issueToUpdate.issueNumber,
+                branchToCheck.branchName,
+                commitAge,
+                lastCommitLogin,
+                validInputs.commentUpdates,
+                validInputs.daysBeforeDelete,
+                validInputs.staleBranchLabel,
+                validInputs.tagLastCommitter
+              )
+            } else if (validInputs.dryRun) {
+              core.info(`Dry Run: Issue would be updated for branch: ${branchToCheck.branchName}`)
+            } else if (validInputs.ignoreIssueInteraction) {
+              core.info(`Ignoring issue interaction: Issue would be updated for branch: ${branchToCheck.branchName}`)
+            }
             if (!outputStales.includes(branchToCheck.branchName)) {
               outputStales.push(branchToCheck.branchName)
             }
@@ -133,8 +156,12 @@ export async function run(): Promise<void> {
       if (commitAge > validInputs.daysBeforeDelete && branchComparison.save === false) {
         for (const issueToDelete of filteredIssue) {
           if (issueToDelete.issueTitle === issueTitleString) {
-            await deleteBranch(branchToCheck.branchName)
-            await closeIssue(issueToDelete.issueNumber)
+            if (!validInputs.dryRun) {
+              await deleteBranch(branchToCheck.branchName)
+            } else {
+              core.info(`Dry Run: Branch would be deleted: ${branchToCheck.branchName}`)
+            }
+            closeIssueWrappedLogs(issueToDelete.issueNumber, validInputs, branchToCheck.branchName)
             outputDeletes.push(branchToCheck.branchName)
           }
         }
@@ -159,7 +186,7 @@ export async function run(): Promise<void> {
             break
           }
         }
-        await closeIssue(issueToDelete.issueNumber)
+        await closeIssueWrappedLogs(issueToDelete.issueNumber, validInputs, "Orphaned Issue")
       }
       core.endGroup()
     }

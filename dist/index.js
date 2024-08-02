@@ -832,6 +832,8 @@ function validateInputs() {
             }
             const inputRateLimit = core.getBooleanInput('rate-limit');
             const inputPrCheck = core.getBooleanInput('pr-check');
+            const dryRun = core.getBooleanInput('dry-run');
+            const ignoreIssueInteraction = core.getBooleanInput('ignore-issue-interaction');
             //Assign inputs
             result.daysBeforeStale = inputDaysBeforeStale;
             result.daysBeforeDelete = inputDaysBeforeDelete;
@@ -843,6 +845,8 @@ function validateInputs() {
             result.branchesFilterRegex = branchesFilterRegex;
             result.rateLimit = inputRateLimit;
             result.prCheck = inputPrCheck;
+            result.dryRun = dryRun;
+            result.ignoreIssueInteraction = ignoreIssueInteraction;
         }
         catch (err) {
             if (err instanceof Error) {
@@ -1870,6 +1874,20 @@ const filter_branches_1 = __nccwpck_require__(6261);
 const get_pr_1 = __nccwpck_require__(2376);
 const log_skipped_branch_1 = __nccwpck_require__(3433);
 const log_branch_group_color_skip_1 = __nccwpck_require__(4792);
+function closeIssueWrappedLogs(issueNumber, validInputs, branchName) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!validInputs.ignoreIssueInteraction && !validInputs.dryRun) {
+            return yield (0, close_issue_1.closeIssue)(issueNumber);
+        }
+        else if (validInputs.dryRun) {
+            core.info(`Dry Run: Issue would be closed for branch: ${branchName}`);
+        }
+        else if (validInputs.ignoreIssueInteraction) {
+            core.info(`Ignoring issue interaction: Issue would be closed for branch: ${branchName}`);
+        }
+        return "";
+    });
+}
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         //Declare output arrays
@@ -1926,7 +1944,15 @@ function run() {
                 //Create new issue if branch is stale & existing issue is not found & issue budget is >0
                 if (commitAge > validInputs.daysBeforeStale) {
                     if (!filteredIssue.find(findIssue => findIssue.issueTitle === issueTitleString) && issueBudgetRemaining > 0) {
-                        yield (0, create_issue_1.createIssue)(branchToCheck.branchName, commitAge, lastCommitLogin, validInputs.daysBeforeDelete, validInputs.staleBranchLabel, validInputs.tagLastCommitter);
+                        if (!validInputs.dryRun && !validInputs.ignoreIssueInteraction) {
+                            yield (0, create_issue_1.createIssue)(branchToCheck.branchName, commitAge, lastCommitLogin, validInputs.daysBeforeDelete, validInputs.staleBranchLabel, validInputs.tagLastCommitter);
+                        }
+                        else if (validInputs.dryRun) {
+                            core.info(`Dry Run: Issue would be created for branch: ${branchToCheck.branchName}`);
+                        }
+                        else if (validInputs.ignoreIssueInteraction) {
+                            core.info(`Ignoring issue interaction: Issue would be created for branch: ${branchToCheck.branchName}`);
+                        }
                         issueBudgetRemaining--;
                         core.info((0, log_max_issues_1.logMaxIssues)(issueBudgetRemaining));
                         if (!outputStales.includes(branchToCheck.branchName)) {
@@ -1939,7 +1965,7 @@ function run() {
                     for (const issueToClose of filteredIssue) {
                         if (issueToClose.issueTitle === issueTitleString) {
                             core.info((0, log_active_branch_1.logActiveBranch)(branchToCheck.branchName));
-                            yield (0, close_issue_1.closeIssue)(issueToClose.issueNumber);
+                            yield closeIssueWrappedLogs(issueToClose.issueNumber, validInputs, branchToCheck.branchName);
                         }
                     }
                 }
@@ -1947,7 +1973,15 @@ function run() {
                 if (commitAge > validInputs.daysBeforeStale) {
                     for (const issueToUpdate of filteredIssue) {
                         if (issueToUpdate.issueTitle === issueTitleString) {
-                            yield (0, create_issue_comment_1.createIssueComment)(issueToUpdate.issueNumber, branchToCheck.branchName, commitAge, lastCommitLogin, validInputs.commentUpdates, validInputs.daysBeforeDelete, validInputs.staleBranchLabel, validInputs.tagLastCommitter);
+                            if (!validInputs.dryRun && !validInputs.ignoreIssueInteraction) {
+                                yield (0, create_issue_comment_1.createIssueComment)(issueToUpdate.issueNumber, branchToCheck.branchName, commitAge, lastCommitLogin, validInputs.commentUpdates, validInputs.daysBeforeDelete, validInputs.staleBranchLabel, validInputs.tagLastCommitter);
+                            }
+                            else if (validInputs.dryRun) {
+                                core.info(`Dry Run: Issue would be updated for branch: ${branchToCheck.branchName}`);
+                            }
+                            else if (validInputs.ignoreIssueInteraction) {
+                                core.info(`Ignoring issue interaction: Issue would be updated for branch: ${branchToCheck.branchName}`);
+                            }
                             if (!outputStales.includes(branchToCheck.branchName)) {
                                 outputStales.push(branchToCheck.branchName);
                             }
@@ -1958,8 +1992,13 @@ function run() {
                 if (commitAge > validInputs.daysBeforeDelete && branchComparison.save === false) {
                     for (const issueToDelete of filteredIssue) {
                         if (issueToDelete.issueTitle === issueTitleString) {
-                            yield (0, delete_branch_1.deleteBranch)(branchToCheck.branchName);
-                            yield (0, close_issue_1.closeIssue)(issueToDelete.issueNumber);
+                            if (!validInputs.dryRun) {
+                                yield (0, delete_branch_1.deleteBranch)(branchToCheck.branchName);
+                            }
+                            else {
+                                core.info(`Dry Run: Branch would be deleted: ${branchToCheck.branchName}`);
+                            }
+                            closeIssueWrappedLogs(issueToDelete.issueNumber, validInputs, branchToCheck.branchName);
                             outputDeletes.push(branchToCheck.branchName);
                         }
                     }
@@ -1982,7 +2021,7 @@ function run() {
                             break;
                         }
                     }
-                    yield (0, close_issue_1.closeIssue)(issueToDelete.issueNumber);
+                    yield closeIssueWrappedLogs(issueToDelete.issueNumber, validInputs, "Orphaned Issue");
                 }
                 core.endGroup();
             }

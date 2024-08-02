@@ -73,6 +73,8 @@ export async function validateInputs(): Promise<Inputs> {
 
     const inputRateLimit = core.getBooleanInput('rate-limit')
     const inputPrCheck = core.getBooleanInput('pr-check')
+    const dryRun = core.getBooleanInput('dry-run')
+    const ignoreIssueInteraction = core.getBooleanInput('ignore-issue-interaction')
 
     //Assign inputs
     result.daysBeforeStale = inputDaysBeforeStale
@@ -85,6 +87,8 @@ export async function validateInputs(): Promise<Inputs> {
     result.branchesFilterRegex = branchesFilterRegex
     result.rateLimit = inputRateLimit
     result.prCheck = inputPrCheck
+    result.dryRun = dryRun
+    result.ignoreIssueInteraction = ignoreIssueInteraction
   } catch (err: unknown) {
     if (err instanceof Error) {
       core.setFailed(`Failed to validate inputs. Error: ${err.message}`)
