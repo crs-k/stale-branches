@@ -41,11 +41,19 @@ inputs:
   rate-limit:
     description: 'If this is enabled, the action will stop if it exceeds 95% of the GitHub API rate limit.'
     required: false
-    default: true
+    default: 'true'
   pr-check:
     description: 'If this is enabled, the action will first check for active pull requests against the branch. If a branch has an active pr, it will not be ignored.'
     required: false
-    default: false
+    default: 'false'
+  dry-run:
+    description: 'If this is enabled, the action will not delete or tag any branches.'
+    required: false
+    default: 'false'
+  ignore-issue-interaction:
+    description: 'If this is enabled, the action will not interact with Github issues.'
+    required: false
+    default: 'false'
 outputs:
   deleted-branches:
     description: 'List of all deleted branches.'
