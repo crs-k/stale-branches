@@ -56,7 +56,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.closeIssue = void 0;
+exports.closeIssue = closeIssue;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
@@ -94,7 +94,6 @@ function closeIssue(issueNumber) {
         return state;
     });
 }
-exports.closeIssue = closeIssue;
 
 
 /***/ }),
@@ -137,7 +136,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.compareBranches = void 0;
+exports.compareBranches = compareBranches;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
@@ -191,7 +190,6 @@ function compareBranches(head, inputCompareBranches) {
         return branchComparison;
     });
 }
-exports.compareBranches = compareBranches;
 
 
 /***/ }),
@@ -234,7 +232,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createIssueComment = void 0;
+exports.createIssueComment = createIssueComment;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
@@ -296,7 +294,6 @@ function createIssueComment(issueNumber, branch, commitAge, lastCommitter, comme
         return createdAt;
     });
 }
-exports.createIssueComment = createIssueComment;
 
 
 /***/ }),
@@ -339,7 +336,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createIssue = void 0;
+exports.createIssue = createIssue;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
@@ -406,7 +403,6 @@ function createIssue(branch, commitAge, lastCommitter, daysBeforeDelete, staleBr
         return issueId;
     });
 }
-exports.createIssue = createIssue;
 
 
 /***/ }),
@@ -449,7 +445,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.deleteBranch = void 0;
+exports.deleteBranch = deleteBranch;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
@@ -489,7 +485,6 @@ function deleteBranch(name) {
         return confirm;
     });
 }
-exports.deleteBranch = deleteBranch;
 
 
 /***/ }),
@@ -532,7 +527,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getBranches = void 0;
+exports.getBranches = getBranches;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
@@ -568,7 +563,6 @@ function getBranches() {
         return branches;
     });
 }
-exports.getBranches = getBranches;
 
 
 /***/ }),
@@ -611,7 +605,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getRecentCommitAge = void 0;
+exports.getRecentCommitAge = getRecentCommitAge;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
@@ -652,7 +646,6 @@ function getRecentCommitAge(sha) {
         return commitAge;
     });
 }
-exports.getRecentCommitAge = getRecentCommitAge;
 
 
 /***/ }),
@@ -695,7 +688,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getRecentCommitLogin = void 0;
+exports.getRecentCommitLogin = getRecentCommitLogin;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
@@ -734,7 +727,6 @@ function getRecentCommitLogin(sha) {
         return lastCommitter;
     });
 }
-exports.getRecentCommitLogin = getRecentCommitLogin;
 
 
 /***/ }),
@@ -778,7 +770,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.validateInputs = exports.repo = exports.owner = exports.github = void 0;
+exports.repo = exports.owner = exports.github = void 0;
+exports.validateInputs = validateInputs;
 const core = __importStar(__nccwpck_require__(2186));
 const github_1 = __nccwpck_require__(5438);
 const input_compare_branches_1 = __nccwpck_require__(5269);
@@ -862,7 +855,6 @@ function validateInputs() {
         return result;
     });
 }
-exports.validateInputs = validateInputs;
 
 
 /***/ }),
@@ -905,7 +897,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getDefaultBranch = void 0;
+exports.getDefaultBranch = getDefaultBranch;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
@@ -939,7 +931,6 @@ function getDefaultBranch() {
         return result;
     });
 }
-exports.getDefaultBranch = getDefaultBranch;
 
 
 /***/ }),
@@ -982,7 +973,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getIssues = void 0;
+exports.getIssues = getIssues;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
@@ -1019,7 +1010,6 @@ function getIssues(staleBranchLabel) {
         return issues;
     });
 }
-exports.getIssues = getIssues;
 
 
 /***/ }),
@@ -1062,7 +1052,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getPr = void 0;
+exports.getPr = getPr;
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
 /**
@@ -1100,7 +1090,6 @@ function getPr(branch) {
         return pullRequests;
     });
 }
-exports.getPr = getPr;
 
 
 /***/ }),
@@ -1143,7 +1132,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getRateLimit = void 0;
+exports.getRateLimit = getRateLimit;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_time_1 = __nccwpck_require__(2643);
@@ -1181,7 +1170,6 @@ function getRateLimit() {
         return rateLimitResponse;
     });
 }
-exports.getRateLimit = getRateLimit;
 
 
 /***/ }),
@@ -1224,7 +1212,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getIssueBudget = void 0;
+exports.getIssueBudget = getIssueBudget;
 const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
@@ -1269,7 +1257,6 @@ function getIssueBudget(maxIssues, staleBranchLabel) {
         return issueBudgetRemaining;
     });
 }
-exports.getIssueBudget = getIssueBudget;
 
 
 /***/ }),
@@ -1283,13 +1270,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.logActiveBranch = void 0;
+exports.logActiveBranch = logActiveBranch;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logActiveBranch(branchName) {
     const closeIssue = `[${ansi_styles_1.default.green.open}${branchName}${ansi_styles_1.default.green.close}] has become active again.`;
     return closeIssue;
 }
-exports.logActiveBranch = logActiveBranch;
 
 
 /***/ }),
@@ -1303,13 +1289,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.logBranchGroupColorSkip = void 0;
+exports.logBranchGroupColorSkip = logBranchGroupColorSkip;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logBranchGroupColorSkip(branchName) {
     const groupColor = `[${ansi_styles_1.default.blueBright.open}${branchName}${ansi_styles_1.default.blueBright.close}]`;
     return groupColor;
 }
-exports.logBranchGroupColorSkip = logBranchGroupColorSkip;
 
 
 /***/ }),
@@ -1323,7 +1308,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.logBranchGroupColor = void 0;
+exports.logBranchGroupColor = logBranchGroupColor;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logBranchGroupColor(branchName, commitAge, daysBeforeStale, daysBeforeDelete) {
     let groupColor = `[${ansi_styles_1.default.greenBright.open}${branchName}${ansi_styles_1.default.greenBright.close}]`;
@@ -1339,7 +1324,6 @@ function logBranchGroupColor(branchName, commitAge, daysBeforeStale, daysBeforeD
     }
     return groupColor;
 }
-exports.logBranchGroupColor = logBranchGroupColor;
 
 
 /***/ }),
@@ -1353,13 +1337,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.logCloseIssue = void 0;
+exports.logCloseIssue = logCloseIssue;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logCloseIssue(issueNumber, state) {
     const closeIssue = `Issue ${ansi_styles_1.default.cyan.open}#${issueNumber}${ansi_styles_1.default.cyan.close}'s state was changed to ${ansi_styles_1.default.redBright.open}${state}${ansi_styles_1.default.redBright.close}.`;
     return closeIssue;
 }
-exports.logCloseIssue = logCloseIssue;
 
 
 /***/ }),
@@ -1373,7 +1356,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.logCompareBranches = void 0;
+exports.logCompareBranches = logCompareBranches;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logCompareBranches(branchComparison, base, head) {
     let compareBranches;
@@ -1394,7 +1377,6 @@ function logCompareBranches(branchComparison, base, head) {
     }
     return compareBranches;
 }
-exports.logCompareBranches = logCompareBranches;
 
 
 /***/ }),
@@ -1408,13 +1390,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.logDeleteBranch = void 0;
+exports.logDeleteBranch = logDeleteBranch;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logDeleteBranch(refFull) {
     const deleteBranch = `Branch: ${ansi_styles_1.default.redBright.open}${refFull}${ansi_styles_1.default.redBright.close} has been ${ansi_styles_1.default.redBright.open}deleted${ansi_styles_1.default.redBright.close}.`;
     return deleteBranch;
 }
-exports.logDeleteBranch = logDeleteBranch;
 
 
 /***/ }),
@@ -1428,12 +1409,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.logFilterBranches = void 0;
+exports.logFilterBranches = logFilterBranches;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logFilterBranches(branchLength) {
     return `${ansi_styles_1.default.bold.open}[${ansi_styles_1.default.magenta.open}${branchLength}${ansi_styles_1.default.magenta.close}] ${ansi_styles_1.default.blueBright.open}passed the RegEx filter${ansi_styles_1.default.blueBright.close}.${ansi_styles_1.default.bold.close}`;
 }
-exports.logFilterBranches = logFilterBranches;
 
 
 /***/ }),
@@ -1447,13 +1427,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.logGetBranches = void 0;
+exports.logGetBranches = logGetBranches;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logGetBranches(branchLength) {
     const getBranches = `${ansi_styles_1.default.bold.open}[${ansi_styles_1.default.magenta.open}${branchLength}${ansi_styles_1.default.magenta.close}] ${ansi_styles_1.default.blueBright.open}branches found${ansi_styles_1.default.blueBright.close}.${ansi_styles_1.default.bold.close}`;
     return getBranches;
 }
-exports.logGetBranches = logGetBranches;
 
 
 /***/ }),
@@ -1467,7 +1446,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.logLastCommitColor = void 0;
+exports.logLastCommitColor = logLastCommitColor;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logLastCommitColor(commitAge, daysBeforeStale, daysBeforeDelete) {
     let commitColor = `Last Commit: ${ansi_styles_1.default.magenta.open}${commitAge.toString()}${ansi_styles_1.default.magenta.close} days ago.`;
@@ -1483,7 +1462,6 @@ function logLastCommitColor(commitAge, daysBeforeStale, daysBeforeDelete) {
     }
     return commitColor;
 }
-exports.logLastCommitColor = logLastCommitColor;
 
 
 /***/ }),
@@ -1497,7 +1475,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.logMaxIssues = void 0;
+exports.logMaxIssues = logMaxIssues;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logMaxIssues(issueBudgetRemaining) {
     let maxIssues = `${ansi_styles_1.default.bold.open}[${ansi_styles_1.default.magenta.open}${issueBudgetRemaining}${ansi_styles_1.default.magenta.close}] ${ansi_styles_1.default.blueBright.open}max-issues budget remaining${ansi_styles_1.default.blueBright.close}.${ansi_styles_1.default.bold.close}`;
@@ -1510,7 +1488,6 @@ function logMaxIssues(issueBudgetRemaining) {
     }
     return maxIssues;
 }
-exports.logMaxIssues = logMaxIssues;
 
 
 /***/ }),
@@ -1524,7 +1501,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.logNewIssue = void 0;
+exports.logNewIssue = logNewIssue;
 const create_issues_title_string_1 = __nccwpck_require__(7594);
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logNewIssue(branchName) {
@@ -1532,7 +1509,6 @@ function logNewIssue(branchName) {
     const newIssue = `${ansi_styles_1.default.bold.open}New issue created:${ansi_styles_1.default.bold.close} ${ansi_styles_1.default.magentaBright.open}${issueTitleString}${ansi_styles_1.default.magentaBright.close}.`;
     return newIssue;
 }
-exports.logNewIssue = logNewIssue;
 
 
 /***/ }),
@@ -1546,13 +1522,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.logOrphanedIssues = void 0;
+exports.logOrphanedIssues = logOrphanedIssues;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logOrphanedIssues(orphanCount) {
     const orphanedIssues = `${ansi_styles_1.default.bold.open}[${ansi_styles_1.default.magenta.open}${orphanCount}${ansi_styles_1.default.magenta.close}] ${ansi_styles_1.default.blueBright.open}orphaned issues found${ansi_styles_1.default.blueBright.close}.${ansi_styles_1.default.bold.close}`;
     return orphanedIssues;
 }
-exports.logOrphanedIssues = logOrphanedIssues;
 
 
 /***/ }),
@@ -1566,13 +1541,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.logRateLimitBreak = void 0;
+exports.logRateLimitBreak = logRateLimitBreak;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logRateLimitBreak(rateLimit) {
     const rateLimitBreak = `Exiting due to rate limit usage of ${ansi_styles_1.default.redBright.open}${rateLimit.used}%${ansi_styles_1.default.redBright.close}. Rate limit resets in ${ansi_styles_1.default.magenta.open}${rateLimit.reset}${ansi_styles_1.default.magenta.close} minutes @ ${ansi_styles_1.default.magenta.open}${rateLimit.resetDateTime}${ansi_styles_1.default.magenta.close}.`;
     return rateLimitBreak;
 }
-exports.logRateLimitBreak = logRateLimitBreak;
 
 
 /***/ }),
@@ -1586,13 +1560,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.logSkippedBranch = void 0;
+exports.logSkippedBranch = logSkippedBranch;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logSkippedBranch(branchName, activePrs) {
     const skippedBranch = `${ansi_styles_1.default.bold.open}${branchName}${ansi_styles_1.default.bold.close} was skipped due to ${ansi_styles_1.default.magenta.open}${activePrs}${ansi_styles_1.default.magenta.close} active pull request(s).`;
     return skippedBranch;
 }
-exports.logSkippedBranch = logSkippedBranch;
 
 
 /***/ }),
@@ -1606,13 +1579,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.logTotalAssessed = void 0;
+exports.logTotalAssessed = logTotalAssessed;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logTotalAssessed(outputStales, outputTotal) {
     const totalAssessed = `${ansi_styles_1.default.bold.open}${ansi_styles_1.default.blueBright.open}Stale Branches Assessed${ansi_styles_1.default.blueBright.close}: [${ansi_styles_1.default.yellowBright.open}${outputStales}${ansi_styles_1.default.yellowBright.close}/${ansi_styles_1.default.magenta.open}${outputTotal}${ansi_styles_1.default.magenta.close}]${ansi_styles_1.default.bold.close}`;
     return totalAssessed;
 }
-exports.logTotalAssessed = logTotalAssessed;
 
 
 /***/ }),
@@ -1626,13 +1598,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.logTotalDeleted = void 0;
+exports.logTotalDeleted = logTotalDeleted;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logTotalDeleted(outputDeletes, outputStales) {
     const totalDeleted = `${ansi_styles_1.default.bold.open}${ansi_styles_1.default.blueBright.open}Stale Branches Deleted${ansi_styles_1.default.blueBright.close}: [${ansi_styles_1.default.redBright.open}${outputDeletes}${ansi_styles_1.default.redBright.close}/${ansi_styles_1.default.yellowBright.open}${outputStales}${ansi_styles_1.default.yellowBright.close}]${ansi_styles_1.default.bold.close}`;
     return totalDeleted;
 }
-exports.logTotalDeleted = logTotalDeleted;
 
 
 /***/ }),
@@ -1646,13 +1617,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.logUpdateIssue = void 0;
+exports.logUpdateIssue = logUpdateIssue;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(2068));
 function logUpdateIssue(issueNumber, createdAt, commentUrl) {
     const updateIssue = `Issue ${ansi_styles_1.default.cyan.open}#${issueNumber}${ansi_styles_1.default.cyan.close} comment was created at ${ansi_styles_1.default.magenta.open}${createdAt}${ansi_styles_1.default.magenta.close}. ${commentUrl}`;
     return updateIssue;
 }
-exports.logUpdateIssue = logUpdateIssue;
 
 
 /***/ }),
@@ -1663,7 +1633,7 @@ exports.logUpdateIssue = logUpdateIssue;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createCommentString = void 0;
+exports.createCommentString = createCommentString;
 /**
  * Creates comment string string for GitHub issues
  *
@@ -1692,7 +1662,6 @@ function createCommentString(branch, lastCommitter, commitAge, daysBeforeDelete,
     }
     return bodyString;
 }
-exports.createCommentString = createCommentString;
 
 
 /***/ }),
@@ -1703,7 +1672,7 @@ exports.createCommentString = createCommentString;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.createIssueTitleString = void 0;
+exports.createIssueTitleString = createIssueTitleString;
 /**
  * Creates title string for GitHub issues
  *
@@ -1714,7 +1683,6 @@ exports.createIssueTitleString = void 0;
 function createIssueTitleString(branchName) {
     return `[${branchName}] is STALE`;
 }
-exports.createIssueTitleString = createIssueTitleString;
 
 
 /***/ }),
@@ -1757,7 +1725,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.filterBranches = void 0;
+exports.filterBranches = filterBranches;
 const core = __importStar(__nccwpck_require__(2186));
 const log_filter_branches_1 = __nccwpck_require__(46);
 /**
@@ -1778,7 +1746,6 @@ function filterBranches(branches, branchesFilterRegex) {
         return branches;
     });
 }
-exports.filterBranches = filterBranches;
 
 
 /***/ }),
@@ -1789,7 +1756,8 @@ exports.filterBranches = filterBranches;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getMinutes = exports.getDays = void 0;
+exports.getDays = getDays;
+exports.getMinutes = getMinutes;
 /**
  * Calcualtes the number of days between two dates
  *
@@ -1804,7 +1772,6 @@ function getDays(date1, date2) {
     const days = Math.round(diffMs / (1000 * 60 * 60 * 24));
     return days;
 }
-exports.getDays = getDays;
 /**
  * Calcualtes the number of minutes between two dates
  *
@@ -1819,7 +1786,6 @@ function getMinutes(date1, date2) {
     const minutes = Math.round(diffMs / (1000 * 60));
     return minutes;
 }
-exports.getMinutes = getMinutes;
 /* USED FOR TESTING
 export function getHours(date1, date2): number {
   const diffMs = Math.abs(date2 - date1)
@@ -1877,7 +1843,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.run = void 0;
+exports.run = run;
 const core = __importStar(__nccwpck_require__(2186));
 const close_issue_1 = __nccwpck_require__(4094);
 const compare_branches_1 = __nccwpck_require__(5466);
@@ -2031,7 +1997,6 @@ function run() {
         }
     });
 }
-exports.run = run;
 
 
 /***/ }),
