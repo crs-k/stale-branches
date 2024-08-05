@@ -1990,16 +1990,16 @@ function run() {
                 }
                 //Delete expired branches
                 if (commitAge > validInputs.daysBeforeDelete && branchComparison.save === false) {
+                    if (!validInputs.dryRun) {
+                        yield (0, delete_branch_1.deleteBranch)(branchToCheck.branchName);
+                        outputDeletes.push(branchToCheck.branchName);
+                    }
+                    else {
+                        core.info(`Dry Run: Branch would be deleted: ${branchToCheck.branchName}`);
+                    }
                     for (const issueToDelete of filteredIssue) {
                         if (issueToDelete.issueTitle === issueTitleString) {
-                            if (!validInputs.dryRun) {
-                                yield (0, delete_branch_1.deleteBranch)(branchToCheck.branchName);
-                            }
-                            else {
-                                core.info(`Dry Run: Branch would be deleted: ${branchToCheck.branchName}`);
-                            }
                             closeIssueWrappedLogs(issueToDelete.issueNumber, validInputs, branchToCheck.branchName);
-                            outputDeletes.push(branchToCheck.branchName);
                         }
                     }
                 }
