@@ -6,7 +6,17 @@ import {Inputs} from '../types/inputs'
 const repoToken = core.getInput('repo-token')
 core.setSecret(repoToken)
 export const github = getOctokit(repoToken)
-export const {owner: owner, repo: repo} = context.repo
+
+// eslint-disable-next-line import/no-mutable-exports
+let {owner: owner, repo: repo} = context.repo
+
+if (core.getInput('repository') && core.getInput('repository').split('/').length === 2) {
+  const repoInput = core.getInput('repository').split('/')
+  owner = repoInput[0]
+  repo = repoInput[1]
+}
+
+export {owner, repo}
 
 /**
  * Validates the Action's inputs and assigns them to the Inputs type
