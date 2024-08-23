@@ -17,15 +17,19 @@ export async function getBranches(): Promise<BranchResponse[]> {
       {
         owner,
         repo,
-        protected: false,
+        //protected: false,
         per_page: 100
       },
-      response => response.data.map(branch => ({branchName: branch.name, commmitSha: branch.commit.sha}) as BranchResponse)
+      response =>
+        response.data.map(
+          branch =>
+            ({
+              branchName: branch.name,
+              commmitSha: branch.commit.sha
+            }) as BranchResponse
+        )
     )
     branches = branchResponse
-
-    assert.ok(branches, 'Response cannot be empty.')
-    core.info(logGetBranches(branches.length))
   } catch (err) {
     if (err instanceof Error) {
       core.setFailed(`Failed to retrieve branches for ${repo}. Error: ${err.message}`)
@@ -35,5 +39,37 @@ export async function getBranches(): Promise<BranchResponse[]> {
     branches = [{branchName: '', commmitSha: ''}]
   }
 
+  const branchesToRemove: BranchResponse[] = []
+
+  try {
+    for (const branch of branches) {
+      const branchProtection = await github.rest.repos.getBranchProtection({
+        owner,
+        repo,
+        branch: branch.branchName
+      })
+      if (!branchProtection.data.allow_deletions?.enabled) {
+        //remove branch from list
+        branchesToRemove.push(branch)
+      }
+    }
+
+    // remove branches that don´t allow deletions
+    for (const branch of branchesToRemove) {
+      const index = branches.indexOf(branch, 0)
+      if (index > -1) {
+        branches.splice(index, 1)
+      }
+    }
+  } catch (err) {
+    if (err instanceof Error) {
+      core.setFailed(`Failed to retrieve branch protection for ${repo}. Error: ${err.message}`)
+    } else {
+      core.setFailed(`Failed to retrieve branch protection for ${repo}.`)
+    }
+  }
+
+  assert.ok(branches, 'Response cannot be empty.')
+  core.info(logGetBranches(branches.length))
   return branches
 }
