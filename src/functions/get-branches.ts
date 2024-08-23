@@ -48,15 +48,15 @@ export async function getBranches(): Promise<BranchResponse[]> {
         repo,
         branch: branch.branchName
       })
-      console.log('branch protection: ' + branchProtection)
+      core.info('branch protection: ' + branchProtection)
       if (!branchProtection.data.allow_deletions?.enabled) {
         //remove branch from list
         branchesToRemove.push(branch)
-        console.log('branch to remove: ' + branch.branchName)
+        core.info('branch to remove: ' + branch.branchName)
       }
     }
 
-    console.log('branches to remove: ' + branchesToRemove.length)
+    core.info('branches to remove: ' + branchesToRemove.length)
 
     // remove branches that don´t allow deletions
     for (const branch of branchesToRemove) {
