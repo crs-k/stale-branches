@@ -539,17 +539,19 @@ const log_get_branches_1 = __nccwpck_require__(5765);
  */
 function getBranches() {
     return __awaiter(this, void 0, void 0, function* () {
+        var _a;
         let branches;
         try {
             const branchResponse = yield get_context_1.github.paginate(get_context_1.github.rest.repos.listBranches, {
                 owner: get_context_1.owner,
                 repo: get_context_1.repo,
-                protected: false,
+                //protected: false,
                 per_page: 100
-            }, response => response.data.map(branch => ({ branchName: branch.name, commmitSha: branch.commit.sha })));
+            }, response => response.data.map(branch => ({
+                branchName: branch.name,
+                commmitSha: branch.commit.sha
+            })));
             branches = branchResponse;
-            assert.ok(branches, 'Response cannot be empty.');
-            core.info((0, log_get_branches_1.logGetBranches)(branches.length));
         }
         catch (err) {
             if (err instanceof Error) {
@@ -560,6 +562,37 @@ function getBranches() {
             }
             branches = [{ branchName: '', commmitSha: '' }];
         }
+        const branchesToRemove = [];
+        try {
+            for (const branch of branches) {
+                const branchProtection = yield get_context_1.github.rest.repos.getBranchProtection({
+                    owner: get_context_1.owner,
+                    repo: get_context_1.repo,
+                    branch: branch.branchName
+                });
+                if (!((_a = branchProtection.data.allow_deletions) === null || _a === void 0 ? void 0 : _a.enabled)) {
+                    //remove branch from list
+                    branchesToRemove.push(branch);
+                }
+            }
+            // remove branches that don´t allow deletions
+            for (const branch of branchesToRemove) {
+                const index = branches.indexOf(branch, 0);
+                if (index > -1) {
+                    branches.splice(index, 1);
+                }
+            }
+        }
+        catch (err) {
+            if (err instanceof Error) {
+                core.setFailed(`Failed to retrieve branch protection for ${get_context_1.repo}. Error: ${err.message}`);
+            }
+            else {
+                core.setFailed(`Failed to retrieve branch protection for ${get_context_1.repo}.`);
+            }
+        }
+        assert.ok(branches, 'Response cannot be empty.');
+        core.info((0, log_get_branches_1.logGetBranches)(branches.length));
         return branches;
     });
 }
