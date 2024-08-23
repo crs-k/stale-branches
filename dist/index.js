@@ -570,11 +570,14 @@ function getBranches() {
                     repo: get_context_1.repo,
                     branch: branch.branchName
                 });
+                core.info('branch protection: ' + branchProtection);
                 if (!((_a = branchProtection.data.allow_deletions) === null || _a === void 0 ? void 0 : _a.enabled)) {
                     //remove branch from list
                     branchesToRemove.push(branch);
+                    core.info('branch to remove: ' + branch.branchName);
                 }
             }
+            core.info('branches to remove: ' + branchesToRemove.length);
             // remove branches that don´t allow deletions
             for (const branch of branchesToRemove) {
                 const index = branches.indexOf(branch, 0);
