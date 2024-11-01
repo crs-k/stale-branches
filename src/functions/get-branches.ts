@@ -39,7 +39,7 @@ export async function getBranches(): Promise<BranchResponse[]> {
     branches = [{branchName: '', commmitSha: ''}]
   }
 
-  core.info(`branches before protection check: ${branches}`)
+  core.info(`branches before protection check: ${branches.length}`)
 
   const branchesToRemove: BranchResponse[] = []
 
@@ -59,9 +59,9 @@ export async function getBranches(): Promise<BranchResponse[]> {
       }
     } catch (err) {
       if (err instanceof Error) {
-        core.setFailed(`Failed to retrieve branch protection for ${repo} branch ${branch.branchName}. Error: ${err.message}`)
+        core.info(`Failed to retrieve branch protection for ${repo} branch ${branch.branchName}. Error: ${err.message}`)
       } else {
-        core.setFailed(`Failed to retrieve branch protection for ${repo} branch ${branch.branchName}.`)
+        core.info(`Failed to retrieve branch protection for ${repo} branch ${branch.branchName}.`)
       }
     }
   }
@@ -76,7 +76,6 @@ export async function getBranches(): Promise<BranchResponse[]> {
     }
   }
 
-  core.info(`branches after protection check: ${branches}`)
 
   assert.ok(branches, 'Response cannot be empty.')
   core.info(logGetBranches(branches.length))

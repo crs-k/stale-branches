@@ -562,7 +562,7 @@ function getBranches() {
             }
             branches = [{ branchName: '', commmitSha: '' }];
         }
-        core.info(`branches before protection check: ${branches}`);
+        core.info(`branches before protection check: ${branches.length}`);
         const branchesToRemove = [];
         for (const branch of branches) {
             core.info(`get branch protection for branch: ${branch.branchName}`);
@@ -581,10 +581,10 @@ function getBranches() {
             }
             catch (err) {
                 if (err instanceof Error) {
-                    core.setFailed(`Failed to retrieve branch protection for ${get_context_1.repo} branch ${branch.branchName}. Error: ${err.message}`);
+                    core.info(`Failed to retrieve branch protection for ${get_context_1.repo} branch ${branch.branchName}. Error: ${err.message}`);
                 }
                 else {
-                    core.setFailed(`Failed to retrieve branch protection for ${get_context_1.repo} branch ${branch.branchName}.`);
+                    core.info(`Failed to retrieve branch protection for ${get_context_1.repo} branch ${branch.branchName}.`);
                 }
             }
         }
@@ -596,7 +596,6 @@ function getBranches() {
                 branches.splice(index, 1);
             }
         }
-        core.info(`branches after protection check: ${branches}`);
         assert.ok(branches, 'Response cannot be empty.');
         core.info((0, log_get_branches_1.logGetBranches)(branches.length));
         return branches;
