@@ -18,7 +18,7 @@ jobs:
     - name: Stale Branches
       uses: michael-vonkeitz/stale-branches@allow-protected-branch-deletion
       with:
-        repo-token: "${{ secrets.GITHUB_TOKEN }}"
+        repo-token: "${{ secrets.STALE_BRANCHES }}"
         days-before-stale: 1
         comment-updates: true
         tag-committer: true
