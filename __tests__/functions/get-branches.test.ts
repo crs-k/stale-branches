@@ -26,7 +26,7 @@ describe('Get Branches Function', () => {
   test('Action fails elegantly - Error', async () => {
     core.setFailed = jest.fn()
     assert.ok = jest.fn()
-    assert.ok.mockImplementation(() => {
+    assert.ok.mockImplementationOnce(() => {
       throw new Error('Response cannot be empty.')
     })
 
@@ -37,7 +37,7 @@ describe('Get Branches Function', () => {
   test('Action fails elegantly - String', async () => {
     core.setFailed = jest.fn()
     assert.ok = jest.fn()
-    assert.ok.mockImplementation(() => {
+    assert.ok.mockImplementationOnce(() => {
       throw new String('Response cannot be empty.')
     })
 
@@ -46,21 +46,59 @@ describe('Get Branches Function', () => {
   })
 
   test('Include protected branches activated', async () => {
-    core.info = jest.fn()
-    assert.ok = jest.fn()
-
-    const branches: BranchResponse[] = [
-      { branchName: 'branch1', commmitSha: '12345' },
-      { branchName: 'branch2', commmitSha: '67890' }
+    // Mock the response you expect from paginate
+    const paginateResponse: BranchResponse[] = [
+      {branchName: 'branch1', commmitSha: 'commit1'},
+      {branchName: 'branch2', commmitSha: 'commit2'}
     ]
 
-    github.paginate = jest.fn().mockResolvedValue(branches) as unknown as typeof github.paginate;
-    jest.spyOn(require('../../src/functions/check-branch-protection'), "checkBranchProtection").mockImplementation(() => {})
+    // Spy on github.paginate and mock its resolved value
+    const paginateSpy = jest.spyOn(github, 'paginate').mockResolvedValueOnce(paginateResponse)
+    jest.spyOn(require('../../src/functions/check-branch-protection'), 'checkBranchProtection').mockImplementationOnce(() => {})
 
+    // Call your function
     const branchResponse = await getBranches(true)
 
-    expect(github.paginate).toHaveBeenCalled()
-    expect(checkBranchProtection).toHaveBeenCalledWith(branches)
-    assert(branchResponse == branches)
+    // Assert that github.paginate was called with expected arguments
+    expect(paginateSpy).toHaveBeenCalledWith(
+      github.rest.repos.listBranches,
+      {
+        owner: expect.any(String),
+        repo: expect.any(String),
+        per_page: expect.any(Number),
+      },
+      expect.any(Function)
+    )
+    expect(checkBranchProtection).toHaveBeenCalledWith(paginateResponse)
+    expect(branchResponse).toEqual(paginateResponse)
+  })
+
+  test('Include protected branches deactivated', async () => {
+    // Mock the response you expect from paginate
+    const paginateResponse: BranchResponse[] = [
+      {branchName: 'branch1', commmitSha: 'commit1'},
+      {branchName: 'branch2', commmitSha: 'commit2'}
+    ]
+
+    // Spy on github.paginate and mock its resolved value
+    const paginateSpy = jest.spyOn(github, 'paginate').mockResolvedValueOnce(paginateResponse)
+    jest.spyOn(require('../../src/functions/check-branch-protection'), 'checkBranchProtection').mockImplementationOnce(() => {})
+
+    // Call your function
+    const branchResponse = await getBranches(false)
+
+    // Assert that github.paginate was called with expected arguments
+    expect(paginateSpy).toHaveBeenCalledWith(
+      github.rest.repos.listBranches,
+      {
+        owner: expect.any(String),
+        repo: expect.any(String),
+        per_page: expect.any(Number),
+        protected: false
+      },
+      expect.any(Function)
+    )
+    expect(checkBranchProtection).toBeCalledTimes(0)
+    expect(branchResponse).toEqual(paginateResponse)
   })
 })

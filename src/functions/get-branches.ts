@@ -12,14 +12,26 @@ import {checkBranchProtection} from './check-branch-protection'
  */
 export async function getBranches(includeProtectedBranches:boolean): Promise<BranchResponse[]> {
   let branches: BranchResponse[]
+  let listBranchesParams;
+  if (includeProtectedBranches) {
+    listBranchesParams = {
+      owner,
+      repo,
+      per_page: 100,
+    };
+  } else {
+    listBranchesParams = {
+      owner,
+      repo,
+      per_page: 100,
+      protected: false,
+    };
+  }
+
   try {
     const branchResponse = await github.paginate(
       github.rest.repos.listBranches,
-      {
-        owner,
-        repo,
-        per_page: 100
-      },
+      listBranchesParams,
       response =>
         response.data.map(
           branch =>

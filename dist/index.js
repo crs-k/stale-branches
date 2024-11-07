@@ -628,12 +628,24 @@ const check_branch_protection_1 = __nccwpck_require__(6807);
 function getBranches(includeProtectedBranches) {
     return __awaiter(this, void 0, void 0, function* () {
         let branches;
-        try {
-            const branchResponse = yield get_context_1.github.paginate(get_context_1.github.rest.repos.listBranches, {
+        let listBranchesParams;
+        if (includeProtectedBranches) {
+            listBranchesParams = {
                 owner: get_context_1.owner,
                 repo: get_context_1.repo,
-                per_page: 100
-            }, response => response.data.map(branch => ({
+                per_page: 100,
+            };
+        }
+        else {
+            listBranchesParams = {
+                owner: get_context_1.owner,
+                repo: get_context_1.repo,
+                per_page: 100,
+                protected: false,
+            };
+        }
+        try {
+            const branchResponse = yield get_context_1.github.paginate(get_context_1.github.rest.repos.listBranches, listBranchesParams, response => response.data.map(branch => ({
                 branchName: branch.name,
                 commmitSha: branch.commit.sha
             })));
