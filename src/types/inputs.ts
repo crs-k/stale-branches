@@ -93,4 +93,13 @@ export interface Inputs {
    * Support boolean input list: `true | True | TRUE | false | False | FALSE`.
    */
   ignoreIssueInteraction: boolean
+
+  /**
+   * If this is enabled, the action will include protected branches in the process
+   *
+   * Must meet YAML 1.2 "Core Schema" specification.
+   *
+   * Support boolean input list: `true | True | TRUE | false | False | FALSE`.
+   */
+  includeProtectedBranches: boolean
 }

@@ -18,6 +18,88 @@ var CompareBranchesEnum;
 
 /***/ }),
 
+/***/ 6807:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.checkBranchProtection = checkBranchProtection;
+const core = __importStar(__nccwpck_require__(2186));
+const get_context_1 = __nccwpck_require__(7782);
+/**
+ * Removes branches that don´t allow deletions
+ */
+function checkBranchProtection(branches) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var _a;
+        const branchesToRemove = [];
+        for (const branch of branches) {
+            try {
+                const branchProtection = yield get_context_1.github.rest.repos.getBranchProtection({
+                    owner: get_context_1.owner,
+                    repo: get_context_1.repo,
+                    branch: branch.branchName
+                });
+                if (!((_a = branchProtection.data.allow_deletions) === null || _a === void 0 ? void 0 : _a.enabled)) {
+                    //remove branch from list
+                    branchesToRemove.push(branch);
+                }
+            }
+            catch (err) {
+                if (err instanceof Error) {
+                    core.info(`Failed to retrieve branch protection for branch ${branch.branchName}. Error: ${err.message}`);
+                }
+                else {
+                    core.info(`Failed to retrieve branch protection for branch ${branch.branchName}.`);
+                }
+            }
+        }
+        // remove branches that don´t allow deletions
+        for (const branch of branchesToRemove) {
+            const index = branches.indexOf(branch, 0);
+            if (index > -1) {
+                branches.splice(index, 1);
+            }
+        }
+    });
+}
+
+
+/***/ }),
+
 /***/ 4094:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -532,26 +614,42 @@ const assert = __importStar(__nccwpck_require__(9491));
 const core = __importStar(__nccwpck_require__(2186));
 const get_context_1 = __nccwpck_require__(7782);
 const log_get_branches_1 = __nccwpck_require__(5765);
+const check_branch_protection_1 = __nccwpck_require__(6807);
 /**
  * Retrieves all branches in a repository
  *
  * @returns {BranchResponse} A subset of data on all branches in a repository @see {@link BranchResponse}
  */
-function getBranches() {
+function getBranches(includeProtectedBranches) {
     return __awaiter(this, void 0, void 0, function* () {
-        var _a;
         let branches;
-        try {
-            const branchResponse = yield get_context_1.github.paginate(get_context_1.github.rest.repos.listBranches, {
+        let listBranchesParams;
+        if (includeProtectedBranches) {
+            listBranchesParams = {
                 owner: get_context_1.owner,
                 repo: get_context_1.repo,
-                //protected: false,
                 per_page: 100
-            }, response => response.data.map(branch => ({
+            };
+        }
+        else {
+            listBranchesParams = {
+                owner: get_context_1.owner,
+                repo: get_context_1.repo,
+                per_page: 100,
+                protected: false
+            };
+        }
+        try {
+            const branchResponse = yield get_context_1.github.paginate(get_context_1.github.rest.repos.listBranches, listBranchesParams, response => response.data.map(branch => ({
                 branchName: branch.name,
                 commmitSha: branch.commit.sha
             })));
             branches = branchResponse;
+            if (includeProtectedBranches) {
+                yield (0, check_branch_protection_1.checkBranchProtection)(branches);
+            }
+            assert.ok(branches, 'Response cannot be empty.');
+            core.info((0, log_get_branches_1.logGetBranches)(branches.length));
         }
         catch (err) {
             if (err instanceof Error) {
@@ -562,37 +660,6 @@ function getBranches() {
             }
             branches = [{ branchName: '', commmitSha: '' }];
         }
-        const branchesToRemove = [];
-        try {
-            for (const branch of branches) {
-                const branchProtection = yield get_context_1.github.rest.repos.getBranchProtection({
-                    owner: get_context_1.owner,
-                    repo: get_context_1.repo,
-                    branch: branch.branchName
-                });
-                if (!((_a = branchProtection.data.allow_deletions) === null || _a === void 0 ? void 0 : _a.enabled)) {
-                    //remove branch from list
-                    branchesToRemove.push(branch);
-                }
-            }
-            // remove branches that don´t allow deletions
-            for (const branch of branchesToRemove) {
-                const index = branches.indexOf(branch, 0);
-                if (index > -1) {
-                    branches.splice(index, 1);
-                }
-            }
-        }
-        catch (err) {
-            if (err instanceof Error) {
-                core.setFailed(`Failed to retrieve branch protection for ${get_context_1.repo}. Error: ${err.message}`);
-            }
-            else {
-                core.setFailed(`Failed to retrieve branch protection for ${get_context_1.repo}.`);
-            }
-        }
-        assert.ok(branches, 'Response cannot be empty.');
-        core.info((0, log_get_branches_1.logGetBranches)(branches.length));
         return branches;
     });
 }
@@ -867,6 +934,7 @@ function validateInputs() {
             const inputPrCheck = core.getBooleanInput('pr-check');
             const dryRun = core.getBooleanInput('dry-run');
             const ignoreIssueInteraction = core.getBooleanInput('ignore-issue-interaction');
+            const includeProtectedBranches = core.getBooleanInput('include-protected-branches');
             //Assign inputs
             result.daysBeforeStale = inputDaysBeforeStale;
             result.daysBeforeDelete = inputDaysBeforeDelete;
@@ -880,6 +948,7 @@ function validateInputs() {
             result.prCheck = inputPrCheck;
             result.dryRun = dryRun;
             result.ignoreIssueInteraction = ignoreIssueInteraction;
+            result.includeProtectedBranches = includeProtectedBranches;
         }
         catch (err) {
             if (err instanceof Error) {
@@ -1933,7 +2002,7 @@ function run() {
                 throw new Error('Invalid inputs');
             }
             //Collect Branches, Issue Budget, Existing Issues, & initialize lastCommitLogin
-            const unfilteredBranches = yield (0, get_branches_1.getBranches)();
+            const unfilteredBranches = yield (0, get_branches_1.getBranches)(validInputs.includeProtectedBranches);
             const branches = yield (0, filter_branches_1.filterBranches)(unfilteredBranches, validInputs.branchesFilterRegex);
             const outputTotal = branches.length;
             let existingIssue = yield (0, get_issues_1.getIssues)(validInputs.staleBranchLabel);
