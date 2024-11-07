@@ -27,5 +27,5 @@ jobs:
         stale-branch-label: 'stale branch 🗑️'
         branches-filter-regex: '^((?!dependabot))'
         pr-check: true
-        dry-run: true
+        dry-run: false
         include-protected-branches: true
