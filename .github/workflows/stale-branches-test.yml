@@ -25,7 +25,7 @@ jobs:
         days-before-delete: 180
         max-issues: 20
         stale-branch-label: 'stale branch 🗑️'
-        branches-filter-regex: '^((?!dependabot))'
+        branches-filter-regex: '^((?!dependabot))((?!main))'
         pr-check: true
         dry-run: false
         include-protected-branches: true
