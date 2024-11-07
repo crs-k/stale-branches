@@ -28,3 +28,4 @@ jobs:
         branches-filter-regex: '^((?!dependabot))'
         pr-check: true
         dry-run: true
+        include-protected-branches: true
