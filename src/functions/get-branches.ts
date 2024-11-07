@@ -10,36 +10,33 @@ import {checkBranchProtection} from './check-branch-protection'
  *
  * @returns {BranchResponse} A subset of data on all branches in a repository @see {@link BranchResponse}
  */
-export async function getBranches(includeProtectedBranches:boolean): Promise<BranchResponse[]> {
+export async function getBranches(includeProtectedBranches: boolean): Promise<BranchResponse[]> {
   let branches: BranchResponse[]
-  let listBranchesParams;
+  let listBranchesParams
   if (includeProtectedBranches) {
     listBranchesParams = {
       owner,
       repo,
-      per_page: 100,
-    };
+      per_page: 100
+    }
   } else {
     listBranchesParams = {
       owner,
       repo,
       per_page: 100,
-      protected: false,
-    };
+      protected: false
+    }
   }
 
   try {
-    const branchResponse = await github.paginate(
-      github.rest.repos.listBranches,
-      listBranchesParams,
-      response =>
-        response.data.map(
-          branch =>
-            ({
-              branchName: branch.name,
-              commmitSha: branch.commit.sha
-            }) as BranchResponse
-        )
+    const branchResponse = await github.paginate(github.rest.repos.listBranches, listBranchesParams, response =>
+      response.data.map(
+        branch =>
+          ({
+            branchName: branch.name,
+            commmitSha: branch.commit.sha
+          }) as BranchResponse
+      )
     )
     branches = branchResponse
 

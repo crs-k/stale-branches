@@ -65,21 +65,17 @@ const get_context_1 = __nccwpck_require__(7782);
 function checkBranchProtection(branches) {
     return __awaiter(this, void 0, void 0, function* () {
         var _a;
-        core.info(`branches before protection check: ${branches.length}`);
         const branchesToRemove = [];
         for (const branch of branches) {
-            core.info(`get branch protection for branch: ${branch.branchName}`);
             try {
                 const branchProtection = yield get_context_1.github.rest.repos.getBranchProtection({
                     owner: get_context_1.owner,
                     repo: get_context_1.repo,
                     branch: branch.branchName
                 });
-                core.info('branch protection: ' + branchProtection);
                 if (!((_a = branchProtection.data.allow_deletions) === null || _a === void 0 ? void 0 : _a.enabled)) {
                     //remove branch from list
                     branchesToRemove.push(branch);
-                    core.info('branch to remove: ' + branch.branchName);
                 }
             }
             catch (err) {
@@ -91,7 +87,6 @@ function checkBranchProtection(branches) {
                 }
             }
         }
-        core.info('branches to remove: ' + branchesToRemove.length);
         // remove branches that don´t allow deletions
         for (const branch of branchesToRemove) {
             const index = branches.indexOf(branch, 0);
@@ -633,7 +628,7 @@ function getBranches(includeProtectedBranches) {
             listBranchesParams = {
                 owner: get_context_1.owner,
                 repo: get_context_1.repo,
-                per_page: 100,
+                per_page: 100
             };
         }
         else {
@@ -641,7 +636,7 @@ function getBranches(includeProtectedBranches) {
                 owner: get_context_1.owner,
                 repo: get_context_1.repo,
                 per_page: 100,
-                protected: false,
+                protected: false
             };
         }
         try {
