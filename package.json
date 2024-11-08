@@ -29,28 +29,28 @@
     "actions"
   ],
   "dependencies": {
-    "@actions/core": "1.10.1",
+    "@actions/core": "1.11.1",
     "@actions/github": "6.0.0",
-    "@octokit/plugin-paginate-rest": "11.3.3",
+    "@octokit/plugin-paginate-rest": "11.3.5",
     "@octokit/types": "12.5.0",
     "@types/semver": "7.5.8",
     "assert": "2.1.0"
   },
   "devDependencies": {
-    "@types/jest": "29.5.12",
-    "@types/node": "22.5.0",
+    "@types/jest": "29.5.14",
+    "@types/node": "22.9.0",
     "@typescript-eslint/parser": "5.62.0",
-    "@vercel/ncc": "0.38.1",
+    "@vercel/ncc": "0.38.2",
     "ansi-styles": "5.2.0",
-    "eslint": "8.57.0",
-    "eslint-plugin-github": "5.0.1",
+    "eslint": "8.57.1",
+    "eslint-plugin-github": "5.0.2",
     "eslint-plugin-jest": "27.9.0",
     "eslint-plugin-prettier": "5.2.1",
     "js-yaml": "4.1.0",
     "npm-package-json-lint": "8.0.0",
     "prettier": "3.3.3",
-    "ts-jest": "29.2.4",
-    "typescript": "5.5.4"
+    "ts-jest": "29.2.5",
+    "typescript": "5.6.3"
   },
   "engines": {
     "node": ">=20.0.0"
