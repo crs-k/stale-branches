@@ -54,6 +54,10 @@ inputs:
     description: 'If this is enabled, the action will not interact with Github issues.'
     required: false
     default: 'false'
+  include-protected-branches:
+    description: 'If this is enabled, the action will include protected branches in the process.'
+    required: false
+    default: 'false'
 outputs:
   deleted-branches:
     description: 'List of all deleted branches.'
