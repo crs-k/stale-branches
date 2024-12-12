@@ -768,7 +768,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var _a;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.repo = exports.owner = exports.github = void 0;
 exports.validateInputs = validateInputs;
@@ -778,7 +777,15 @@ const input_compare_branches_1 = __nccwpck_require__(5269);
 const repoToken = core.getInput('repo-token');
 core.setSecret(repoToken);
 exports.github = (0, github_1.getOctokit)(repoToken);
-_a = github_1.context.repo, exports.owner = _a.owner, exports.repo = _a.repo;
+// eslint-disable-next-line import/no-mutable-exports
+let { owner: owner, repo: repo } = github_1.context.repo;
+exports.owner = owner;
+exports.repo = repo;
+if (core.getInput('repository') && core.getInput('repository').split('/').length === 2) {
+    const repoInput = core.getInput('repository').split('/');
+    exports.owner = owner = repoInput[0];
+    exports.repo = repo = repoInput[1];
+}
 /**
  * Validates the Action's inputs and assigns them to the Inputs type
  *
