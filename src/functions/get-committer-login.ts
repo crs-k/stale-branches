@@ -20,7 +20,10 @@ export async function getRecentCommitLogin(sha: string): Promise<string> {
       page: 1
     })
     const commitData = commitResponse.data
-    lastCommitter = commitData.committer?.login || commitData.author?.login || commitData.commit?.committer?.name || commitData.commit?.author?.name
+    lastCommitter = commitData.committer?.login
+    if (!lastCommitter || lastCommitter === 'web-flow') {
+      lastCommitter = commitData.author?.login || commitData.commit?.committer?.name || commitData.commit?.author?.name
+    }
     assert.ok(lastCommitter, 'Committer cannot be empty.')
   } catch (err) {
     if (err instanceof Error) {
