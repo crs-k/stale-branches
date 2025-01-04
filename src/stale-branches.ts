@@ -48,7 +48,7 @@ export async function run(): Promise<void> {
       throw new Error('Invalid inputs')
     }
     //Collect Branches, Issue Budget, Existing Issues, & initialize lastCommitLogin
-    const unfilteredBranches = await getBranches()
+    const unfilteredBranches = await getBranches(validInputs.includeProtectedBranches)
     const branches = await filterBranches(unfilteredBranches, validInputs.branchesFilterRegex)
     const outputTotal = branches.length
     let existingIssue = await getIssues(validInputs.staleBranchLabel)
