@@ -50,7 +50,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./
         with:
-          repo-token: '${{ secrets.GITHUB_TOKEN }}'
+          repo-token: '${{ secrets.ADMINPAT }}'
           days-before-stale: 1
           days-before-delete: 200
           comment-updates: true
