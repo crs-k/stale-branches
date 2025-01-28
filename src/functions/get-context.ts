@@ -85,6 +85,7 @@ export async function validateInputs(): Promise<Inputs> {
     const inputPrCheck = core.getBooleanInput('pr-check')
     const dryRun = core.getBooleanInput('dry-run')
     const ignoreIssueInteraction = core.getBooleanInput('ignore-issue-interaction')
+    const includeProtectedBranches = core.getBooleanInput('include-protected-branches')
 
     //Assign inputs
     result.daysBeforeStale = inputDaysBeforeStale
@@ -99,6 +100,7 @@ export async function validateInputs(): Promise<Inputs> {
     result.prCheck = inputPrCheck
     result.dryRun = dryRun
     result.ignoreIssueInteraction = ignoreIssueInteraction
+    result.includeProtectedBranches = includeProtectedBranches
   } catch (err: unknown) {
     if (err instanceof Error) {
       core.setFailed(`Failed to validate inputs. Error: ${err.message}`)

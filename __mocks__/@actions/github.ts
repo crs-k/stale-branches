@@ -23,6 +23,7 @@ export const validInputs: Inputs = {
   prCheck: false,
   dryRun: false,
   ignoreIssueInteraction: false,
+  includeProtectedBranches: false,
 }
 
 type ListIssuesResponseDataType = GetResponseTypeFromEndpointMethod<typeof githubActual.github.rest.issues.listForRepo>
