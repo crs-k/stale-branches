@@ -46,4 +46,18 @@ describe('Get Commits Function', () => {
     await getRecentCommitLogin(sha)
     expect(core.info).toHaveBeenCalledWith(`Failed to retrieve commit for 123 in repo.`)
   })
+
+  test('Handles missing owner or repo gracefully', async () => {
+    github.rest.repos.getCommit = jest.fn().mockRejectedValue(new Error('Not Found')) as unknown as typeof github.rest.repos.getCommit;
+
+    core.info = jest.fn()
+
+    await getRecentCommitLogin(sha)
+
+    expect(core.info).toHaveBeenCalledWith(
+      `Failed to retrieve commit for 123 in repo. Error: Not Found`
+    )
+  })
+
+
 })
