@@ -6,7 +6,13 @@ const config = {
     clearMocks: true,
     testMatch: ['**/*.test.ts'],
     transform: {
-        '^.+\\.ts?$': 'ts-jest',
+        '^.+\\.tsx?$': 'ts-jest'
     },
+    transformIgnorePatterns: [
+        'node_modules/(?!@octokit/.*)'
+    ],
+    moduleNameMapper: {
+        '^@octokit/request-error$': '<rootDir>/__mocks__/request-error.ts'
+    }
 };
 exports.default = config;
