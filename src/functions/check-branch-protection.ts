@@ -24,6 +24,8 @@ export async function checkBranchProtection(branches: BranchResponse[]): Promise
     return
   }
 
+  const includeProtectedBranches = core.getInput('include-protected-branches').toLowerCase() === 'true'
+
   for (const branch of branches) {
     // Skip the default branch
     if (branch.branchName === defaultBranch) {
@@ -31,7 +33,7 @@ export async function checkBranchProtection(branches: BranchResponse[]): Promise
       continue
     }
 
-    core.info(`Checking: ${branch.branchName}`)
+    core.startGroup(`Checking: ${branch.branchName}`)
 
     let hasBranchProtection = false
     let branchProtectionAllowsDeletion = false
@@ -48,10 +50,9 @@ export async function checkBranchProtection(branches: BranchResponse[]): Promise
 
       hasBranchProtection = true
       branchProtectionAllowsDeletion = branchProtection.data.allow_deletions?.enabled ?? false
-      core.info(`Protection: ${branchProtectionAllowsDeletion ? '✅ allows deletion' : '❌ prevents deletion'}`)
     } catch (err) {
       if (err instanceof RequestError && err.status === 404) {
-        core.info('Protection: None')
+        // No branch protection
       }
     }
 
@@ -65,20 +66,39 @@ export async function checkBranchProtection(branches: BranchResponse[]): Promise
 
       hasRulesetProtection = rulesets.data.length > 0
       rulesetAllowsDeletion = !rulesets.data.some(ruleset => !ruleset.deletion)
-      core.info(`Rulesets: ${hasRulesetProtection ? `${rulesets.data.length} found` : 'None'}`)
     } catch (err) {
       if (err instanceof RequestError && err.status === 404) {
-        core.info('Rulesets: None')
+        // No rulesets
       }
     }
 
-    // If either protection system prevents deletion, remove the branch
-    if ((hasBranchProtection && !branchProtectionAllowsDeletion) || (hasRulesetProtection && !rulesetAllowsDeletion)) {
-      core.info(`❌ ${branch.branchName} is protected and cannot be deleted\n---\n`)
-      branchesToRemove.push(branch)
-    } else {
-      core.info(`✅ ${branch.branchName} is eligible for deletion\n---\n`)
+    // Determine protection type
+    let isProtected = false
+    let protectionType = ''
+    if (hasBranchProtection && !branchProtectionAllowsDeletion && hasRulesetProtection && !rulesetAllowsDeletion) {
+      isProtected = true
+      protectionType = 'branch protection and ruleset'
+    } else if (hasBranchProtection && !branchProtectionAllowsDeletion) {
+      isProtected = true
+      protectionType = 'branch protection'
+    } else if (hasRulesetProtection && !rulesetAllowsDeletion) {
+      isProtected = true
+      protectionType = 'ruleset'
     }
+
+    if (isProtected) {
+      if (includeProtectedBranches) {
+        core.info(`✅ ${branch.branchName} is protected by ${protectionType} and is eligible for deletion`)
+      } else {
+        core.info(`❌ ${branch.branchName} is protected by ${protectionType} and cannot be deleted`)
+        branchesToRemove.push(branch)
+      }
+    } else {
+      core.info(`✅ ${branch.branchName} is eligible for deletion`)
+    }
+
+    core.endGroup()
+    core.info('---\n')
   }
 
   // remove branches that don´t allow deletions
