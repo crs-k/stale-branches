@@ -102,4 +102,10 @@ export interface Inputs {
    * Support boolean input list: `true | True | TRUE | false | False | FALSE`.
    */
   includeProtectedBranches: boolean
+
+  /**
+   * Comma-separated list of commit messages (or substrings) to ignore when determining commit age.
+   * If provided, commits with these messages will be ignored when calculating branch age.
+   */
+  ignoreCommitMessages?: string
 }

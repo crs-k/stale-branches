@@ -832,6 +832,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getRecentCommitAge = getRecentCommitAge;
+exports.getRecentCommitAgeByNonIgnoredMessage = getRecentCommitAgeByNonIgnoredMessage;
 const assert = __importStar(__nccwpck_require__(2613));
 const core = __importStar(__nccwpck_require__(7484));
 const get_context_1 = __nccwpck_require__(7740);
@@ -846,7 +847,7 @@ const get_time_1 = __nccwpck_require__(3692);
 function getRecentCommitAge(sha) {
     return __awaiter(this, void 0, void 0, function* () {
         let commitDate;
-        const currentDate = new Date().getTime();
+        const currentDate = Date.now();
         try {
             const commitResponse = yield get_context_1.github.rest.repos.getCommit({
                 owner: get_context_1.owner,
@@ -870,6 +871,70 @@ function getRecentCommitAge(sha) {
         const commitDateTime = new Date(commitDate).getTime();
         const commitAge = (0, get_time_1.getDays)(currentDate, commitDateTime);
         return commitAge;
+    });
+}
+/**
+ * Calculates the age of the most recent commit not matching any ignored commit messages, up to a max age.
+ *
+ * @param {string} sha The SHA of the branch head
+ * @param {string[]} ignoredMessages Array of commit messages or substrings to ignore
+ * @param {number} [maxAgeDays] Optional. If provided, stop searching if a commit is older than this many days.
+ *
+ * @returns {number} The age of the most recent non-ignored commit, or maxAgeDays if none found within that range
+ */
+function getRecentCommitAgeByNonIgnoredMessage(sha, ignoredMessages, maxAgeDays) {
+    return __awaiter(this, void 0, void 0, function* () {
+        var _a, _b, _c;
+        const currentDate = Date.now();
+        let page = 1;
+        let commitDate;
+        let found = false;
+        while (!found) {
+            const commitsResponse = yield get_context_1.github.rest.repos.listCommits({
+                owner: get_context_1.owner,
+                repo: get_context_1.repo,
+                sha,
+                per_page: 100,
+                page
+            });
+            if (commitsResponse.data.length === 0)
+                break;
+            for (const commit of commitsResponse.data) {
+                const message = ((_a = commit.commit) === null || _a === void 0 ? void 0 : _a.message) || '';
+                const commitDateStr = (_c = (_b = commit.commit) === null || _b === void 0 ? void 0 : _b.committer) === null || _c === void 0 ? void 0 : _c.date;
+                if (!commitDateStr)
+                    continue;
+                const commitDateTime = new Date(commitDateStr).getTime();
+                const commitAge = (0, get_time_1.getDays)(currentDate, commitDateTime);
+                // If maxAgeDays is set and this commit is older than the threshold, stop searching
+                if (maxAgeDays !== undefined && commitAge > maxAgeDays) {
+                    // If we haven't found a valid commit yet, return maxAgeDays
+                    if (!commitDate) {
+                        return maxAgeDays;
+                    }
+                    else {
+                        // We already found a valid commit in this or a previous page, break out
+                        found = true;
+                        break;
+                    }
+                }
+                if (ignoredMessages.some(msg => message.includes(msg))) {
+                    continue;
+                }
+                // Found a valid commit within the window
+                commitDate = commitDateStr;
+                found = true;
+                break;
+            }
+            if (found)
+                break;
+            page++;
+        }
+        if (commitDate) {
+            const commitDateTime = new Date(commitDate).getTime();
+            return (0, get_time_1.getDays)(currentDate, commitDateTime);
+        }
+        throw new Error('No non-ignored commit found');
     });
 }
 
@@ -1084,6 +1149,7 @@ function validateInputs() {
             const dryRun = core.getBooleanInput('dry-run');
             const ignoreIssueInteraction = core.getBooleanInput('ignore-issue-interaction');
             const includeProtectedBranches = core.getBooleanInput('include-protected-branches');
+            const ignoreCommitMessages = core.getInput('ignore-commit-messages');
             //Assign inputs
             result.daysBeforeStale = inputDaysBeforeStale;
             result.daysBeforeDelete = inputDaysBeforeDelete;
@@ -1098,6 +1164,9 @@ function validateInputs() {
             result.dryRun = dryRun;
             result.ignoreIssueInteraction = ignoreIssueInteraction;
             result.includeProtectedBranches = includeProtectedBranches;
+            if (ignoreCommitMessages) {
+                result.ignoreCommitMessages = ignoreCommitMessages;
+            }
         }
         catch (err) {
             if (err instanceof Error) {
@@ -2206,7 +2275,7 @@ function closeIssueWrappedLogs(issueNumber, validInputs, branchName) {
         else if (validInputs.ignoreIssueInteraction) {
             core.info(`Ignoring issue interaction: Issue would be closed for branch: ${branchName}`);
         }
-        return "";
+        return '';
     });
 }
 function run() {
@@ -2249,7 +2318,17 @@ function run() {
                     }
                 }
                 //Get age of last commit, generate issue title, and filter existing issues to current branch
-                const commitAge = yield (0, get_commit_age_1.getRecentCommitAge)(branchToCheck.commmitSha);
+                let commitAge;
+                if (validInputs.ignoreCommitMessages && validInputs.ignoreCommitMessages.trim() !== '') {
+                    const ignoredMessages = validInputs.ignoreCommitMessages
+                        .split(',')
+                        .map(s => s.trim())
+                        .filter(Boolean);
+                    commitAge = yield (0, get_commit_age_1.getRecentCommitAgeByNonIgnoredMessage)(branchToCheck.commmitSha, ignoredMessages, validInputs.daysBeforeDelete);
+                }
+                else {
+                    commitAge = yield (0, get_commit_age_1.getRecentCommitAge)(branchToCheck.commmitSha);
+                }
                 const issueTitleString = (0, create_issues_title_string_1.createIssueTitleString)(branchToCheck.branchName);
                 const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === issueTitleString);
                 // Skip looking for last commit's login if input is set to false
@@ -2342,7 +2421,7 @@ function run() {
                             break;
                         }
                     }
-                    yield closeIssueWrappedLogs(issueToDelete.issueNumber, validInputs, "Orphaned Issue");
+                    yield closeIssueWrappedLogs(issueToDelete.issueNumber, validInputs, 'Orphaned Issue');
                 }
                 core.endGroup();
             }

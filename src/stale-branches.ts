@@ -9,7 +9,7 @@ import {getBranches} from './functions/get-branches'
 import {getIssueBudget} from './functions/get-stale-issue-budget'
 import {getIssues} from './functions/get-issues'
 import {getRateLimit} from './functions/get-rate-limit'
-import {getRecentCommitAge} from './functions/get-commit-age'
+import {getRecentCommitAge, getRecentCommitAgeByNonIgnoredMessage} from './functions/get-commit-age'
 import {getRecentCommitLogin} from './functions/get-committer-login'
 import {logActiveBranch} from './functions/logging/log-active-branch'
 import {logBranchGroupColor} from './functions/logging/log-branch-group-color'
@@ -34,7 +34,7 @@ async function closeIssueWrappedLogs(issueNumber: number, validInputs: Inputs, b
   } else if (validInputs.ignoreIssueInteraction) {
     core.info(`Ignoring issue interaction: Issue would be closed for branch: ${branchName}`)
   }
-  return ""
+  return ''
 }
 export async function run(): Promise<void> {
   //Declare output arrays
@@ -79,7 +79,16 @@ export async function run(): Promise<void> {
       }
 
       //Get age of last commit, generate issue title, and filter existing issues to current branch
-      const commitAge = await getRecentCommitAge(branchToCheck.commmitSha)
+      let commitAge: number
+      if (validInputs.ignoreCommitMessages && validInputs.ignoreCommitMessages.trim() !== '') {
+        const ignoredMessages = validInputs.ignoreCommitMessages
+          .split(',')
+          .map(s => s.trim())
+          .filter(Boolean)
+        commitAge = await getRecentCommitAgeByNonIgnoredMessage(branchToCheck.commmitSha, ignoredMessages, validInputs.daysBeforeDelete)
+      } else {
+        commitAge = await getRecentCommitAge(branchToCheck.commmitSha)
+      }
       const issueTitleString = createIssueTitleString(branchToCheck.branchName)
       const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === issueTitleString)
 
@@ -186,7 +195,7 @@ export async function run(): Promise<void> {
             break
           }
         }
-        await closeIssueWrappedLogs(issueToDelete.issueNumber, validInputs, "Orphaned Issue")
+        await closeIssueWrappedLogs(issueToDelete.issueNumber, validInputs, 'Orphaned Issue')
       }
       core.endGroup()
     }
