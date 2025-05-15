@@ -91,13 +91,14 @@ function checkBranchProtection(branches) {
             core.warning(`Failed to fetch default branch: ${err instanceof Error ? err.message : 'Unknown error'}`);
             return;
         }
+        const includeProtectedBranches = core.getInput('include-protected-branches').toLowerCase() === 'true';
         for (const branch of branches) {
             // Skip the default branch
             if (branch.branchName === defaultBranch) {
                 core.info(`⚠️ Skipping default branch: ${defaultBranch}\n`);
                 continue;
             }
-            core.info(`Checking: ${branch.branchName}`);
+            core.startGroup(`Checking: ${branch.branchName}`);
             let hasBranchProtection = false;
             let branchProtectionAllowsDeletion = false;
             let hasRulesetProtection = false;
@@ -111,11 +112,10 @@ function checkBranchProtection(branches) {
                 });
                 hasBranchProtection = true;
                 branchProtectionAllowsDeletion = (_b = (_a = branchProtection.data.allow_deletions) === null || _a === void 0 ? void 0 : _a.enabled) !== null && _b !== void 0 ? _b : false;
-                core.info(`Protection: ${branchProtectionAllowsDeletion ? '✅ allows deletion' : '❌ prevents deletion'}`);
             }
             catch (err) {
                 if (err instanceof request_error_1.RequestError && err.status === 404) {
-                    core.info('Protection: None');
+                    // No branch protection
                 }
             }
             // Check rulesets
@@ -127,21 +127,41 @@ function checkBranchProtection(branches) {
                 }));
                 hasRulesetProtection = rulesets.data.length > 0;
                 rulesetAllowsDeletion = !rulesets.data.some(ruleset => !ruleset.deletion);
-                core.info(`Rulesets: ${hasRulesetProtection ? `${rulesets.data.length} found` : 'None'}`);
             }
             catch (err) {
                 if (err instanceof request_error_1.RequestError && err.status === 404) {
-                    core.info('Rulesets: None');
+                    // No rulesets
                 }
             }
-            // If either protection system prevents deletion, remove the branch
-            if ((hasBranchProtection && !branchProtectionAllowsDeletion) || (hasRulesetProtection && !rulesetAllowsDeletion)) {
-                core.info(`❌ ${branch.branchName} is protected and cannot be deleted\n---\n`);
-                branchesToRemove.push(branch);
+            // Determine protection type
+            let isProtected = false;
+            let protectionType = '';
+            if (hasBranchProtection && !branchProtectionAllowsDeletion && hasRulesetProtection && !rulesetAllowsDeletion) {
+                isProtected = true;
+                protectionType = 'branch protection and ruleset';
+            }
+            else if (hasBranchProtection && !branchProtectionAllowsDeletion) {
+                isProtected = true;
+                protectionType = 'branch protection';
+            }
+            else if (hasRulesetProtection && !rulesetAllowsDeletion) {
+                isProtected = true;
+                protectionType = 'ruleset';
+            }
+            if (isProtected) {
+                if (includeProtectedBranches) {
+                    core.info(`✅ ${branch.branchName} is protected by ${protectionType} and is eligible for deletion`);
+                }
+                else {
+                    core.info(`❌ ${branch.branchName} is protected by ${protectionType} and cannot be deleted`);
+                    branchesToRemove.push(branch);
+                }
             }
             else {
-                core.info(`✅ ${branch.branchName} is eligible for deletion\n---\n`);
+                core.info(`✅ ${branch.branchName} is eligible for deletion`);
             }
+            core.endGroup();
+            core.info('---\n');
         }
         // remove branches that don´t allow deletions
         for (const branch of branchesToRemove) {
