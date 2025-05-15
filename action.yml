@@ -58,6 +58,11 @@ inputs:
     description: 'If this is enabled, the action will include protected branches in the process.'
     required: false
     default: 'false'
+  ignore-commit-messages:
+    description: >-
+      Comma-separated list of commit messages (or substrings) to ignore when determining commit age.
+      If provided, commits with these messages will be ignored when calculating branch age.
+    required: false
 outputs:
   deleted-branches:
     description: 'List of all deleted branches.'

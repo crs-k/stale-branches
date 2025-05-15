@@ -121,7 +121,7 @@ describe('Get Context Function', () => {
     expect(core.setFailed).toHaveBeenCalledWith(`Failed to validate inputs. Error: compare-branches input of 'bleh' is not valid.`)
   })
 
-  test('Expect Success: Proper Inputs', async () => {
+  test('Expect Success: Proper Inputs with ignore-commit-messages', async () => {
     core.setFailed = jest.fn()
     core.getBooleanInput = jest.fn().mockReturnValueOnce(true).mockReturnValueOnce(true)
     core.getInput = jest
@@ -132,10 +132,12 @@ describe('Get Context Function', () => {
       .mockReturnValueOnce('Stale Branch Label') // stale-branch-label
       .mockReturnValueOnce('save') // compare-branches
       .mockReturnValueOnce('^((?!dependabot).)*$') // branches-filter-regex
+      .mockReturnValueOnce('skip this message') // ignore-commit-messages
     await validateInputs()
 
-    expect(core.getInput).toHaveBeenCalledTimes(6)
+    expect(core.getInput).toHaveBeenCalledTimes(7)
     expect(core.getBooleanInput).toHaveBeenCalledTimes(7)
+    expect(core.getInput).toHaveBeenCalledWith('ignore-commit-messages')
   })
 
   test('Expect Failure: - TypeError', async () => {
