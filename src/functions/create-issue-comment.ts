@@ -23,6 +23,8 @@ import {logUpdateIssue} from './logging/log-update-issue'
  *
  * @param {boolean} tagLastCommitter If true, the user that last committed to this branch will be tagged
  *
+ * @param {object} [ignoredCommitInfo] Optional. Info about ignored commits (ignoredCount, usedFallback)
+ *
  * @returns {string} The time the comment was created
  */
 export async function createIssueComment(
@@ -33,14 +35,15 @@ export async function createIssueComment(
   commentUpdates: boolean,
   daysBeforeDelete: number,
   staleBranchLabel: string,
-  tagLastCommitter: boolean
+  tagLastCommitter: boolean,
+  ignoredCommitInfo?: {ignoredCount: number; usedFallback: boolean}
 ): Promise<string> {
   let createdAt = ''
   let commentUrl: string
   let bodyString: string
 
   if (commentUpdates === true) {
-    bodyString = createCommentString(branch, lastCommitter, commitAge, daysBeforeDelete, tagLastCommitter)
+    bodyString = createCommentString(branch, lastCommitter, commitAge, daysBeforeDelete, tagLastCommitter, ignoredCommitInfo)
 
     try {
       const issueResponse = await github.rest.issues.createComment({

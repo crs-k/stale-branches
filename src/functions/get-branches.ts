@@ -3,7 +3,6 @@ import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
 import {BranchResponse} from '../types/branches'
 import {logGetBranches} from './logging/log-get-branches'
-import {checkBranchProtection} from './check-branch-protection'
 
 /**
  * Retrieves all branches in a repository
@@ -39,10 +38,6 @@ export async function getBranches(includeProtectedBranches: boolean): Promise<Br
       )
     )
     branches = branchResponse
-
-    if (includeProtectedBranches) {
-      await checkBranchProtection(branches)
-    }
 
     assert.ok(branches, 'Response cannot be empty.')
     core.info(logGetBranches(branches.length))

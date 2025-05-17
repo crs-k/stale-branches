@@ -1,76 +1,84 @@
-name: 'Stale Branches'
-description: 'Finds and deletes stale branches'
-author: 'Chris Kerins'
+name: "Stale Branches"
+description: "Finds and deletes stale branches"
+author: "Chris Kerins"
 inputs:
   repo-token:
-    description: 'The token to be used to auth with GitHubs API. Can be passed in using `{{ secrets.GITHUB_TOKEN }}`'
+    description: "The token to be used to auth with GitHubs API. Can be passed in using `{{ secrets.GITHUB_TOKEN }}`"
     required: false
     default: ${{ github.token }}
   days-before-stale:
-    description: 'Number of days a branch has been inactive before it is considered stale. Default: 120.'
+    description: "Number of days a branch has been inactive before it is considered stale. Default: 120."
     required: false
-    default: '120'
+    default: "120"
   days-before-delete:
-    description: 'Number of days a branch has been inactive before it is deleted. Default: 180.'
+    description: "Number of days a branch has been inactive before it is deleted. Default: 180."
     required: false
-    default: '180'
+    default: "180"
   comment-updates:
-    description: 'If this is enabled, a comment with updated information will be added to existing issues each workflow run.'
+    description: "If this is enabled, a comment with updated information will be added to existing issues each workflow run."
     required: false
     default: false
   max-issues:
-    description: 'This dictates the number of Stale issues that can exist. It also limits the number of branches that can be deleted per run.'
+    description: "This dictates the number of Stale issues that can exist. It also limits the number of branches that can be deleted per run."
     required: false
-    default: '20'
+    default: "20"
   tag-committer:
-    description: 'When an issue is opened, this will tag the stale branchs last committer in the comments.'
+    description: "When an issue is opened, this will tag the stale branchs last committer in the comments."
     required: false
     default: false
   stale-branch-label:
-    description: 'Label to be applied to issues created for stale branches.'
+    description: "Label to be applied to issues created for stale branches."
     required: false
-    default: 'stale branch 🗑️'
+    default: "stale branch 🗑️"
   compare-branches:
-    description: 'Compares current branch with default branch. Options: off | info | save'
+    description: "Compares current branch with default branch. Options: off | info | save"
     required: false
-    default: 'off'
+    default: "off"
   branches-filter-regex:
-    description: 'An optional Regex that will be used to filter branches from this action.'
+    description: "An optional Regex that will be used to filter branches from this action."
     required: false
-    default: ''
+    default: ""
   rate-limit:
-    description: 'If this is enabled, the action will stop if it exceeds 95% of the GitHub API rate limit.'
+    description: "If this is enabled, the action will stop if it exceeds 95% of the GitHub API rate limit."
     required: false
-    default: 'true'
+    default: "true"
   pr-check:
-    description: 'If this is enabled, the action will first check for active pull requests against the branch. If a branch has an active pr, it will not be ignored.'
+    description: "If this is enabled, the action will first check for active pull requests against the branch. If a branch has an active pr, it will not be ignored."
     required: false
-    default: 'false'
+    default: "false"
   dry-run:
-    description: 'If this is enabled, the action will not delete or tag any branches.'
+    description: "If this is enabled, the action will not delete or tag any branches."
     required: false
-    default: 'false'
+    default: "false"
   ignore-issue-interaction:
-    description: 'If this is enabled, the action will not interact with Github issues.'
+    description: "If this is enabled, the action will not interact with Github issues."
     required: false
-    default: 'false'
+    default: "false"
   include-protected-branches:
-    description: 'If this is enabled, the action will include protected branches in the process.'
+    description: "If this is enabled, the action will include protected branches in the process."
     required: false
-    default: 'false'
+    default: "false"
   ignore-commit-messages:
     description: >-
       Comma-separated list of commit messages (or substrings) to ignore when determining commit age.
       If provided, commits with these messages will be ignored when calculating branch age.
     required: false
+  ignore-committers:
+    description: "Comma-separated list of committer usernames to ignore when calculating the most recent commit."
+    required: false
+    default: ""
+  ignore-default-branch-commits:
+    description: "If true, ignore commits that are also present in the default branch when determining the last meaningful commit."
+    required: false
+    default: "false"
 outputs:
   deleted-branches:
-    description: 'List of all deleted branches.'
+    description: "List of all deleted branches."
   stale-branches:
-    description: 'List of all stale branches.'
+    description: "List of all stale branches."
 runs:
-  using: 'node20'
-  main: 'dist/index.js'
+  using: "node20"
+  main: "dist/index.js"
 branding:
-  icon: 'delete'
-  color: 'blue'
+  icon: "delete"
+  color: "blue"
