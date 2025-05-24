@@ -11,5 +11,5 @@ export interface BranchResponse {
    *
    * Example: aef86c0cfec5f986ab3032af9010bbd6923b92ee
    */
-  commmitSha: string
+  commitSha: string
 }

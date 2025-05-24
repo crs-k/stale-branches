@@ -1,15 +1,17 @@
 import {BranchResponse} from '../../src/types/branches'
+import {getBranches} from '../../src/functions/get-branches'
+import {github} from '../../src/functions/get-context'
+import styles from 'ansi-styles'
 
 jest.mock('@actions/core')
 jest.mock('@actions/github')
 jest.mock('assert')
 jest.mock('../../src/functions/get-context')
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires, import/no-commonjs
 const core = require('@actions/core')
+// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-var-requires, import/no-commonjs
 const assert = require('assert')
-import {getBranches} from '../../src/functions/get-branches'
-import {github} from '../../src/functions/get-context'
-import styles from 'ansi-styles'
 
 describe('Get Branches Function', () => {
   test('github.paginate endpoint is called', async () => {
@@ -18,7 +20,9 @@ describe('Get Branches Function', () => {
     await getBranches(false)
 
     expect(github.paginate).toHaveBeenCalled()
-    expect(core.info).toHaveBeenCalledWith(`${styles.bold.open}[${styles.magenta.open}6${styles.magenta.close}] ${styles.blueBright.open}branches found${styles.blueBright.close}.${styles.bold.close}`)
+    expect(core.info).toHaveBeenCalledWith(
+      `${styles.bold.open}[${styles.magenta.open}6${styles.magenta.close}] ${styles.blueBright.open}branches found${styles.blueBright.close}.${styles.bold.close}`
+    )
     expect(assert.ok).toHaveBeenCalled()
   })
 
@@ -30,7 +34,9 @@ describe('Get Branches Function', () => {
     })
 
     await getBranches(false)
-    expect(core.setFailed).toHaveBeenCalledWith(`Failed to retrieve branches for repo. Error: Response cannot be empty.`)
+    expect(core.setFailed).toHaveBeenCalledWith(
+      `Failed to retrieve branches for repo. Error: Response cannot be empty.`
+    )
   })
 
   test('Action fails elegantly - String', async () => {
@@ -43,12 +49,12 @@ describe('Get Branches Function', () => {
     await getBranches(false)
     expect(core.setFailed).toHaveBeenCalledWith(`Failed to retrieve branches for repo.`)
   })
-  
+
   test('Handles error in paginate', async () => {
     core.setFailed = jest.fn()
     core.info = jest.fn()
     assert.ok = jest.fn()
-    
+
     // Mock the paginate function with proper error handling
     const mockError = new Error('API rate limit exceeded')
     jest.spyOn(github, 'paginate').mockImplementationOnce(() => {
@@ -56,15 +62,15 @@ describe('Get Branches Function', () => {
     })
 
     await getBranches(false)
-    
+
     expect(core.setFailed).toHaveBeenCalledWith('Failed to retrieve branches for repo. Error: API rate limit exceeded')
   })
 
   test('Include protected branches activated', async () => {
     // Mock the response you expect from paginate
     const paginateResponse: BranchResponse[] = [
-      {branchName: 'branch1', commmitSha: 'commit1'},
-      {branchName: 'branch2', commmitSha: 'commit2'}
+      {branchName: 'branch1', commitSha: 'commit1'},
+      {branchName: 'branch2', commitSha: 'commit2'}
     ]
 
     // Spy on github.paginate and mock its resolved value
@@ -89,8 +95,8 @@ describe('Get Branches Function', () => {
   test('Include protected branches deactivated', async () => {
     // Mock the response you expect from paginate
     const paginateResponse: BranchResponse[] = [
-      {branchName: 'branch1', commmitSha: 'commit1'},
-      {branchName: 'branch2', commmitSha: 'commit2'}
+      {branchName: 'branch1', commitSha: 'commit1'},
+      {branchName: 'branch2', commitSha: 'commit2'}
     ]
 
     // Spy on github.paginate and mock its resolved value

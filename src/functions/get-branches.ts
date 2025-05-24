@@ -33,7 +33,7 @@ export async function getBranches(includeProtectedBranches: boolean): Promise<Br
         branch =>
           ({
             branchName: branch.name,
-            commmitSha: branch.commit.sha
+            commitSha: branch.commit.sha
           }) as BranchResponse
       )
     )
@@ -47,7 +47,7 @@ export async function getBranches(includeProtectedBranches: boolean): Promise<Br
     } else {
       core.setFailed(`Failed to retrieve branches for ${repo}.`)
     }
-    branches = [{branchName: '', commmitSha: ''}]
+    branches = [{branchName: '', commitSha: ''}]
   }
 
   return branches

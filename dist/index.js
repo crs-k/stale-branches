@@ -664,7 +664,7 @@ async function getBranches(includeProtectedBranches) {
     try {
         const branchResponse = await get_context_1.github.paginate(get_context_1.github.rest.repos.listBranches, listBranchesParams, response => response.data.map(branch => ({
             branchName: branch.name,
-            commmitSha: branch.commit.sha
+            commitSha: branch.commit.sha
         })));
         branches = branchResponse;
         assert.ok(branches, 'Response cannot be empty.');
@@ -677,7 +677,7 @@ async function getBranches(includeProtectedBranches) {
         else {
             core.setFailed(`Failed to retrieve branches for ${get_context_1.repo}.`);
         }
-        branches = [{ branchName: '', commmitSha: '' }];
+        branches = [{ branchName: '', commitSha: '' }];
     }
     return branches;
 }
@@ -2055,7 +2055,7 @@ async function run() {
                     .split(',')
                     .map(s => s.trim())
                     .filter(Boolean);
-                const commitInfo = await (0, get_commit_info_1.getRecentCommitInfo)(branchToCheck.commmitSha, ignoredMessages, validInputs.daysBeforeDelete, validInputs.ignoreCommitters, defaultBranchShas, validInputs.ignoreDefaultBranchCommits);
+                const commitInfo = await (0, get_commit_info_1.getRecentCommitInfo)(branchToCheck.commitSha, ignoredMessages, validInputs.daysBeforeDelete, validInputs.ignoreCommitters, defaultBranchShas, validInputs.ignoreDefaultBranchCommits);
                 commitAge = commitInfo.age;
                 committer = commitInfo.committer;
                 lastMeaningfulSha = commitInfo.sha;
@@ -2066,7 +2066,7 @@ async function run() {
             }
             else {
                 // No ignored messages, but still use getRecentCommitInfo for consistency
-                const commitInfo = await (0, get_commit_info_1.getRecentCommitInfo)(branchToCheck.commmitSha, [], undefined, validInputs.ignoreCommitters, defaultBranchShas, validInputs.ignoreDefaultBranchCommits);
+                const commitInfo = await (0, get_commit_info_1.getRecentCommitInfo)(branchToCheck.commitSha, [], undefined, validInputs.ignoreCommitters, defaultBranchShas, validInputs.ignoreDefaultBranchCommits);
                 commitAge = commitInfo.age;
                 committer = commitInfo.committer;
                 lastMeaningfulSha = commitInfo.sha;

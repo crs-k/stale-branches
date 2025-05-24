@@ -106,7 +106,7 @@ export async function run(): Promise<void> {
           .map(s => s.trim())
           .filter(Boolean)
         const commitInfo = await getRecentCommitInfo(
-          branchToCheck.commmitSha,
+          branchToCheck.commitSha,
           ignoredMessages,
           validInputs.daysBeforeDelete,
           validInputs.ignoreCommitters,
@@ -122,7 +122,7 @@ export async function run(): Promise<void> {
         }
       } else {
         // No ignored messages, but still use getRecentCommitInfo for consistency
-        const commitInfo = await getRecentCommitInfo(branchToCheck.commmitSha, [], undefined, validInputs.ignoreCommitters, defaultBranchShas, validInputs.ignoreDefaultBranchCommits)
+        const commitInfo = await getRecentCommitInfo(branchToCheck.commitSha, [], undefined, validInputs.ignoreCommitters, defaultBranchShas, validInputs.ignoreDefaultBranchCommits)
         commitAge = commitInfo.age
         committer = commitInfo.committer
         lastMeaningfulSha = commitInfo.sha
