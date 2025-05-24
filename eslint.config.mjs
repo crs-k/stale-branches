@@ -20,11 +20,14 @@ export default [{
         "**/dist/",
         "**/lib/",
         "**/node_modules/",
+        "**/coverage/",
         "src/functions/__mocks__",
         "**/jest.config.js",
         "**/__mocks__/",
+        "**/*.d.ts"
     ],
 }, ...compat.extends("plugin:github/recommended", "plugin:jest/recommended", "prettier"), {
+    files: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"],
     plugins: {
         jest,
         "@typescript-eslint": typescriptEslint,
@@ -49,6 +52,7 @@ export default [{
         "i18n-text/no-en": "off",
         "eslint-comments/no-use": "off",
         "import/no-namespace": "off",
+        "filenames/match-regex": "off", // Disable problematic rule from github plugin
         "no-unused-vars": "off",
         "no-shadow": "off",
         "@typescript-eslint/no-shadow": "error",
@@ -70,7 +74,6 @@ export default [{
             allowExpressions: true,
         }],
 
-        "@typescript-eslint/func-call-spacing": ["error", "never"],
         "@typescript-eslint/no-array-constructor": "error",
         "@typescript-eslint/no-empty-interface": "error",
         "@typescript-eslint/no-explicit-any": "error",
@@ -89,12 +92,8 @@ export default [{
         "@typescript-eslint/prefer-includes": "error",
         "@typescript-eslint/prefer-string-starts-ends-with": "error",
         "@typescript-eslint/promise-function-async": "error",
-        "@typescript-eslint/require-array-sort-compare": "error",
         "@typescript-eslint/restrict-plus-operands": "error",
         semi: "off",
-        "@typescript-eslint/semi": ["error", "never"],
-        "@typescript-eslint/type-annotation-spacing": "error",
-        "@typescript-eslint/unbound-method": "error",
         "@typescript-eslint/method-signature-style": "error",
         "@typescript-eslint/no-dynamic-delete": "error",
         "@typescript-eslint/prefer-enum-initializers": "error",

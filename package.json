@@ -17,16 +17,29 @@
     "lint": "npm run npmpackagejsonlint . && npm run eslint",
     "eslint": "eslint src/**/*.ts",
     "npmpackagejsonlint": "npmPkgJsonLint .",
-    "package": "set NODE_OPTIONS=--openssl-legacy-provider && ncc build --source-map",
+    "package": "ncc build --source-map --license licenses.txt",
     "test": "jest --coverage",
-    "all": "npm run format && npm run lint && npm test && npm run build && npm run package"
+    "test:watch": "jest --watch",
+    "all": "npm run format && npm run lint && npm test && npm run build && npm run package",
+    "clean": "rm -rf lib/ dist/"
   },
   "repository": {
     "type": "git",
     "url": "git://github.com/crs-k/stale-branches.git"
   },
   "keywords": [
-    "actions"
+    "actions",
+    "github-actions",
+    "stale-branches",
+    "git",
+    "cleanup",
+    "automation"
+  ],
+  "files": [
+    "lib/**/*",
+    "action.yml",
+    "README.md",
+    "LICENSE"
   ],
   "dependencies": {
     "@actions/core": "1.11.1",
@@ -51,6 +64,7 @@
     "eslint-plugin-jest": "28.11.0",
     "eslint-plugin-prettier": "5.4.0",
     "globals": "16.1.0",
+    "jest": "29.7.0",
     "js-yaml": "4.1.0",
     "npm-package-json-lint": "8.0.0",
     "prettier": "3.5.3",

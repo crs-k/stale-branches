@@ -22,7 +22,7 @@ export async function getRecentCommitAge(sha: string): Promise<number> {
       per_page: 1,
       page: 1
     })
-    commitDate = commitResponse.data.commit.committer!.date
+    commitDate = commitResponse.data.commit.committer?.date || ''
     assert.ok(commitDate, 'Date cannot be empty.')
   } catch (err) {
     if (err instanceof Error) {

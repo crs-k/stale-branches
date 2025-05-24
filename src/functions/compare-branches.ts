@@ -31,7 +31,10 @@ export async function compareBranches(head: string, inputCompareBranches: string
         basehead
       })
 
-      if (inputCompareBranches === CompareBranchesEnum.save && (branchComparisonResponse.data.status === 'ahead' || branchComparisonResponse.data.status === 'diverged')) {
+      if (
+        inputCompareBranches === CompareBranchesEnum.save &&
+        (branchComparisonResponse.data.status === 'ahead' || branchComparisonResponse.data.status === 'diverged')
+      ) {
         branchComparison.save = true
       }
 

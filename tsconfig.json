@@ -1,13 +1,30 @@
 {
   "compilerOptions": {
-    "target": "es6",                          /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019' or 'ESNEXT'. */
+    "target": "ES2020",                       /* Use modern ES2020 for better performance and features */
     "module": "commonjs",                     /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */
+    "lib": ["ES2020"],                        /* Specify library files to include */
     "outDir": "./lib",                        /* Redirect output structure to the directory. */
     "rootDir": "./src",                       /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */
     "strict": true,                           /* Enable all strict type-checking options. */
-    "noImplicitAny": false,                    /* Raise error on expressions and declarations with an implied 'any' type. */
-    "esModuleInterop": true,                   /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
+    "noImplicitAny": true,                    /* Raise error on expressions and declarations with an implied 'any' type. */
+    "strictNullChecks": true,                 /* Enable strict null checks. */
+    "strictFunctionTypes": true,              /* Enable strict checking of function types. */
+    "noImplicitReturns": true,                /* Report error when not all code paths in function return a value. */
+    "noFallthroughCasesInSwitch": true,       /* Report errors for fallthrough cases in switch statement. */
+    "noUncheckedIndexedAccess": false,        /* Include 'undefined' in index signature results - disabled for compatibility */
+    "exactOptionalPropertyTypes": false,      /* Treat optional property types as written, rather than adding 'undefined' - disabled for compatibility */
+    "esModuleInterop": true,                  /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
+    "allowSyntheticDefaultImports": true,     /* Allow default imports from modules with no default export. This does not affect code emit, just typechecking. */
+    "forceConsistentCasingInFileNames": true, /* Disallow inconsistently-cased references to the same file. */
+    "skipLibCheck": true,                     /* Skip type checking of declaration files. */
+    "resolveJsonModule": true,                /* Enable importing .json files */
+    "declaration": true,                      /* Generate corresponding '.d.ts' file. */
+    "declarationMap": true,                   /* Generate a sourcemap for each corresponding '.d.ts' file. */
+    "sourceMap": true,                        /* Generate corresponding '.map' file. */
     "typeRoots": ["./node_modules/@types", "./__tests__/types"]
   },
-  "exclude": ["node_modules", "**/*.test.ts","__mocks__","./src/functions/__mocks__"]
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": ["node_modules", "**/*.test.ts", "__mocks__", "./src/functions/__mocks__", "lib", "dist"]
 }

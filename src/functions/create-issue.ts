@@ -21,7 +21,14 @@ import {logNewIssue} from './logging/log-new-issue'
  *
  * @returns {number} The ID of the issue created
  */
-export async function createIssue(branch: string, commitAge: number, lastCommitter: string, daysBeforeDelete: number, staleBranchLabel: string, tagLastCommitter: boolean): Promise<number> {
+export async function createIssue(
+  branch: string,
+  commitAge: number,
+  lastCommitter: string,
+  daysBeforeDelete: number,
+  staleBranchLabel: string,
+  tagLastCommitter: boolean
+): Promise<number> {
   let issueId: number
   let bodyString: string
   const daysUntilDelete = Math.max(0, daysBeforeDelete - commitAge)

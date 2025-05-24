@@ -1,5 +1,3 @@
-import * as core from '@actions/core'
-import * as assert from 'assert'
 import {github, owner, repo} from './get-context'
 import {getDays} from './utils/get-time'
 
@@ -47,9 +45,14 @@ export async function getRecentCommitInfo(
       if (!commitDateStr) continue
       const commitDateTime = new Date(commitDateStr).getTime()
       const commitAge = getDays(currentDate, commitDateTime)
-      committer = commit.committer?.login || commit.author?.login || commit.commit?.committer?.name || commit.commit?.author?.name || 'Unknown'
+      committer =
+        commit.committer?.login ||
+        commit.author?.login ||
+        commit.commit?.committer?.name ||
+        commit.commit?.author?.name ||
+        'Unknown'
       // Ignore by SHA (default branch), if within window
-      if (ignoreDefaultBranchCommits && defaultBranchShas && defaultBranchShas.has(commit.sha)) {
+      if (ignoreDefaultBranchCommits && defaultBranchShas?.has(commit.sha)) {
         if (maxAgeDays === undefined || commitAge <= maxAgeDays) {
           ignoredCount++
           continue
@@ -58,7 +61,8 @@ export async function getRecentCommitInfo(
       // Ignore by message or committer
       if (
         ignoredMessages.some(msg => message.includes(msg)) ||
-        (ignoredCommitters && ignoredCommitters.length > 0 && ignoredCommitters.some(ignored => ignored && committer && committer.toLowerCase() === ignored.toLowerCase()))
+        (ignoredCommitters?.length &&
+          ignoredCommitters.some(ignored => ignored && committer && committer.toLowerCase() === ignored.toLowerCase()))
       ) {
         ignoredCount++
         continue

@@ -20,7 +20,9 @@ export async function getRateLimit(): Promise<RateLimit> {
     rateLimit = await github.rest.rateLimit.get()
 
     const rateLimitUsed = Math.round((rateLimit.data.resources.core.used / rateLimit.data.resources.core.limit) * 100)
-    const rateLimitRemaining = Math.round((rateLimit.data.resources.core.remaining / rateLimit.data.resources.core.limit) * 100)
+    const rateLimitRemaining = Math.round(
+      (rateLimit.data.resources.core.remaining / rateLimit.data.resources.core.limit) * 100
+    )
     const currentDate = new Date().getTime()
     const rateLimitReset = new Date(rateLimit.data.resources.core.reset * 1000).getTime()
     const rateLimitResetMinutes = getMinutes(currentDate, rateLimitReset)
