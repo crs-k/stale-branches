@@ -3,10 +3,10 @@ import {filterBranches} from '../../src/functions/utils/filter-branches'
 describe('Filter Branches Function', () => {
     test('branchesFilterRegex is empty', async () => {
         const branches = [
-            {branchName: 'dependabot/npm_and_yarn/test/ms', commmitSha: 'abc123'}, 
-            {branchName: 'JIRA-123', commmitSha: 'def456'}, 
-            {branchName: 'dependabot/npm_and_yarn/123', commmitSha: 'ghi789'}, 
-            {branchName: 'David', commmitSha: 'jkl012'}
+            {branchName: 'dependabot/npm_and_yarn/test/ms', commitSha: 'abc123'}, 
+            {branchName: 'JIRA-123', commitSha: 'def456'}, 
+            {branchName: 'dependabot/npm_and_yarn/123', commitSha: 'ghi789'}, 
+            {branchName: 'David', commitSha: 'jkl012'}
         ]
         const branchesFilterRegex = ''
 
