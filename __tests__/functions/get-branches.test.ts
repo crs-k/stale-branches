@@ -43,6 +43,22 @@ describe('Get Branches Function', () => {
     await getBranches(false)
     expect(core.setFailed).toHaveBeenCalledWith(`Failed to retrieve branches for repo.`)
   })
+  
+  test('Handles error in paginate', async () => {
+    core.setFailed = jest.fn()
+    core.info = jest.fn()
+    assert.ok = jest.fn()
+    
+    // Mock the paginate function with proper error handling
+    const mockError = new Error('API rate limit exceeded')
+    jest.spyOn(github, 'paginate').mockImplementationOnce(() => {
+      throw mockError
+    })
+
+    await getBranches(false)
+    
+    expect(core.setFailed).toHaveBeenCalledWith('Failed to retrieve branches for repo. Error: API rate limit exceeded')
+  })
 
   test('Include protected branches activated', async () => {
     // Mock the response you expect from paginate

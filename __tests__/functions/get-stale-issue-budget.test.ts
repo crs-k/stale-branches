@@ -54,4 +54,69 @@ describe('Get Stale Issue Budget Function', () => {
     await getIssueBudget(maxIssues, staleBranchLabel)
     expect(core.setFailed).toHaveBeenCalledWith(`Failed to calculate issue budget.`)
   })
+  
+  test('Correctly calculates remaining budget with existing issues', async () => {
+    // Setup
+    core.info = jest.fn()
+    assert.ok = jest.fn()
+    
+    // Mock 3 issues with the stale branch label
+    const mockIssues = [
+      { issueTitle: 'Stale Branch 1', issueNumber: 101 },
+      { issueTitle: 'Stale Branch 2', issueNumber: 102 },
+      { issueTitle: 'Stale Branch 3', issueNumber: 103 }
+    ]
+    
+    // Setup the mock to return our test data
+    jest.spyOn(github, 'paginate').mockResolvedValueOnce(mockIssues)
+    
+    // Execute with max issues of 5
+    const result = await getIssueBudget(5, staleBranchLabel)
+    
+    // Verify - should be 5 max - 3 existing = 2 remaining
+    expect(result).toBe(2)
+    expect(core.info).toHaveBeenCalledWith(expect.stringContaining('2'))
+  })
+  
+  test('Returns 0 when existing issues exceed max', async () => {
+    // Setup
+    core.info = jest.fn()
+    assert.ok = jest.fn()
+    
+    // Mock 5 issues with the stale branch label
+    const mockIssues = [
+      { issueTitle: 'Stale Branch 1', issueNumber: 101 },
+      { issueTitle: 'Stale Branch 2', issueNumber: 102 },
+      { issueTitle: 'Stale Branch 3', issueNumber: 103 },
+      { issueTitle: 'Stale Branch 4', issueNumber: 104 },
+      { issueTitle: 'Stale Branch 5', issueNumber: 105 }
+    ]
+    
+    // Setup the mock to return our test data
+    jest.spyOn(github, 'paginate').mockResolvedValueOnce(mockIssues)
+    
+    // Execute with max issues of 3 (less than existing)
+    const result = await getIssueBudget(3, staleBranchLabel)
+    
+    // Verify - should return 0 since max limit is exceeded
+    expect(result).toBe(0)
+  })
+  
+  test('Validates that issues are not empty', async () => {
+    core.info = jest.fn()
+    core.setFailed = jest.fn()
+    
+    // Setup mock to return empty array
+    jest.spyOn(github, 'paginate').mockResolvedValueOnce([])
+    
+    // Mock assertion to throw
+    assert.ok = jest.fn().mockImplementationOnce(() => {
+      throw new Error('Issue ID cannot be empty')
+    })
+    
+    await getIssueBudget(maxIssues, staleBranchLabel)
+    
+    expect(assert.ok).toHaveBeenCalledWith([], 'Issue ID cannot be empty')
+    expect(core.setFailed).toHaveBeenCalledWith('Failed to calculate issue budget. Error: Issue ID cannot be empty')
+  })
 })

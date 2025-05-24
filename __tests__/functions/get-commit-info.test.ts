@@ -193,4 +193,96 @@ describe('getRecentCommitInfo', () => {
     expect(info.ignoredCount).toBe(0)
     expect(info.usedFallback).toBe(false)
   })
+  
+  it('correctly handles empty commit responses', async () => {
+    // Setup
+    const maxAgeDays = 30;
+    require('../../src/functions/get-context').github = {
+      rest: {
+        repos: {
+          listCommits: jest.fn().mockResolvedValue({data: []})
+        }
+      }
+    }
+    
+    // Execute and verify
+    await expect(getRecentCommitInfo('sha1', [], maxAgeDays)).rejects.toThrow('No non-ignored commit found')
+  })
+  
+  it('correctly handles commits with missing committer dates', async () => {
+    // Mock a commit with missing date
+    const commits = [
+      {...mockCommits[0], commit: {...mockCommits[0].commit, committer: { ...mockCommits[0].commit.committer, date: undefined }}}
+    ]
+    
+    require('../../src/functions/get-context').github = {
+      rest: {
+        repos: {
+          listCommits: jest.fn().mockResolvedValueOnce({data: commits}).mockResolvedValue({data: []})
+        }
+      }
+    }
+    
+    // Since the first commit has no date, we should use the fallback if set
+    const maxAgeDays = 30;
+    
+    // Execute and verify
+    await expect(getRecentCommitInfo('sha1', [], maxAgeDays)).rejects.toThrow('No non-ignored commit found')
+  })
+  
+  it('uses fallback for commits older than maxAgeDays', async () => {
+    const now = new Date()
+    // Create a commit that's 50 days old (beyond our 30 day maxAgeDays)
+    const oldDate = new Date(now.getTime() - 50 * 24 * 60 * 60 * 1000).toISOString() // 50 days ago
+    
+    const commits = [
+      {...mockCommits[0], commit: {...mockCommits[0].commit, committer: { ...mockCommits[0].commit.committer, date: oldDate }}}
+    ]
+    
+    require('../../src/functions/get-context').github = {
+      rest: {
+        repos: {
+          listCommits: jest.fn().mockResolvedValueOnce({data: commits}).mockResolvedValue({data: []})
+        }
+      }
+    }
+    
+    const maxAgeDays = 30;
+    const result = await getRecentCommitInfo('sha1', [], maxAgeDays)
+    
+    // Should use the fallback with usedFallback=true
+    expect(result.usedFallback).toBe(true)
+    expect(result.age).toBe(maxAgeDays)
+  })
+
+  it('handles case where commit date exists but is older than maxAgeDays', async () => {
+    const now = new Date();
+    // Create a date that's 40 days old (past our 30 day window)
+    const oldDate = new Date(now.getTime() - 40 * 24 * 60 * 60 * 1000); 
+    
+    // First commit will be beyond maxAgeDays
+    const oldCommit = {
+      commit: {
+        message: 'old commit',
+        committer: { date: oldDate.toISOString() },
+        author: { name: 'Dave' }
+      },
+      committer: { login: 'dave' },
+      author: { login: 'dave' },
+      sha: 'sha-old'
+    };
+    
+    // Setup the mock to return our test data
+    require('../../src/functions/get-context').github.rest.repos.listCommits = jest.fn().mockResolvedValue({
+      data: [oldCommit]
+    });
+    
+    const maxAgeDays = 30;
+    const result = await getRecentCommitInfo('branch', [], maxAgeDays);
+    
+    // Should trigger the logic in lines 72-73 where we find a commit, but it's too old
+    expect(result.committer).toBe('dave');
+    expect(result.age).toBeGreaterThanOrEqual(maxAgeDays);
+    expect(result.usedFallback).toBe(true); // Using fallback since commit is older than maxAgeDays
+  });
 })
