@@ -12,14 +12,22 @@
   },
   "scripts": {
     "build": "tsc",
+    "clean": "rm -rf dist",
     "format": "prettier --write src/**/*.ts",
     "format-check": "prettier --check src/**/*.ts",
     "lint": "npm run npmpackagejsonlint . && npm run eslint",
+    "lint:fix": "npm run eslint -- --fix",
     "eslint": "eslint src/**/*.ts",
     "npmpackagejsonlint": "npmPkgJsonLint .",
-    "package": "set NODE_OPTIONS=--openssl-legacy-provider && ncc build --source-map",
+    "package": "ncc build --source-map --license licenses.txt",
+    "package:watch": "ncc build --source-map --watch",
     "test": "jest --coverage",
-    "all": "npm run format && npm run lint && npm test && npm run build && npm run package"
+    "test:watch": "jest --watch",
+    "test:ci": "jest --coverage --ci --reporters=default --reporters=jest-junit",
+    "type-check": "tsc --noEmit",
+    "validate": "npm run format-check && npm run lint && npm run type-check",
+    "all": "npm run clean && npm run format && npm run lint && npm run type-check && npm test && npm run build && npm run package",
+    "prepare": "npm run build"
   },
   "repository": {
     "type": "git",
@@ -55,6 +63,7 @@
     "npm-package-json-lint": "8.0.0",
     "prettier": "3.5.3",
     "ts-jest": "29.3.4",
+    "ts-node": "^10.9.2",
     "typescript": "5.8.3"
   },
   "engines": {

@@ -1,6 +1,6 @@
 import styles from 'ansi-styles'
 
-export function logLastCommitColor(commitAge, daysBeforeStale, daysBeforeDelete): string {
+export function logLastCommitColor(commitAge: number, daysBeforeStale: number, daysBeforeDelete: number): string {
   let commitColor = `Last Commit: ${styles.magenta.open}${commitAge.toString()}${styles.magenta.close} days ago.`
 
   //color group based on age of branch

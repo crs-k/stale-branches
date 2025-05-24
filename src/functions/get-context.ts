@@ -5,7 +5,8 @@ import {Inputs} from '../types/inputs'
 
 const repoToken = core.getInput('repo-token')
 core.setSecret(repoToken)
-export const github = getOctokit(repoToken)
+// Use type assertion to avoid complex inferred type issues
+export const github = getOctokit(repoToken) as ReturnType<typeof getOctokit>
 export const {owner: owner, repo: repo} = context.repo
 
 /**

@@ -1,0 +1,1 @@
+{"version":3,"file":"log-branch-group-color-skip.js","sourceRoot":"","sources":["../../../src/functions/logging/log-branch-group-color-skip.ts"],"names":[],"mappings":";;;;;AAEA,0DAIC;AAND,8DAAgC;AAEhC,SAAgB,uBAAuB,CAAC,UAAkB;IACxD,MAAM,UAAU,GAAG,IAAI,qBAAM,CAAC,UAAU,CAAC,IAAI,GAAG,UAAU,GAAG,qBAAM,CAAC,UAAU,CAAC,KAAK,GAAG,CAAA;IAEvF,OAAO,UAAU,CAAA;AACnB,CAAC"}

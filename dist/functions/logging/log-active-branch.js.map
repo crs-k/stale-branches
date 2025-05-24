@@ -1,0 +1,1 @@
+{"version":3,"file":"log-active-branch.js","sourceRoot":"","sources":["../../../src/functions/logging/log-active-branch.ts"],"names":[],"mappings":";;;;;AAEA,0CAIC;AAND,8DAAgC;AAEhC,SAAgB,eAAe,CAAC,UAAkB;IAChD,MAAM,UAAU,GAAG,IAAI,qBAAM,CAAC,KAAK,CAAC,IAAI,GAAG,UAAU,GAAG,qBAAM,CAAC,KAAK,CAAC,KAAK,4BAA4B,CAAA;IAEtG,OAAO,UAAU,CAAA;AACnB,CAAC"}

@@ -129,6 +129,96 @@ jobs:
           ignore-commit-messages: ''
 ```
 
-## Contributing
+## Advanced Examples
 
-Contributions are welcomed. Please read the [contributing](https://github.com/crs-k/stale-branches/blob/main/CONTRIBUTING.md).
+### Enterprise Setup with Custom Rules
+
+```yaml
+name: Enterprise Stale Branch Cleanup
+
+on:
+  schedule:
+    - cron: '0 9 * * 1,3,5'  # Run M/W/F at 9 AM
+
+permissions:
+  issues: write
+  contents: write
+  pull-requests: read
+
+jobs:
+  stale_branches:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Stale Branches
+        uses: crs-k/stale-branches@v5.0.0
+        with:
+          days-before-stale: 90
+          days-before-delete: 180
+          max-issues: 10
+          tag-committer: true
+          compare-branches: 'save'
+          branches-filter-regex: '^((?!main|develop|staging|release/))'
+          pr-check: true
+          ignore-commit-messages: 'Automated commit,CI update,Bot:'
+```
+
+### Development Team Workflow
+
+```yaml
+name: Dev Team Branch Cleanup
+
+on:
+  schedule:
+    - cron: '0 10 * * 1'  # Weekly on Monday
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notify About Stale Branches
+        uses: crs-k/stale-branches@v5.0.0
+        with:
+          days-before-stale: 30
+          days-before-delete: 90
+          comment-updates: true
+          tag-committer: true
+          stale-branch-label: '🧹 stale-branch'
+          compare-branches: 'info'
+          pr-check: true
+```
+
+### Safe Mode with Manual Review
+
+```yaml
+name: Safe Stale Branch Detection
+
+on:
+  schedule:
+    - cron: '0 8 * * 1'
+
+jobs:
+  detect_only:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Find Stale Branches (No Deletion)
+        uses: crs-k/stale-branches@v5.0.0
+        with:
+          days-before-stale: 60
+          days-before-delete: 999999  # Never delete automatically
+          compare-branches: 'info'
+          tag-committer: true
+```
+
+## Troubleshooting
+
+For common issues and solutions, see our [Troubleshooting Guide](docs/TROUBLESHOOTING.md).
+
+Quick debugging tips:
+- Use `dry-run: true` to test configuration
+- Check action logs for detailed branch processing information
+- Verify repository permissions and branch protection rules
+
+## Documentation
+
+- [API Documentation](docs/API.md) - Detailed function and type reference
+- [Troubleshooting Guide](docs/TROUBLESHOOTING.md) - Common issues and solutions

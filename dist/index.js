@@ -91,14 +91,13 @@ function checkBranchProtection(branches) {
             core.warning(`Failed to fetch default branch: ${err instanceof Error ? err.message : 'Unknown error'}`);
             return;
         }
-        const includeProtectedBranches = core.getInput('include-protected-branches').toLowerCase() === 'true';
         for (const branch of branches) {
             // Skip the default branch
             if (branch.branchName === defaultBranch) {
                 core.info(`⚠️ Skipping default branch: ${defaultBranch}\n`);
                 continue;
             }
-            core.startGroup(`Checking: ${branch.branchName}`);
+            core.info(`Checking: ${branch.branchName}`);
             let hasBranchProtection = false;
             let branchProtectionAllowsDeletion = false;
             let hasRulesetProtection = false;
@@ -112,10 +111,11 @@ function checkBranchProtection(branches) {
                 });
                 hasBranchProtection = true;
                 branchProtectionAllowsDeletion = (_b = (_a = branchProtection.data.allow_deletions) === null || _a === void 0 ? void 0 : _a.enabled) !== null && _b !== void 0 ? _b : false;
+                core.info(`Protection: ${branchProtectionAllowsDeletion ? '✅ allows deletion' : '❌ prevents deletion'}`);
             }
             catch (err) {
                 if (err instanceof request_error_1.RequestError && err.status === 404) {
-                    // No branch protection
+                    core.info('Protection: None');
                 }
             }
             // Check rulesets
@@ -127,41 +127,21 @@ function checkBranchProtection(branches) {
                 }));
                 hasRulesetProtection = rulesets.data.length > 0;
                 rulesetAllowsDeletion = !rulesets.data.some(ruleset => !ruleset.deletion);
+                core.info(`Rulesets: ${hasRulesetProtection ? `${rulesets.data.length} found` : 'None'}`);
             }
             catch (err) {
                 if (err instanceof request_error_1.RequestError && err.status === 404) {
-                    // No rulesets
+                    core.info('Rulesets: None');
                 }
             }
-            // Determine protection type
-            let isProtected = false;
-            let protectionType = '';
-            if (hasBranchProtection && !branchProtectionAllowsDeletion && hasRulesetProtection && !rulesetAllowsDeletion) {
-                isProtected = true;
-                protectionType = 'branch protection and ruleset';
-            }
-            else if (hasBranchProtection && !branchProtectionAllowsDeletion) {
-                isProtected = true;
-                protectionType = 'branch protection';
-            }
-            else if (hasRulesetProtection && !rulesetAllowsDeletion) {
-                isProtected = true;
-                protectionType = 'ruleset';
-            }
-            if (isProtected) {
-                if (includeProtectedBranches) {
-                    core.info(`✅ ${branch.branchName} is protected by ${protectionType} and is eligible for deletion`);
-                }
-                else {
-                    core.info(`❌ ${branch.branchName} is protected by ${protectionType} and cannot be deleted`);
-                    branchesToRemove.push(branch);
-                }
+            // If either protection system prevents deletion, remove the branch
+            if ((hasBranchProtection && !branchProtectionAllowsDeletion) || (hasRulesetProtection && !rulesetAllowsDeletion)) {
+                core.info(`❌ ${branch.branchName} is protected and cannot be deleted\n---\n`);
+                branchesToRemove.push(branch);
             }
             else {
-                core.info(`✅ ${branch.branchName} is eligible for deletion`);
+                core.info(`✅ ${branch.branchName} is eligible for deletion\n---\n`);
             }
-            core.endGroup();
-            core.info('---\n');
         }
         // remove branches that don´t allow deletions
         for (const branch of branchesToRemove) {
@@ -852,7 +832,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getRecentCommitAge = getRecentCommitAge;
-exports.getRecentCommitAgeByNonIgnoredMessage = getRecentCommitAgeByNonIgnoredMessage;
 const assert = __importStar(__nccwpck_require__(2613));
 const core = __importStar(__nccwpck_require__(7484));
 const get_context_1 = __nccwpck_require__(7740);
@@ -867,7 +846,7 @@ const get_time_1 = __nccwpck_require__(3692);
 function getRecentCommitAge(sha) {
     return __awaiter(this, void 0, void 0, function* () {
         let commitDate;
-        const currentDate = Date.now();
+        const currentDate = new Date().getTime();
         try {
             const commitResponse = yield get_context_1.github.rest.repos.getCommit({
                 owner: get_context_1.owner,
@@ -891,70 +870,6 @@ function getRecentCommitAge(sha) {
         const commitDateTime = new Date(commitDate).getTime();
         const commitAge = (0, get_time_1.getDays)(currentDate, commitDateTime);
         return commitAge;
-    });
-}
-/**
- * Calculates the age of the most recent commit not matching any ignored commit messages, up to a max age.
- *
- * @param {string} sha The SHA of the branch head
- * @param {string[]} ignoredMessages Array of commit messages or substrings to ignore
- * @param {number} [maxAgeDays] Optional. If provided, stop searching if a commit is older than this many days.
- *
- * @returns {number} The age of the most recent non-ignored commit, or maxAgeDays if none found within that range
- */
-function getRecentCommitAgeByNonIgnoredMessage(sha, ignoredMessages, maxAgeDays) {
-    return __awaiter(this, void 0, void 0, function* () {
-        var _a, _b, _c;
-        const currentDate = Date.now();
-        let page = 1;
-        let commitDate;
-        let found = false;
-        while (!found) {
-            const commitsResponse = yield get_context_1.github.rest.repos.listCommits({
-                owner: get_context_1.owner,
-                repo: get_context_1.repo,
-                sha,
-                per_page: 100,
-                page
-            });
-            if (commitsResponse.data.length === 0)
-                break;
-            for (const commit of commitsResponse.data) {
-                const message = ((_a = commit.commit) === null || _a === void 0 ? void 0 : _a.message) || '';
-                const commitDateStr = (_c = (_b = commit.commit) === null || _b === void 0 ? void 0 : _b.committer) === null || _c === void 0 ? void 0 : _c.date;
-                if (!commitDateStr)
-                    continue;
-                const commitDateTime = new Date(commitDateStr).getTime();
-                const commitAge = (0, get_time_1.getDays)(currentDate, commitDateTime);
-                // If maxAgeDays is set and this commit is older than the threshold, stop searching
-                if (maxAgeDays !== undefined && commitAge > maxAgeDays) {
-                    // If we haven't found a valid commit yet, return maxAgeDays
-                    if (!commitDate) {
-                        return maxAgeDays;
-                    }
-                    else {
-                        // We already found a valid commit in this or a previous page, break out
-                        found = true;
-                        break;
-                    }
-                }
-                if (ignoredMessages.some(msg => message.includes(msg))) {
-                    continue;
-                }
-                // Found a valid commit within the window
-                commitDate = commitDateStr;
-                found = true;
-                break;
-            }
-            if (found)
-                break;
-            page++;
-        }
-        if (commitDate) {
-            const commitDateTime = new Date(commitDate).getTime();
-            return (0, get_time_1.getDays)(currentDate, commitDateTime);
-        }
-        throw new Error('No non-ignored commit found');
     });
 }
 
@@ -1169,7 +1084,6 @@ function validateInputs() {
             const dryRun = core.getBooleanInput('dry-run');
             const ignoreIssueInteraction = core.getBooleanInput('ignore-issue-interaction');
             const includeProtectedBranches = core.getBooleanInput('include-protected-branches');
-            const ignoreCommitMessages = core.getInput('ignore-commit-messages');
             //Assign inputs
             result.daysBeforeStale = inputDaysBeforeStale;
             result.daysBeforeDelete = inputDaysBeforeDelete;
@@ -1184,9 +1098,6 @@ function validateInputs() {
             result.dryRun = dryRun;
             result.ignoreIssueInteraction = ignoreIssueInteraction;
             result.includeProtectedBranches = includeProtectedBranches;
-            if (ignoreCommitMessages) {
-                result.ignoreCommitMessages = ignoreCommitMessages;
-            }
         }
         catch (err) {
             if (err instanceof Error) {
@@ -2295,7 +2206,7 @@ function closeIssueWrappedLogs(issueNumber, validInputs, branchName) {
         else if (validInputs.ignoreIssueInteraction) {
             core.info(`Ignoring issue interaction: Issue would be closed for branch: ${branchName}`);
         }
-        return '';
+        return "";
     });
 }
 function run() {
@@ -2338,17 +2249,7 @@ function run() {
                     }
                 }
                 //Get age of last commit, generate issue title, and filter existing issues to current branch
-                let commitAge;
-                if (validInputs.ignoreCommitMessages && validInputs.ignoreCommitMessages.trim() !== '') {
-                    const ignoredMessages = validInputs.ignoreCommitMessages
-                        .split(',')
-                        .map(s => s.trim())
-                        .filter(Boolean);
-                    commitAge = yield (0, get_commit_age_1.getRecentCommitAgeByNonIgnoredMessage)(branchToCheck.commmitSha, ignoredMessages, validInputs.daysBeforeDelete);
-                }
-                else {
-                    commitAge = yield (0, get_commit_age_1.getRecentCommitAge)(branchToCheck.commmitSha);
-                }
+                const commitAge = yield (0, get_commit_age_1.getRecentCommitAge)(branchToCheck.commmitSha);
                 const issueTitleString = (0, create_issues_title_string_1.createIssueTitleString)(branchToCheck.branchName);
                 const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === issueTitleString);
                 // Skip looking for last commit's login if input is set to false
@@ -2441,7 +2342,7 @@ function run() {
                             break;
                         }
                     }
-                    yield closeIssueWrappedLogs(issueToDelete.issueNumber, validInputs, 'Orphaned Issue');
+                    yield closeIssueWrappedLogs(issueToDelete.issueNumber, validInputs, "Orphaned Issue");
                 }
                 core.endGroup();
             }
@@ -15613,7 +15514,7 @@ module.exports = {
 
 
 const { parseSetCookie } = __nccwpck_require__(8915)
-const { stringify, getHeadersList } = __nccwpck_require__(3834)
+const { stringify } = __nccwpck_require__(3834)
 const { webidl } = __nccwpck_require__(4222)
 const { Headers } = __nccwpck_require__(6349)
 
@@ -15689,14 +15590,13 @@ function getSetCookies (headers) {
 
   webidl.brandCheck(headers, Headers, { strict: false })
 
-  const cookies = getHeadersList(headers).cookies
+  const cookies = headers.getSetCookie()
 
   if (!cookies) {
     return []
   }
 
-  // In older versions of undici, cookies is a list of name:value.
-  return cookies.map((pair) => parseSetCookie(Array.isArray(pair) ? pair[1] : pair))
+  return cookies.map((pair) => parseSetCookie(pair))
 }
 
 /**
@@ -16124,14 +16024,15 @@ module.exports = {
 /***/ }),
 
 /***/ 3834:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+/***/ ((module) => {
 
 "use strict";
 
 
-const assert = __nccwpck_require__(2613)
-const { kHeadersList } = __nccwpck_require__(6443)
-
+/**
+ * @param {string} value
+ * @returns {boolean}
+ */
 function isCTLExcludingHtab (value) {
   if (value.length === 0) {
     return false
@@ -16392,31 +16293,13 @@ function stringify (cookie) {
   return out.join('; ')
 }
 
-let kHeadersListNode
-
-function getHeadersList (headers) {
-  if (headers[kHeadersList]) {
-    return headers[kHeadersList]
-  }
-
-  if (!kHeadersListNode) {
-    kHeadersListNode = Object.getOwnPropertySymbols(headers).find(
-      (symbol) => symbol.description === 'headers list'
-    )
-
-    assert(kHeadersListNode, 'Headers cannot be parsed')
-  }
-
-  const headersList = headers[kHeadersListNode]
-  assert(headersList)
-
-  return headersList
-}
-
 module.exports = {
   isCTLExcludingHtab,
-  stringify,
-  getHeadersList
+  validateCookieName,
+  validateCookiePath,
+  validateCookieValue,
+  toIMFDate,
+  stringify
 }
 
 
@@ -20420,6 +20303,7 @@ const {
   isValidHeaderName,
   isValidHeaderValue
 } = __nccwpck_require__(5523)
+const util = __nccwpck_require__(9023)
 const { webidl } = __nccwpck_require__(4222)
 const assert = __nccwpck_require__(2613)
 
@@ -20973,6 +20857,9 @@ Object.defineProperties(Headers.prototype, {
   [Symbol.toStringTag]: {
     value: 'Headers',
     configurable: true
+  },
+  [util.inspect.custom]: {
+    enumerable: false
   }
 })
 
@@ -30149,6 +30036,20 @@ class Pool extends PoolBase {
       ? { ...options.interceptors }
       : undefined
     this[kFactory] = factory
+
+    this.on('connectionError', (origin, targets, error) => {
+      // If a connection error occurs, we remove the client from the pool,
+      // and emit a connectionError event. They will not be re-used.
+      // Fixes https://github.com/nodejs/undici/issues/3895
+      for (const target of targets) {
+        // Do not use kRemoveClient here, as it will close the client,
+        // but the client cannot be closed in this state.
+        const idx = this[kClients].indexOf(target)
+        if (idx !== -1) {
+          this[kClients].splice(idx, 1)
+        }
+      }
+    })
   }
 
   [kGetDispatcher] () {

@@ -1,12 +1,28 @@
 {
   "compilerOptions": {
-    "target": "es6",                          /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019' or 'ESNEXT'. */
+    "target": "ES2020",                       /* Use modern ECMAScript target for better performance */
     "module": "commonjs",                     /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */
-    "outDir": "./lib",                        /* Redirect output structure to the directory. */
+    "lib": ["ES2020"],                        /* Specify library files to be included in the compilation */
+    "outDir": "./dist",                       /* Redirect output structure to the directory. */
     "rootDir": "./src",                       /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */
     "strict": true,                           /* Enable all strict type-checking options. */
-    "noImplicitAny": false,                    /* Raise error on expressions and declarations with an implied 'any' type. */
-    "esModuleInterop": true                   /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
+    "noImplicitAny": true,                    /* Enable stricter type checking */
+    "strictNullChecks": true,                 /* Enable strict null checks */
+    "strictFunctionTypes": true,              /* Enable strict checking of function types */
+    "strictBindCallApply": true,              /* Enable strict bind, call, and apply method checking */
+    "strictPropertyInitialization": true,    /* Enable strict checking of property initialization */
+    "noImplicitReturns": true,                /* Report error when not all code paths in function return a value */
+    "noFallthroughCasesInSwitch": true,       /* Report errors for fallthrough cases in switch statement */
+    "noUncheckedIndexedAccess": true,         /* Include 'undefined' in index signature results */
+    "exactOptionalPropertyTypes": false,       /* Interpret optional property types as written */
+    "esModuleInterop": true,                  /* Enables emit interoperability between CommonJS and ES Modules */
+    "allowSyntheticDefaultImports": true,     /* Allow default imports from modules with no default export */
+    "forceConsistentCasingInFileNames": true, /* Disallow inconsistently-cased references to the same file */
+    "skipLibCheck": true,                     /* Skip type checking of declaration files */
+    "resolveJsonModule": true,                /* Include modules imported with '.json' extension */
+    "declaration": true,                      /* Generate corresponding '.d.ts' file */
+    "sourceMap": true                         /* Generate corresponding '.map' file */
   },
-  "exclude": ["node_modules", "**/*.test.ts","__mocks__","./src/functions/__mocks__"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "**/*.test.ts", "__mocks__", "./src/functions/__mocks__", "dist", "lib"]
 }
