@@ -1,4 +1,3 @@
-import {checkBranchProtection} from '../../src/functions/check-branch-protection'
 import {BranchResponse} from '../../src/types/branches'
 
 jest.mock('@actions/core')
@@ -54,7 +53,6 @@ describe('Get Branches Function', () => {
 
     // Spy on github.paginate and mock its resolved value
     const paginateSpy = jest.spyOn(github, 'paginate').mockResolvedValueOnce(paginateResponse)
-    jest.spyOn(require('../../src/functions/check-branch-protection'), 'checkBranchProtection').mockImplementationOnce(() => {})
 
     // Call your function
     const branchResponse = await getBranches(true)
@@ -65,11 +63,10 @@ describe('Get Branches Function', () => {
       {
         owner: expect.any(String),
         repo: expect.any(String),
-        per_page: expect.any(Number),
+        per_page: expect.any(Number)
       },
       expect.any(Function)
     )
-    expect(checkBranchProtection).toHaveBeenCalledWith(paginateResponse)
     expect(branchResponse).toEqual(paginateResponse)
   })
 
@@ -82,7 +79,6 @@ describe('Get Branches Function', () => {
 
     // Spy on github.paginate and mock its resolved value
     const paginateSpy = jest.spyOn(github, 'paginate').mockResolvedValueOnce(paginateResponse)
-    jest.spyOn(require('../../src/functions/check-branch-protection'), 'checkBranchProtection').mockImplementationOnce(() => {})
 
     // Call your function
     const branchResponse = await getBranches(false)
@@ -98,7 +94,6 @@ describe('Get Branches Function', () => {
       },
       expect.any(Function)
     )
-    expect(checkBranchProtection).toBeCalledTimes(0)
     expect(branchResponse).toEqual(paginateResponse)
   })
 })

@@ -135,7 +135,7 @@ describe('Get Context Function', () => {
       .mockReturnValueOnce('skip this message') // ignore-commit-messages
     await validateInputs()
 
-    expect(core.getInput).toHaveBeenCalledTimes(7)
+    expect(core.getInput).toHaveBeenCalledTimes(9)
     expect(core.getBooleanInput).toHaveBeenCalledTimes(7)
     expect(core.getInput).toHaveBeenCalledWith('ignore-commit-messages')
   })

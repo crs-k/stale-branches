@@ -18,164 +18,6 @@ var CompareBranchesEnum;
 
 /***/ }),
 
-/***/ 9027:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.checkBranchProtection = checkBranchProtection;
-const core = __importStar(__nccwpck_require__(7484));
-const get_context_1 = __nccwpck_require__(7740);
-const request_error_1 = __nccwpck_require__(1015);
-/**
- * Removes branches that don´t allow deletions
- */
-function checkBranchProtection(branches) {
-    return __awaiter(this, void 0, void 0, function* () {
-        var _a, _b;
-        const branchesToRemove = [];
-        // Get the default branch from the repository
-        let defaultBranch;
-        try {
-            const repoInfo = yield get_context_1.github.rest.repos.get({
-                owner: get_context_1.owner,
-                repo: get_context_1.repo
-            });
-            defaultBranch = repoInfo.data.default_branch;
-            core.info(`Default branch: ${defaultBranch}\n`);
-        }
-        catch (err) {
-            core.warning(`Failed to fetch default branch: ${err instanceof Error ? err.message : 'Unknown error'}`);
-            return;
-        }
-        const includeProtectedBranches = core.getInput('include-protected-branches').toLowerCase() === 'true';
-        for (const branch of branches) {
-            // Skip the default branch
-            if (branch.branchName === defaultBranch) {
-                core.info(`⚠️ Skipping default branch: ${defaultBranch}\n`);
-                continue;
-            }
-            core.startGroup(`Checking: ${branch.branchName}`);
-            let hasBranchProtection = false;
-            let branchProtectionAllowsDeletion = false;
-            let hasRulesetProtection = false;
-            let rulesetAllowsDeletion = false;
-            // Check branch protection
-            try {
-                const branchProtection = yield get_context_1.github.rest.repos.getBranchProtection({
-                    owner: get_context_1.owner,
-                    repo: get_context_1.repo,
-                    branch: branch.branchName
-                });
-                hasBranchProtection = true;
-                branchProtectionAllowsDeletion = (_b = (_a = branchProtection.data.allow_deletions) === null || _a === void 0 ? void 0 : _a.enabled) !== null && _b !== void 0 ? _b : false;
-            }
-            catch (err) {
-                if (err instanceof request_error_1.RequestError && err.status === 404) {
-                    // No branch protection
-                }
-            }
-            // Check rulesets
-            try {
-                const rulesets = (yield get_context_1.github.rest.repos.getBranchRules({
-                    owner: get_context_1.owner,
-                    repo: get_context_1.repo,
-                    branch: branch.branchName
-                }));
-                hasRulesetProtection = rulesets.data.length > 0;
-                rulesetAllowsDeletion = !rulesets.data.some(ruleset => !ruleset.deletion);
-            }
-            catch (err) {
-                if (err instanceof request_error_1.RequestError && err.status === 404) {
-                    // No rulesets
-                }
-            }
-            // Determine protection type
-            let isProtected = false;
-            let protectionType = '';
-            if (hasBranchProtection && !branchProtectionAllowsDeletion && hasRulesetProtection && !rulesetAllowsDeletion) {
-                isProtected = true;
-                protectionType = 'branch protection and ruleset';
-            }
-            else if (hasBranchProtection && !branchProtectionAllowsDeletion) {
-                isProtected = true;
-                protectionType = 'branch protection';
-            }
-            else if (hasRulesetProtection && !rulesetAllowsDeletion) {
-                isProtected = true;
-                protectionType = 'ruleset';
-            }
-            if (isProtected) {
-                if (includeProtectedBranches) {
-                    core.info(`✅ ${branch.branchName} is protected by ${protectionType} and is eligible for deletion`);
-                }
-                else {
-                    core.info(`❌ ${branch.branchName} is protected by ${protectionType} and cannot be deleted`);
-                    branchesToRemove.push(branch);
-                }
-            }
-            else {
-                core.info(`✅ ${branch.branchName} is eligible for deletion`);
-            }
-            core.endGroup();
-            core.info('---\n');
-        }
-        // remove branches that don´t allow deletions
-        for (const branch of branchesToRemove) {
-            const index = branches.indexOf(branch, 0);
-            if (index > -1) {
-                branches.splice(index, 1);
-            }
-        }
-    });
-}
-
-
-/***/ }),
-
 /***/ 2640:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -445,15 +287,17 @@ const log_update_issue_1 = __nccwpck_require__(1808);
  *
  * @param {boolean} tagLastCommitter If true, the user that last committed to this branch will be tagged
  *
+ * @param {object} [ignoredCommitInfo] Optional. Info about ignored commits (ignoredCount, usedFallback)
+ *
  * @returns {string} The time the comment was created
  */
-function createIssueComment(issueNumber, branch, commitAge, lastCommitter, commentUpdates, daysBeforeDelete, staleBranchLabel, tagLastCommitter) {
+function createIssueComment(issueNumber, branch, commitAge, lastCommitter, commentUpdates, daysBeforeDelete, staleBranchLabel, tagLastCommitter, ignoredCommitInfo) {
     return __awaiter(this, void 0, void 0, function* () {
         let createdAt = '';
         let commentUrl;
         let bodyString;
         if (commentUpdates === true) {
-            bodyString = (0, create_comment_string_1.createCommentString)(branch, lastCommitter, commitAge, daysBeforeDelete, tagLastCommitter);
+            bodyString = (0, create_comment_string_1.createCommentString)(branch, lastCommitter, commitAge, daysBeforeDelete, tagLastCommitter, ignoredCommitInfo);
             try {
                 const issueResponse = yield get_context_1.github.rest.issues.createComment({
                     owner: get_context_1.owner,
@@ -697,6 +541,123 @@ function deleteBranch(name) {
 
 /***/ }),
 
+/***/ 7611:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getBranchProtectionStatus = getBranchProtectionStatus;
+const core = __importStar(__nccwpck_require__(7484));
+const get_context_1 = __nccwpck_require__(7740);
+/**
+ * Returns the protection status for a single branch
+ * @param {string} branchName
+ * @returns {Promise<{isProtected: boolean, protectionType: string, canDelete: boolean}>}
+ */
+function getBranchProtectionStatus(branchName) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let defaultBranch;
+        try {
+            const repoInfo = yield get_context_1.github.rest.repos.get({ owner: get_context_1.owner, repo: get_context_1.repo });
+            defaultBranch = repoInfo.data.default_branch;
+        }
+        catch (err) {
+            return { isProtected: false, protectionType: '', canDelete: true };
+        }
+        if (branchName === defaultBranch) {
+            return { isProtected: true, protectionType: 'default branch', canDelete: false };
+        }
+        let isProtected = false;
+        let protectionType = '';
+        let canDelete = true;
+        // Check branch protection
+        try {
+            const protection = yield get_context_1.github.rest.repos.getBranchProtection({ owner: get_context_1.owner, repo: get_context_1.repo, branch: branchName });
+            if (protection.data && protection.data.allow_deletions && protection.data.allow_deletions.enabled) {
+                canDelete = true;
+            }
+            else {
+                isProtected = true;
+                protectionType = 'branch protection';
+                canDelete = false;
+            }
+        }
+        catch (err) {
+            if (err.status !== 404) {
+                isProtected = true;
+                protectionType = 'error';
+                canDelete = false;
+            }
+        }
+        // Check rulesets
+        try {
+            const rules = yield get_context_1.github.rest.repos.getBranchRules({ owner: get_context_1.owner, repo: get_context_1.repo, branch: branchName });
+            if (rules.data && rules.data.some(rule => typeof rule.deletion !== 'undefined' && rule.deletion === false)) {
+                isProtected = true;
+                protectionType = protectionType ? protectionType + ' and ruleset' : 'ruleset';
+                canDelete = false;
+            }
+        }
+        catch (err) {
+            // ignore
+        }
+        const includeProtectedBranches = core.getInput('include-protected-branches').toLowerCase() === 'true';
+        if (isProtected && includeProtectedBranches) {
+            canDelete = true;
+        }
+        return { isProtected, protectionType, canDelete };
+    });
+}
+/**
+ * @deprecated Use getBranchProtectionStatus in the main branch loop instead.
+ */
+
+
+/***/ }),
+
 /***/ 4879:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -750,7 +711,6 @@ const assert = __importStar(__nccwpck_require__(2613));
 const core = __importStar(__nccwpck_require__(7484));
 const get_context_1 = __nccwpck_require__(7740);
 const log_get_branches_1 = __nccwpck_require__(3180);
-const check_branch_protection_1 = __nccwpck_require__(9027);
 /**
  * Retrieves all branches in a repository
  *
@@ -781,9 +741,6 @@ function getBranches(includeProtectedBranches) {
                 commmitSha: branch.commit.sha
             })));
             branches = branchResponse;
-            if (includeProtectedBranches) {
-                yield (0, check_branch_protection_1.checkBranchProtection)(branches);
-            }
             assert.ok(branches, 'Response cannot be empty.');
             core.info((0, log_get_branches_1.logGetBranches)(branches.length));
         }
@@ -803,44 +760,11 @@ function getBranches(includeProtectedBranches) {
 
 /***/ }),
 
-/***/ 4708:
+/***/ 3415:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -851,64 +775,32 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getRecentCommitAge = getRecentCommitAge;
-exports.getRecentCommitAgeByNonIgnoredMessage = getRecentCommitAgeByNonIgnoredMessage;
-const assert = __importStar(__nccwpck_require__(2613));
-const core = __importStar(__nccwpck_require__(7484));
+exports.getRecentCommitInfo = getRecentCommitInfo;
 const get_context_1 = __nccwpck_require__(7740);
 const get_time_1 = __nccwpck_require__(3692);
 /**
- * Calcualtes the age of a commit in days
- *
- * @param {string} sha The SHA of the last commit
- *
- * @returns {number} The age of the commit
- */
-function getRecentCommitAge(sha) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let commitDate;
-        const currentDate = Date.now();
-        try {
-            const commitResponse = yield get_context_1.github.rest.repos.getCommit({
-                owner: get_context_1.owner,
-                repo: get_context_1.repo,
-                ref: sha,
-                per_page: 1,
-                page: 1
-            });
-            commitDate = commitResponse.data.commit.committer.date;
-            assert.ok(commitDate, 'Date cannot be empty.');
-        }
-        catch (err) {
-            if (err instanceof Error) {
-                core.setFailed(`Failed to retrieve commit for ${sha} in ${get_context_1.repo}. Error: ${err.message}`);
-            }
-            else {
-                core.setFailed(`Failed to retrieve commit for ${sha} in ${get_context_1.repo}.`);
-            }
-            commitDate = '';
-        }
-        const commitDateTime = new Date(commitDate).getTime();
-        const commitAge = (0, get_time_1.getDays)(currentDate, commitDateTime);
-        return commitAge;
-    });
-}
-/**
- * Calculates the age of the most recent commit not matching any ignored commit messages, up to a max age.
+ * Retrieves the most recent non-ignored commit's committer and age.
  *
  * @param {string} sha The SHA of the branch head
- * @param {string[]} ignoredMessages Array of commit messages or substrings to ignore
+ * @param {string[]} [ignoredMessages] Array of commit messages or substrings to ignore
  * @param {number} [maxAgeDays] Optional. If provided, stop searching if a commit is older than this many days.
+ * @param {string[]} [ignoredCommitters] Optional. List of committer usernames/names to ignore.
+ * @param {Set<string>} [defaultBranchShas] Optional. Set of commit SHAs from the default branch to ignore if ignoreDefaultBranchCommits is true.
+ * @param {boolean} [ignoreDefaultBranchCommits] Optional. If true, ignore commits also present in the default branch.
  *
- * @returns {number} The age of the most recent non-ignored commit, or maxAgeDays if none found within that range
+ * @returns {{ committer: string, age: number, ignoredCount: number, usedFallback: boolean, sha?: string }}
  */
-function getRecentCommitAgeByNonIgnoredMessage(sha, ignoredMessages, maxAgeDays) {
-    return __awaiter(this, void 0, void 0, function* () {
-        var _a, _b, _c;
+function getRecentCommitInfo(sha_1) {
+    return __awaiter(this, arguments, void 0, function* (sha, ignoredMessages = [], maxAgeDays, ignoredCommitters, defaultBranchShas, ignoreDefaultBranchCommits) {
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j;
         const currentDate = Date.now();
         let page = 1;
         let commitDate;
         let found = false;
+        let ignoredCount = 0;
+        let usedFallback = false;
+        let committer = 'Unknown';
+        let foundSha = undefined;
         while (!found) {
             const commitsResponse = yield get_context_1.github.rest.repos.listCommits({
                 owner: get_context_1.owner,
@@ -926,23 +818,34 @@ function getRecentCommitAgeByNonIgnoredMessage(sha, ignoredMessages, maxAgeDays)
                     continue;
                 const commitDateTime = new Date(commitDateStr).getTime();
                 const commitAge = (0, get_time_1.getDays)(currentDate, commitDateTime);
-                // If maxAgeDays is set and this commit is older than the threshold, stop searching
+                committer = ((_d = commit.committer) === null || _d === void 0 ? void 0 : _d.login) || ((_e = commit.author) === null || _e === void 0 ? void 0 : _e.login) || ((_g = (_f = commit.commit) === null || _f === void 0 ? void 0 : _f.committer) === null || _g === void 0 ? void 0 : _g.name) || ((_j = (_h = commit.commit) === null || _h === void 0 ? void 0 : _h.author) === null || _j === void 0 ? void 0 : _j.name) || 'Unknown';
+                // Ignore by SHA (default branch), if within window
+                if (ignoreDefaultBranchCommits && defaultBranchShas && defaultBranchShas.has(commit.sha)) {
+                    if (maxAgeDays === undefined || commitAge <= maxAgeDays) {
+                        ignoredCount++;
+                        continue;
+                    }
+                }
+                // Ignore by message or committer
+                if (ignoredMessages.some(msg => message.includes(msg)) ||
+                    (ignoredCommitters && ignoredCommitters.length > 0 && ignoredCommitters.some(ignored => ignored && committer && committer.toLowerCase() === ignored.toLowerCase()))) {
+                    ignoredCount++;
+                    continue;
+                }
+                // Only now check if commit is too old
                 if (maxAgeDays !== undefined && commitAge > maxAgeDays) {
-                    // If we haven't found a valid commit yet, return maxAgeDays
                     if (!commitDate) {
-                        return maxAgeDays;
+                        usedFallback = true;
+                        return { committer, age: maxAgeDays, ignoredCount, usedFallback };
                     }
                     else {
-                        // We already found a valid commit in this or a previous page, break out
                         found = true;
                         break;
                     }
                 }
-                if (ignoredMessages.some(msg => message.includes(msg))) {
-                    continue;
-                }
                 // Found a valid commit within the window
                 commitDate = commitDateStr;
+                foundSha = commit.sha;
                 found = true;
                 break;
             }
@@ -952,103 +855,10 @@ function getRecentCommitAgeByNonIgnoredMessage(sha, ignoredMessages, maxAgeDays)
         }
         if (commitDate) {
             const commitDateTime = new Date(commitDate).getTime();
-            return (0, get_time_1.getDays)(currentDate, commitDateTime);
+            const age = (0, get_time_1.getDays)(currentDate, commitDateTime);
+            return { committer, age, ignoredCount, usedFallback, sha: foundSha };
         }
         throw new Error('No non-ignored commit found');
-    });
-}
-
-
-/***/ }),
-
-/***/ 6863:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getRecentCommitLogin = getRecentCommitLogin;
-const assert = __importStar(__nccwpck_require__(2613));
-const core = __importStar(__nccwpck_require__(7484));
-const get_context_1 = __nccwpck_require__(7740);
-/**
- * Retrieves last committer's username
- *
- * @param {string} sha The SHA of the last commit
- *
- * @returns {string} The last committers username
- */
-function getRecentCommitLogin(sha) {
-    return __awaiter(this, void 0, void 0, function* () {
-        var _a, _b, _c, _d, _e, _f;
-        let lastCommitter;
-        try {
-            const commitResponse = yield get_context_1.github.rest.repos.getCommit({
-                owner: get_context_1.owner,
-                repo: get_context_1.repo,
-                ref: sha,
-                per_page: 1,
-                page: 1
-            });
-            const commitData = commitResponse.data;
-            lastCommitter = (_a = commitData.committer) === null || _a === void 0 ? void 0 : _a.login;
-            if (!lastCommitter || lastCommitter === 'web-flow') {
-                lastCommitter = ((_b = commitData.author) === null || _b === void 0 ? void 0 : _b.login) || ((_d = (_c = commitData.commit) === null || _c === void 0 ? void 0 : _c.committer) === null || _d === void 0 ? void 0 : _d.name) || ((_f = (_e = commitData.commit) === null || _e === void 0 ? void 0 : _e.author) === null || _f === void 0 ? void 0 : _f.name);
-            }
-            assert.ok(lastCommitter, 'Committer cannot be empty.');
-        }
-        catch (err) {
-            if (err instanceof Error) {
-                core.info(`Failed to retrieve commit for ${sha} in ${get_context_1.repo}. Error: ${err.message}`);
-            }
-            else {
-                core.info(`Failed to retrieve commit for ${sha} in ${get_context_1.repo}.`);
-            }
-            lastCommitter = '';
-        }
-        return lastCommitter;
     });
 }
 
@@ -1170,6 +980,8 @@ function validateInputs() {
             const ignoreIssueInteraction = core.getBooleanInput('ignore-issue-interaction');
             const includeProtectedBranches = core.getBooleanInput('include-protected-branches');
             const ignoreCommitMessages = core.getInput('ignore-commit-messages');
+            const ignoreCommittersInput = core.getInput('ignore-committers');
+            const ignoreDefaultBranchCommitsInput = core.getInput('ignore-default-branch-commits');
             //Assign inputs
             result.daysBeforeStale = inputDaysBeforeStale;
             result.daysBeforeDelete = inputDaysBeforeDelete;
@@ -1186,6 +998,21 @@ function validateInputs() {
             result.includeProtectedBranches = includeProtectedBranches;
             if (ignoreCommitMessages) {
                 result.ignoreCommitMessages = ignoreCommitMessages;
+            }
+            if (ignoreCommittersInput) {
+                result.ignoreCommitters = ignoreCommittersInput
+                    .split(',')
+                    .map(s => s.trim())
+                    .filter(Boolean);
+            }
+            if (typeof ignoreDefaultBranchCommitsInput === 'string' && ignoreDefaultBranchCommitsInput !== '') {
+                result.ignoreDefaultBranchCommits = ignoreDefaultBranchCommitsInput.toLowerCase() === 'true';
+            }
+            else if (ignoreCommitMessages) {
+                result.ignoreDefaultBranchCommits = true;
+            }
+            else {
+                result.ignoreDefaultBranchCommits = false;
             }
         }
         catch (err) {
@@ -1722,6 +1549,38 @@ function logBranchGroupColor(branchName, commitAge, daysBeforeStale, daysBeforeD
 
 /***/ }),
 
+/***/ 7411:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.logBranchProtection = logBranchProtection;
+const ansi_styles_1 = __importDefault(__nccwpck_require__(4412));
+/**
+ * Returns a log string for branch protection status, or an empty string if not protected.
+ *
+ * @param {boolean} isProtected - Whether the branch is protected
+ * @param {boolean} includeProtectedBranches - Whether protected branches are included for staleness/deletion
+ * @returns {string} The log message for branch protection status
+ */
+function logBranchProtection(isProtected, includeProtectedBranches) {
+    if (!isProtected)
+        return '';
+    if (includeProtectedBranches) {
+        return `${ansi_styles_1.default.bold.open}${ansi_styles_1.default.yellowBright.open}protected branch: true${ansi_styles_1.default.yellowBright.close}${ansi_styles_1.default.bold.close} (included)`;
+    }
+    else {
+        return `${ansi_styles_1.default.bold.open}${ansi_styles_1.default.redBright.open}protected branch: true${ansi_styles_1.default.redBright.close}${ansi_styles_1.default.bold.close} (skipped)`;
+    }
+}
+
+
+/***/ }),
+
 /***/ 7313:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -1842,17 +1701,31 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.logLastCommitColor = logLastCommitColor;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(4412));
-function logLastCommitColor(commitAge, daysBeforeStale, daysBeforeDelete) {
-    let commitColor = `Last Commit: ${ansi_styles_1.default.magenta.open}${commitAge.toString()}${ansi_styles_1.default.magenta.close} days ago.`;
+function logLastCommitColor(commitAge, daysBeforeStale, daysBeforeDelete, ignoredCommitInfo, committer, sha) {
+    if (ignoredCommitInfo && ignoredCommitInfo.usedFallback) {
+        return `${ansi_styles_1.default.redBright.open}No meaningful commit found in the last ${daysBeforeDelete} days (days-before-delete).${ansi_styles_1.default.redBright.close} ${ansi_styles_1.default.cyan.open}(ignored ${ignoredCommitInfo.ignoredCount} commit${ignoredCommitInfo.ignoredCount > 1 ? 's' : ''} matching filter, used fallback)${ansi_styles_1.default.cyan.close}`;
+    }
+    let label = 'Last Meaningful Commit:';
+    let commitColor = `${label} ${ansi_styles_1.default.magenta.open}${commitAge.toString()}${ansi_styles_1.default.magenta.close} days ago`;
+    if (committer) {
+        commitColor += ` by ${ansi_styles_1.default.bold.open}${committer}${ansi_styles_1.default.bold.close}`;
+    }
+    if (sha) {
+        commitColor += ` ${ansi_styles_1.default.cyan.open}SHA: ${sha}${ansi_styles_1.default.cyan.close}`;
+    }
+    commitColor += '.';
     //color group based on age of branch
     if (commitAge > daysBeforeDelete) {
-        commitColor = `Last Commit: ${ansi_styles_1.default.redBright.open}${commitAge.toString()}${ansi_styles_1.default.redBright.close} days ago.`;
+        commitColor = `${ansi_styles_1.default.redBright.open}${commitColor}${ansi_styles_1.default.redBright.close}`;
     }
     else if (commitAge > daysBeforeStale) {
-        commitColor = `Last Commit: ${ansi_styles_1.default.yellowBright.open}${commitAge.toString()}${ansi_styles_1.default.yellowBright.close} days ago.`;
+        commitColor = `${ansi_styles_1.default.yellow.open}${commitColor}${ansi_styles_1.default.yellow.close}`;
     }
-    else if (commitAge < daysBeforeStale) {
-        commitColor = `Last Commit: ${ansi_styles_1.default.greenBright.open}${commitAge.toString()}${ansi_styles_1.default.greenBright.close} days ago.`;
+    else {
+        commitColor = `${ansi_styles_1.default.green.open}${commitColor}${ansi_styles_1.default.green.close}`;
+    }
+    if (ignoredCommitInfo && ignoredCommitInfo.ignoredCount > 0) {
+        commitColor += ` ${ansi_styles_1.default.cyan.open}(ignored ${ignoredCommitInfo.ignoredCount} commit${ignoredCommitInfo.ignoredCount > 1 ? 's' : ''} matching filter${ignoredCommitInfo.usedFallback ? ', used fallback' : ''})${ansi_styles_1.default.cyan.close}`;
     }
     return commitColor;
 }
@@ -2041,9 +1914,11 @@ exports.createCommentString = createCommentString;
  *
  * @param {boolean} tagLastCommitter If true, the user that last committed to this branch will be tagged
  *
+ * @param {object} [ignoredCommitInfo] Optional. Info about ignored commits (ignoredCount, usedFallback)
+ *
  * @returns A string to use as a comment on a GitHub issue
  */
-function createCommentString(branch, lastCommitter, commitAge, daysBeforeDelete, tagLastCommitter) {
+function createCommentString(branch, lastCommitter, commitAge, daysBeforeDelete, tagLastCommitter, ignoredCommitInfo) {
     const daysUntilDelete = Math.max(0, daysBeforeDelete - commitAge);
     let bodyString;
     switch (tagLastCommitter) {
@@ -2053,6 +1928,9 @@ function createCommentString(branch, lastCommitter, commitAge, daysBeforeDelete,
         case false:
             bodyString = `${branch} has had no activity for ${commitAge.toString()} days. \r \r This branch will be automatically deleted in ${daysUntilDelete.toString()} days. \r \r This issue was last updated on ${new Date().toString()}`;
             break;
+    }
+    if (ignoredCommitInfo && ignoredCommitInfo.ignoredCount > 0) {
+        bodyString += `\r \r _Note: Ignored ${ignoredCommitInfo.ignoredCount} commit${ignoredCommitInfo.ignoredCount > 1 ? 's' : ''} matching filter${ignoredCommitInfo.usedFallback ? ', used fallback' : ''}._`;
     }
     return bodyString;
 }
@@ -2269,8 +2147,7 @@ const get_branches_1 = __nccwpck_require__(4879);
 const get_stale_issue_budget_1 = __nccwpck_require__(6492);
 const get_issues_1 = __nccwpck_require__(8955);
 const get_rate_limit_1 = __nccwpck_require__(6295);
-const get_commit_age_1 = __nccwpck_require__(4708);
-const get_committer_login_1 = __nccwpck_require__(6863);
+const get_commit_info_1 = __nccwpck_require__(3415);
 const log_active_branch_1 = __nccwpck_require__(8690);
 const log_branch_group_color_1 = __nccwpck_require__(3231);
 const log_last_commit_color_1 = __nccwpck_require__(4975);
@@ -2284,6 +2161,9 @@ const filter_branches_1 = __nccwpck_require__(3985);
 const get_pr_1 = __nccwpck_require__(9349);
 const log_skipped_branch_1 = __nccwpck_require__(1948);
 const log_branch_group_color_skip_1 = __nccwpck_require__(7123);
+const get_branch_protection_1 = __nccwpck_require__(7611);
+const log_branch_protection_1 = __nccwpck_require__(7411);
+const get_context_2 = __nccwpck_require__(7740);
 function closeIssueWrappedLogs(issueNumber, validInputs, branchName) {
     return __awaiter(this, void 0, void 0, function* () {
         if (!validInputs.ignoreIssueInteraction && !validInputs.dryRun) {
@@ -2300,6 +2180,7 @@ function closeIssueWrappedLogs(issueNumber, validInputs, branchName) {
 }
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
+        var _a, _b;
         //Declare output arrays
         const outputDeletes = [];
         const outputStales = [];
@@ -2316,8 +2197,89 @@ function run() {
             let existingIssue = yield (0, get_issues_1.getIssues)(validInputs.staleBranchLabel);
             let issueBudgetRemaining = yield (0, get_stale_issue_budget_1.getIssueBudget)(validInputs.maxIssues, validInputs.staleBranchLabel);
             let lastCommitLogin = 'Unknown';
+            // Get default branch name and SHAs if needed
+            let defaultBranch = '';
+            let defaultBranchShas = undefined;
+            if (validInputs.ignoreDefaultBranchCommits) {
+                // Use the repo API to get the default branch name
+                const repoMeta = yield get_context_2.github.rest.repos.get({ owner: get_context_2.owner, repo: get_context_2.repo });
+                defaultBranch = repoMeta.data.default_branch;
+                // Fetch SHAs from the default branch (up to maxAgeDays)
+                let page = 1;
+                let shas = [];
+                let done = false;
+                const maxAgeDays = validInputs.daysBeforeDelete;
+                const now = Date.now();
+                while (!done) {
+                    const resp = yield get_context_2.github.rest.repos.listCommits({ owner: get_context_2.owner, repo: get_context_2.repo, sha: defaultBranch, per_page: 100, page });
+                    if (resp.data.length === 0)
+                        break;
+                    for (const commit of resp.data) {
+                        const commitDateStr = (_b = (_a = commit.commit) === null || _a === void 0 ? void 0 : _a.committer) === null || _b === void 0 ? void 0 : _b.date;
+                        if (commitDateStr) {
+                            const commitDateTime = new Date(commitDateStr).getTime();
+                            const commitAge = Math.floor((now - commitDateTime) / (1000 * 60 * 60 * 24));
+                            if (commitAge > maxAgeDays) {
+                                done = true;
+                                break;
+                            }
+                        }
+                        shas.push(commit.sha);
+                    }
+                    if (resp.data.length < 100)
+                        done = true;
+                    page++;
+                }
+                defaultBranchShas = new Set(shas);
+            }
             // Assess Branches
             for (const branchToCheck of branches) {
+                // Check branch protection for this branch
+                const protection = yield (0, get_branch_protection_1.getBranchProtectionStatus)(branchToCheck.branchName);
+                //Get age of last commit, generate issue title, and filter existing issues to current branch
+                let commitAge;
+                let ignoredCommitInfo = undefined;
+                let committer = undefined;
+                let lastMeaningfulSha = undefined;
+                if (validInputs.ignoreCommitMessages && validInputs.ignoreCommitMessages.trim() !== '') {
+                    const ignoredMessages = validInputs.ignoreCommitMessages
+                        .split(',')
+                        .map(s => s.trim())
+                        .filter(Boolean);
+                    const commitInfo = yield (0, get_commit_info_1.getRecentCommitInfo)(branchToCheck.commmitSha, ignoredMessages, validInputs.daysBeforeDelete, validInputs.ignoreCommitters, defaultBranchShas, validInputs.ignoreDefaultBranchCommits);
+                    commitAge = commitInfo.age;
+                    committer = commitInfo.committer;
+                    lastMeaningfulSha = commitInfo.sha;
+                    ignoredCommitInfo = { ignoredCount: commitInfo.ignoredCount, usedFallback: commitInfo.usedFallback };
+                    if (validInputs.tagLastCommitter === true) {
+                        lastCommitLogin = commitInfo.committer;
+                    }
+                }
+                else {
+                    // No ignored messages, but still use getRecentCommitInfo for consistency
+                    const commitInfo = yield (0, get_commit_info_1.getRecentCommitInfo)(branchToCheck.commmitSha, [], undefined, validInputs.ignoreCommitters, defaultBranchShas, validInputs.ignoreDefaultBranchCommits);
+                    commitAge = commitInfo.age;
+                    committer = commitInfo.committer;
+                    lastMeaningfulSha = commitInfo.sha;
+                    if (validInputs.tagLastCommitter === true) {
+                        lastCommitLogin = commitInfo.committer;
+                    }
+                }
+                const issueTitleString = (0, create_issues_title_string_1.createIssueTitleString)(branchToCheck.branchName);
+                const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === issueTitleString);
+                // Start output group for current branch assessment (after commitAge is known)
+                core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchToCheck.branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
+                // Log branch protection status for all protected branches
+                const protectionMsg = (0, log_branch_protection_1.logBranchProtection)(protection.isProtected, validInputs.includeProtectedBranches);
+                if (protectionMsg) {
+                    core.info(protectionMsg);
+                    if (!validInputs.includeProtectedBranches) {
+                        core.endGroup();
+                        continue;
+                    }
+                }
+                // Log last commit age
+                core.info((0, log_last_commit_color_1.logLastCommitColor)(commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete, ignoredCommitInfo, committer, lastMeaningfulSha));
                 // Break if Rate Limit usage exceeds 95%
                 if (validInputs.rateLimit) {
                     const rateLimit = yield (0, get_rate_limit_1.getRateLimit)();
@@ -2337,31 +2299,7 @@ function run() {
                         continue;
                     }
                 }
-                //Get age of last commit, generate issue title, and filter existing issues to current branch
-                let commitAge;
-                if (validInputs.ignoreCommitMessages && validInputs.ignoreCommitMessages.trim() !== '') {
-                    const ignoredMessages = validInputs.ignoreCommitMessages
-                        .split(',')
-                        .map(s => s.trim())
-                        .filter(Boolean);
-                    commitAge = yield (0, get_commit_age_1.getRecentCommitAgeByNonIgnoredMessage)(branchToCheck.commmitSha, ignoredMessages, validInputs.daysBeforeDelete);
-                }
-                else {
-                    commitAge = yield (0, get_commit_age_1.getRecentCommitAge)(branchToCheck.commmitSha);
-                }
-                const issueTitleString = (0, create_issues_title_string_1.createIssueTitleString)(branchToCheck.branchName);
-                const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === issueTitleString);
-                // Skip looking for last commit's login if input is set to false
-                if (validInputs.tagLastCommitter === true) {
-                    lastCommitLogin = yield (0, get_committer_login_1.getRecentCommitLogin)(branchToCheck.commmitSha);
-                }
-                // Start output group for current branch assessment
-                core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchToCheck.branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
-                //Compare current branch to default branch
-                const branchComparison = yield (0, compare_branches_1.compareBranches)(branchToCheck.branchName, validInputs.compareBranches);
-                //Log last commit age
-                core.info((0, log_last_commit_color_1.logLastCommitColor)(commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
-                //Create new issue if branch is stale & existing issue is not found & issue budget is >0
+                // Create new issue if branch is stale & existing issue is not found & issue budget is >0
                 if (commitAge > validInputs.daysBeforeStale) {
                     if (!filteredIssue.find(findIssue => findIssue.issueTitle === issueTitleString) && issueBudgetRemaining > 0) {
                         if (!validInputs.dryRun && !validInputs.ignoreIssueInteraction) {
@@ -2380,7 +2318,7 @@ function run() {
                         }
                     }
                 }
-                //Close issues if a branch becomes active again
+                // Close issues if a branch becomes active again
                 if (commitAge < validInputs.daysBeforeStale) {
                     for (const issueToClose of filteredIssue) {
                         if (issueToClose.issueTitle === issueTitleString) {
@@ -2389,12 +2327,12 @@ function run() {
                         }
                     }
                 }
-                //Update existing issues
+                // Update existing issues
                 if (commitAge > validInputs.daysBeforeStale) {
                     for (const issueToUpdate of filteredIssue) {
                         if (issueToUpdate.issueTitle === issueTitleString) {
                             if (!validInputs.dryRun && !validInputs.ignoreIssueInteraction) {
-                                yield (0, create_issue_comment_1.createIssueComment)(issueToUpdate.issueNumber, branchToCheck.branchName, commitAge, lastCommitLogin, validInputs.commentUpdates, validInputs.daysBeforeDelete, validInputs.staleBranchLabel, validInputs.tagLastCommitter);
+                                yield (0, create_issue_comment_1.createIssueComment)(issueToUpdate.issueNumber, branchToCheck.branchName, commitAge, lastCommitLogin, validInputs.commentUpdates, validInputs.daysBeforeDelete, validInputs.staleBranchLabel, validInputs.tagLastCommitter, ignoredCommitInfo);
                             }
                             else if (validInputs.dryRun) {
                                 core.info(`Dry Run: Issue would be updated for branch: ${branchToCheck.branchName}`);
@@ -2408,7 +2346,8 @@ function run() {
                         }
                     }
                 }
-                //Delete expired branches
+                // Delete expired branches
+                const branchComparison = yield (0, compare_branches_1.compareBranches)(branchToCheck.branchName, validInputs.compareBranches);
                 if (commitAge > validInputs.daysBeforeDelete && branchComparison.save === false) {
                     if (!validInputs.dryRun) {
                         yield (0, delete_branch_1.deleteBranch)(branchToCheck.branchName);
@@ -34358,56 +34297,6 @@ function parseParams (str) {
 module.exports = parseParams
 
 
-/***/ }),
-
-/***/ 1015:
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __nccwpck_require__) => {
-
-"use strict";
-__nccwpck_require__.r(__webpack_exports__);
-/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
-/* harmony export */   RequestError: () => (/* binding */ RequestError)
-/* harmony export */ });
-class RequestError extends Error {
-  name;
-  /**
-   * http status code
-   */
-  status;
-  /**
-   * Request options that lead to the error.
-   */
-  request;
-  /**
-   * Response object if a response was received
-   */
-  response;
-  constructor(message, statusCode, options) {
-    super(message);
-    this.name = "HttpError";
-    this.status = Number.parseInt(statusCode);
-    if (Number.isNaN(this.status)) {
-      this.status = 0;
-    }
-    if ("response" in options) {
-      this.response = options.response;
-    }
-    const requestCopy = Object.assign({}, options.request);
-    if (options.request.headers.authorization) {
-      requestCopy.headers = Object.assign({}, options.request.headers, {
-        authorization: options.request.headers.authorization.replace(
-          /(?<! ) .*$/,
-          " [REDACTED]"
-        )
-      });
-    }
-    requestCopy.url = requestCopy.url.replace(/\bclient_secret=\w+/g, "client_secret=[REDACTED]").replace(/\baccess_token=\w+/g, "access_token=[REDACTED]");
-    this.request = requestCopy;
-  }
-}
-
-
-
 /***/ })
 
 /******/ 	});
@@ -34446,34 +34335,6 @@ class RequestError extends Error {
 /******/ 	}
 /******/ 	
 /************************************************************************/
-/******/ 	/* webpack/runtime/define property getters */
-/******/ 	(() => {
-/******/ 		// define getter functions for harmony exports
-/******/ 		__nccwpck_require__.d = (exports, definition) => {
-/******/ 			for(var key in definition) {
-/******/ 				if(__nccwpck_require__.o(definition, key) && !__nccwpck_require__.o(exports, key)) {
-/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
-/******/ 				}
-/******/ 			}
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	(() => {
-/******/ 		__nccwpck_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/make namespace object */
-/******/ 	(() => {
-/******/ 		// define __esModule on exports
-/******/ 		__nccwpck_require__.r = (exports) => {
-/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 			}
-/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 		};
-/******/ 	})();
-/******/ 	
 /******/ 	/* webpack/runtime/node module decorator */
 /******/ 	(() => {
 /******/ 		__nccwpck_require__.nmd = (module) => {
