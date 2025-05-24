@@ -23,7 +23,6 @@ import {validateInputs} from './functions/get-context'
 import {filterBranches} from './functions/utils/filter-branches'
 import {getPr} from './functions/get-pr'
 import {logSkippedBranch} from './functions/logging/log-skipped-branch'
-import {logBranchGroupColorSkip} from './functions/logging/log-branch-group-color-skip'
 import {Inputs} from './types/inputs'
 import {getBranchProtectionStatus} from './functions/get-branch-protection'
 import {logBranchProtection} from './functions/logging/log-branch-protection'
@@ -134,6 +133,14 @@ export async function run(): Promise<void> {
       const issueTitleString = createIssueTitleString(branchToCheck.branchName)
       const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === issueTitleString)
 
+      // Check if we should skip this branch due to PRs before starting the output group
+      let skipDueToActivePR = false
+      let activePrCount = 0
+      if (validInputs.prCheck) {
+        activePrCount = await getPr(branchToCheck.branchName)
+        skipDueToActivePR = activePrCount > 0
+      }
+
       // Start output group for current branch assessment (after commitAge is known)
       core.startGroup(logBranchGroupColor(branchToCheck.branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete))
 
@@ -160,15 +167,11 @@ export async function run(): Promise<void> {
         }
       }
 
-      // Check for active pull requests if prCheck is true
-      if (validInputs.prCheck) {
-        const activePrs = await getPr(branchToCheck.branchName)
-        if (activePrs > 0) {
-          core.startGroup(logBranchGroupColorSkip(branchToCheck.branchName))
-          core.info(logSkippedBranch(branchToCheck.branchName, activePrs))
-          core.endGroup()
-          continue
-        }
+      // Check for active pull requests if already determined there are PRs
+      if (skipDueToActivePR) {
+        core.info(logSkippedBranch(branchToCheck.branchName, activePrCount))
+        core.endGroup()
+        continue
       }
 
       // Create new issue if branch is stale & existing issue is not found & issue budget is >0

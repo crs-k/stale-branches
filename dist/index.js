@@ -1501,25 +1501,6 @@ function logActiveBranch(branchName) {
 
 /***/ }),
 
-/***/ 7123:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.logBranchGroupColorSkip = logBranchGroupColorSkip;
-const ansi_styles_1 = __importDefault(__nccwpck_require__(4412));
-function logBranchGroupColorSkip(branchName) {
-    const groupColor = `[${ansi_styles_1.default.blueBright.open}${branchName}${ansi_styles_1.default.blueBright.close}]`;
-    return groupColor;
-}
-
-
-/***/ }),
-
 /***/ 3231:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -2160,7 +2141,6 @@ const get_context_1 = __nccwpck_require__(7740);
 const filter_branches_1 = __nccwpck_require__(3985);
 const get_pr_1 = __nccwpck_require__(9349);
 const log_skipped_branch_1 = __nccwpck_require__(1948);
-const log_branch_group_color_skip_1 = __nccwpck_require__(7123);
 const get_branch_protection_1 = __nccwpck_require__(7611);
 const log_branch_protection_1 = __nccwpck_require__(7411);
 const get_context_2 = __nccwpck_require__(7740);
@@ -2267,6 +2247,13 @@ function run() {
                 }
                 const issueTitleString = (0, create_issues_title_string_1.createIssueTitleString)(branchToCheck.branchName);
                 const filteredIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle === issueTitleString);
+                // Check if we should skip this branch due to PRs before starting the output group
+                let skipDueToActivePR = false;
+                let activePrCount = 0;
+                if (validInputs.prCheck) {
+                    activePrCount = yield (0, get_pr_1.getPr)(branchToCheck.branchName);
+                    skipDueToActivePR = activePrCount > 0;
+                }
                 // Start output group for current branch assessment (after commitAge is known)
                 core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchToCheck.branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
                 // Log branch protection status for all protected branches
@@ -2289,15 +2276,11 @@ function run() {
                         break;
                     }
                 }
-                // Check for active pull requests if prCheck is true
-                if (validInputs.prCheck) {
-                    const activePrs = yield (0, get_pr_1.getPr)(branchToCheck.branchName);
-                    if (activePrs > 0) {
-                        core.startGroup((0, log_branch_group_color_skip_1.logBranchGroupColorSkip)(branchToCheck.branchName));
-                        core.info((0, log_skipped_branch_1.logSkippedBranch)(branchToCheck.branchName, activePrs));
-                        core.endGroup();
-                        continue;
-                    }
+                // Check for active pull requests if already determined there are PRs
+                if (skipDueToActivePR) {
+                    core.info((0, log_skipped_branch_1.logSkippedBranch)(branchToCheck.branchName, activePrCount));
+                    core.endGroup();
+                    continue;
                 }
                 // Create new issue if branch is stale & existing issue is not found & issue budget is >0
                 if (commitAge > validInputs.daysBeforeStale) {
@@ -15552,7 +15535,7 @@ module.exports = {
 
 
 const { parseSetCookie } = __nccwpck_require__(8915)
-const { stringify, getHeadersList } = __nccwpck_require__(3834)
+const { stringify } = __nccwpck_require__(3834)
 const { webidl } = __nccwpck_require__(4222)
 const { Headers } = __nccwpck_require__(6349)
 
@@ -15628,14 +15611,13 @@ function getSetCookies (headers) {
 
   webidl.brandCheck(headers, Headers, { strict: false })
 
-  const cookies = getHeadersList(headers).cookies
+  const cookies = headers.getSetCookie()
 
   if (!cookies) {
     return []
   }
 
-  // In older versions of undici, cookies is a list of name:value.
-  return cookies.map((pair) => parseSetCookie(Array.isArray(pair) ? pair[1] : pair))
+  return cookies.map((pair) => parseSetCookie(pair))
 }
 
 /**
@@ -16063,14 +16045,15 @@ module.exports = {
 /***/ }),
 
 /***/ 3834:
-/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+/***/ ((module) => {
 
 "use strict";
 
 
-const assert = __nccwpck_require__(2613)
-const { kHeadersList } = __nccwpck_require__(6443)
-
+/**
+ * @param {string} value
+ * @returns {boolean}
+ */
 function isCTLExcludingHtab (value) {
   if (value.length === 0) {
     return false
@@ -16331,31 +16314,13 @@ function stringify (cookie) {
   return out.join('; ')
 }
 
-let kHeadersListNode
-
-function getHeadersList (headers) {
-  if (headers[kHeadersList]) {
-    return headers[kHeadersList]
-  }
-
-  if (!kHeadersListNode) {
-    kHeadersListNode = Object.getOwnPropertySymbols(headers).find(
-      (symbol) => symbol.description === 'headers list'
-    )
-
-    assert(kHeadersListNode, 'Headers cannot be parsed')
-  }
-
-  const headersList = headers[kHeadersListNode]
-  assert(headersList)
-
-  return headersList
-}
-
 module.exports = {
   isCTLExcludingHtab,
-  stringify,
-  getHeadersList
+  validateCookieName,
+  validateCookiePath,
+  validateCookieValue,
+  toIMFDate,
+  stringify
 }
 
 
@@ -20359,6 +20324,7 @@ const {
   isValidHeaderName,
   isValidHeaderValue
 } = __nccwpck_require__(5523)
+const util = __nccwpck_require__(9023)
 const { webidl } = __nccwpck_require__(4222)
 const assert = __nccwpck_require__(2613)
 
@@ -20912,6 +20878,9 @@ Object.defineProperties(Headers.prototype, {
   [Symbol.toStringTag]: {
     value: 'Headers',
     configurable: true
+  },
+  [util.inspect.custom]: {
+    enumerable: false
   }
 })
 
@@ -30088,6 +30057,20 @@ class Pool extends PoolBase {
       ? { ...options.interceptors }
       : undefined
     this[kFactory] = factory
+
+    this.on('connectionError', (origin, targets, error) => {
+      // If a connection error occurs, we remove the client from the pool,
+      // and emit a connectionError event. They will not be re-used.
+      // Fixes https://github.com/nodejs/undici/issues/3895
+      for (const target of targets) {
+        // Do not use kRemoveClient here, as it will close the client,
+        // but the client cannot be closed in this state.
+        const idx = this[kClients].indexOf(target)
+        if (idx !== -1) {
+          this[kClients].splice(idx, 1)
+        }
+      }
+    })
   }
 
   [kGetDispatcher] () {
