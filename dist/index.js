@@ -34339,8 +34339,14 @@ var __webpack_exports__ = {};
 var exports = __webpack_exports__;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.checkIsMainModule = checkIsMainModule;
 const stale_branches_1 = __nccwpck_require__(5378);
-if (require.main === require.cache[eval('__filename')]) {
+// Helper function to check if this is the main module
+// This can be mocked in tests to avoid manipulating require.main
+function checkIsMainModule() {
+    return require.main === require.cache[eval('__filename')];
+}
+if (checkIsMainModule()) {
     (0, stale_branches_1.run)();
 }
 

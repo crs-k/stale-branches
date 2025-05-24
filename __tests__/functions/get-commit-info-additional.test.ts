@@ -49,12 +49,54 @@ describe('getRecentCommitInfo - Additional Tests', () => {
     require('../../src/functions/get-context').github = githubBackup
   })
   
+  // Create properly typed mock function for listCommits
+  type CommitsResponse = {
+    data: Array<{
+      sha?: string;
+      commit: {
+        message: string;
+        committer: {
+          date?: string;
+          name?: string;
+        };
+        author: {
+          name?: string;
+        };
+      };
+      committer?: {
+        login?: string;
+      };
+      author?: {
+        login?: string;
+      };
+    }>;
+  };
+
+  // Define proper typings to support both resolve and reject cases
+  type MockListCommitsType = jest.Mock<
+    Promise<CommitsResponse>,
+    [any?, any?, any?, any?, any?],
+    any
+  >;
+
+  // Helper function to create properly typed mock functions for listCommits
+  function createTypedListCommitsMock(initialData: any[] = []): MockListCommitsType {
+    return jest.fn().mockImplementation(() => 
+      Promise.resolve({ data: initialData } as CommitsResponse)
+    ) as MockListCommitsType;
+  }
+  
+  const mockListCommits = createTypedListCommitsMock([]);
+  
   beforeEach(() => {
     // Mock github client
+    mockListCommits.mockClear();
+    mockListCommits.mockResolvedValueOnce({data: testCommits} as CommitsResponse).mockResolvedValue({data: []} as CommitsResponse);
+    
     require('../../src/functions/get-context').github = {
       rest: {
         repos: {
-          listCommits: jest.fn().mockResolvedValueOnce({data: testCommits}).mockResolvedValue({data: []})
+          listCommits: mockListCommits
         }
       }
     }
@@ -72,8 +114,10 @@ describe('getRecentCommitInfo - Additional Tests', () => {
       ...testCommits
     ]
     
-    require('../../src/functions/get-context').github.rest.repos.listCommits = 
-      jest.fn().mockResolvedValueOnce({data: commitsWithMissingDate}).mockResolvedValue({data: []})
+    mockListCommits.mockClear();
+    mockListCommits.mockResolvedValueOnce({data: commitsWithMissingDate}).mockResolvedValue({data: []});
+    
+    require('../../src/functions/get-context').github.rest.repos.listCommits = mockListCommits
     
     const result = await getRecentCommitInfo('sha', [])
     
@@ -121,8 +165,12 @@ describe('getRecentCommitInfo - Additional Tests', () => {
       }
     ]
     
-    require('../../src/functions/get-context').github.rest.repos.listCommits = 
-      jest.fn().mockResolvedValueOnce({data: olderCommits}).mockResolvedValue({data: []})
+    const typedMock = createTypedListCommitsMock();
+    typedMock
+      .mockResolvedValueOnce({data: olderCommits} as CommitsResponse)
+      .mockResolvedValue({data: []} as CommitsResponse);
+    
+    require('../../src/functions/get-context').github.rest.repos.listCommits = typedMock
     
     const result = await getRecentCommitInfo('sha', [], 30, [])
     
@@ -141,8 +189,12 @@ describe('getRecentCommitInfo - Additional Tests', () => {
       ...testCommits
     ]
     
-    require('../../src/functions/get-context').github.rest.repos.listCommits = 
-      jest.fn().mockResolvedValueOnce({data: commitsWithDifferentNameFormats}).mockResolvedValue({data: []})
+    const typedMock = createTypedListCommitsMock();
+    typedMock
+      .mockResolvedValueOnce({data: commitsWithDifferentNameFormats} as CommitsResponse)
+      .mockResolvedValue({data: []} as CommitsResponse);
+    
+    require('../../src/functions/get-context').github.rest.repos.listCommits = typedMock
     
     const result = await getRecentCommitInfo('sha', [], undefined, ['John Doe'])
     
@@ -151,8 +203,10 @@ describe('getRecentCommitInfo - Additional Tests', () => {
   })
 
   it('handles empty commits response', async () => {
-    require('../../src/functions/get-context').github.rest.repos.listCommits = 
-      jest.fn().mockResolvedValueOnce({data: []})
+    const typedMock = createTypedListCommitsMock();
+    typedMock.mockResolvedValueOnce({data: []} as CommitsResponse);
+    
+    require('../../src/functions/get-context').github.rest.repos.listCommits = typedMock
     
     await expect(getRecentCommitInfo('sha', [], undefined, [])).rejects.toThrow('No non-ignored commit found')
   })
@@ -175,10 +229,13 @@ describe('getRecentCommitInfo - Additional Tests', () => {
       }
     ]
     
-    require('../../src/functions/get-context').github.rest.repos.listCommits = jest.fn()
-      .mockResolvedValueOnce({data: page1Commits})
-      .mockResolvedValueOnce({data: page2Commits})
-      .mockResolvedValue({data: []})
+    const typedMock = createTypedListCommitsMock();
+    typedMock
+      .mockResolvedValueOnce({data: page1Commits} as CommitsResponse)
+      .mockResolvedValueOnce({data: page2Commits} as CommitsResponse)
+      .mockResolvedValue({data: []} as CommitsResponse);
+    
+    require('../../src/functions/get-context').github.rest.repos.listCommits = typedMock
     
     const result = await getRecentCommitInfo('sha', ['WIP'], undefined, [])
     
