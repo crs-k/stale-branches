@@ -164,9 +164,8 @@ export async function run(): Promise<void> {
       if (validInputs.prCheck) {
         const activePrs = await getPr(branchToCheck.branchName)
         if (activePrs > 0) {
-          core.startGroup(logBranchGroupColorSkip(branchToCheck.branchName))
           core.info(logSkippedBranch(branchToCheck.branchName, activePrs))
-          core.endGroup()
+          core.endGroup() // Close the branch group after adding the PR skip message
           continue
         }
       }
