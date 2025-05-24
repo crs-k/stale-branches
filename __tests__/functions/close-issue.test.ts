@@ -1,18 +1,34 @@
 jest.mock('@actions/core')
 jest.mock('@actions/github')
-jest.mock('assert')
 jest.mock('../../src/functions/get-context')
 
-const core = require('@actions/core')
-const assert = require('assert')
+import * as core from '@actions/core'
 import {closeIssue} from '../../src/functions/close-issue'
 import {github} from '../../src/functions/get-context'
 import {logCloseIssue} from '../../src/functions/logging/log-close-issue'
 
-let issueNumber = 1
-let state = 'closed'
+const issueNumber = 1
+const state = 'closed'
 
 describe('Close Issue Function', () => {
+  let mockInfo: jest.Mock
+
+  beforeEach(() => {
+    jest.resetAllMocks()
+    mockInfo = jest.fn()
+    ;(core.info as jest.Mock) = mockInfo
+    
+    // Default successful mock
+    jest.spyOn(github.rest.issues, 'update').mockResolvedValue({
+      data: {
+        issue_number: issueNumber,
+        owner: 'owner',
+        repo: 'repo',
+        state: 'closed'
+      }
+    } as any)
+  })
+
   test('closeIssue endpoint is called', async () => {
     await closeIssue(issueNumber)
     expect(github.rest.issues.update).toHaveBeenCalledWith({
@@ -21,36 +37,33 @@ describe('Close Issue Function', () => {
       repo: 'repo',
       state: 'closed'
     })
-    expect(github.rest.issues.update).toHaveReturnedWith({
-      data: {issue_number: 1, owner: 'owner', repo: 'repo', state: 'closed'}
-    })
   })
 
   test('Infos are set', async () => {
-    core.info = jest.fn()
     await closeIssue(issueNumber)
-    expect(core.info).toHaveBeenCalledWith(logCloseIssue(issueNumber, state))
+    expect(mockInfo).toHaveBeenCalledWith(logCloseIssue(issueNumber, state))
   })
 
   test('Action fails elegantly - Error', async () => {
-    core.info = jest.fn()
-    assert.ok = jest.fn()
-    assert.ok.mockImplementation(() => {
-      throw new Error('State cannot be empty')
-    })
+    // Mock response with empty state to trigger the error condition
+    jest.spyOn(github.rest.issues, 'update').mockResolvedValueOnce({
+      data: {
+        issue_number: issueNumber,
+        owner: 'owner',
+        repo: 'repo',
+        state: ''
+      }
+    } as any)
 
     await closeIssue(issueNumber)
-    expect(core.info).toHaveBeenCalledWith(`No existing issue returned for issue number: 1. Description: State cannot be empty`)
+    expect(mockInfo).toHaveBeenCalledWith('No existing issue returned for issue number: 1. Description: State cannot be empty')
   })
 
   test('Action fails elegantly - String', async () => {
-    core.info = jest.fn()
-    assert.ok = jest.fn()
-    assert.ok.mockImplementation(() => {
-      throw new String('State cannot be empty')
-    })
+    // Mock GitHub API to reject with a string
+    jest.spyOn(github.rest.issues, 'update').mockRejectedValueOnce('State cannot be empty')
 
     await closeIssue(issueNumber)
-    expect(core.info).toHaveBeenCalledWith(`No existing issue returned for issue number: 1.`)
+    expect(mockInfo).toHaveBeenCalledWith('No existing issue returned for issue number: 1.')
   })
 })

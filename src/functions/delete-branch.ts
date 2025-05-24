@@ -1,4 +1,3 @@
-import * as assert from 'assert'
 import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
 import {logDeleteBranch} from './logging/log-delete-branch'
@@ -24,7 +23,9 @@ export async function deleteBranch(name: string): Promise<number> {
     })
     confirm = response.status
 
-    assert.ok(response, 'response cannot be empty')
+    if (!response) {
+      throw new Error('response cannot be empty')
+    }
     core.info(logDeleteBranch(refFull))
   } catch (err) {
     if (err instanceof Error) {

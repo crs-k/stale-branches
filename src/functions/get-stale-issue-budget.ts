@@ -1,4 +1,3 @@
-import * as assert from 'assert'
 import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
 import {IssueResponse} from '../types/issues'
@@ -32,7 +31,9 @@ export async function getIssueBudget(maxIssues: number, staleBranchLabel: string
     issues = issueResponse
     issueCount = new Set(issues.map(filteredIssues => filteredIssues.issueNumber)).size
     issueBudgetRemaining = Math.max(0, maxIssues - issueCount)
-    assert.ok(issues, 'Issue ID cannot be empty')
+    if (!issues) {
+      throw new Error('Issues cannot be empty')
+    }
   } catch (err) {
     if (err instanceof Error) {
       core.setFailed(`Failed to calculate issue budget. Error: ${err.message}`)

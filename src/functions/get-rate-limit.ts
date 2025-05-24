@@ -1,4 +1,3 @@
-import * as assert from 'assert'
 import * as core from '@actions/core'
 // eslint-disable-next-line import/no-unresolved
 import {GetResponseTypeFromEndpointMethod} from '@octokit/types'
@@ -32,7 +31,9 @@ export async function getRateLimit(): Promise<RateLimit> {
     rateLimitResponse.reset = rateLimitResetMinutes
     rateLimitResponse.resetDateTime = new Date(rateLimitReset)
 
-    assert.ok(rateLimitResponse, 'Rate Limit Response cannot be empty.')
+    if (!rateLimitResponse) {
+      throw new Error('Rate Limit Response cannot be empty.')
+    }
   } catch (err) {
     if (err instanceof Error) {
       core.info(`Failed to retrieve rate limit data. Error: ${err.message}`)

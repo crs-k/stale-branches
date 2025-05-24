@@ -58,7 +58,6 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.closeIssue = closeIssue;
-const assert = __importStar(__nccwpck_require__(2613));
 const core = __importStar(__nccwpck_require__(7484));
 const get_context_1 = __nccwpck_require__(7740);
 const log_close_issue_1 = __nccwpck_require__(7313);
@@ -79,7 +78,9 @@ async function closeIssue(issueNumber) {
             state: 'closed'
         });
         state = issueResponse.data.state;
-        assert.ok(state, 'State cannot be empty');
+        if (!state) {
+            throw new Error('State cannot be empty');
+        }
         core.info((0, log_close_issue_1.logCloseIssue)(issueNumber, state));
     }
     catch (err) {
@@ -137,7 +138,6 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.compareBranches = compareBranches;
-const assert = __importStar(__nccwpck_require__(2613));
 const core = __importStar(__nccwpck_require__(7484));
 const get_context_1 = __nccwpck_require__(7740);
 const input_compare_branches_1 = __nccwpck_require__(4960);
@@ -175,7 +175,9 @@ async function compareBranches(head, inputCompareBranches) {
             branchComparison.behindBy = branchComparisonResponse.data.behind_by;
             branchComparison.branchStatus = branchComparisonResponse.data.status;
             branchComparison.totalCommits = branchComparisonResponse.data.total_commits;
-            assert.ok(branchComparison.branchStatus, 'Branch Comparison Status cannot be empty.');
+            if (!branchComparison.branchStatus) {
+                throw new Error('Branch Comparison Status cannot be empty.');
+            }
             core.info((0, log_compare_branches_1.logCompareBranches)(branchComparison, base, head));
         }
         catch (err) {
@@ -233,7 +235,6 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createIssueComment = createIssueComment;
-const assert = __importStar(__nccwpck_require__(2613));
 const core = __importStar(__nccwpck_require__(7484));
 const get_context_1 = __nccwpck_require__(7740);
 const create_comment_string_1 = __nccwpck_require__(1074);
@@ -283,7 +284,9 @@ async function createIssueComment(issueNumber, branch, commitAge, lastCommitter,
             });
             createdAt = issueResponse.data.created_at;
             commentUrl = issueResponse.data.html_url;
-            assert.ok(createdAt, 'Created At cannot be empty');
+            if (!createdAt) {
+                throw new Error('Created At cannot be empty');
+            }
             core.info((0, log_update_issue_1.logUpdateIssue)(issueNumber, createdAt, commentUrl));
         }
         catch (err) {
@@ -338,7 +341,6 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.createIssue = createIssue;
-const assert = __importStar(__nccwpck_require__(2613));
 const core = __importStar(__nccwpck_require__(7484));
 const get_context_1 = __nccwpck_require__(7740);
 const create_issues_title_string_1 = __nccwpck_require__(6372);
@@ -388,7 +390,9 @@ async function createIssue(branch, commitAge, lastCommitter, daysBeforeDelete, s
             ]
         });
         issueId = issueResponse.data.id;
-        assert.ok(issueId, 'Issue ID cannot be empty');
+        if (!issueId) {
+            throw new Error('Issue ID cannot be empty');
+        }
         core.info((0, log_new_issue_1.logNewIssue)(branch));
     }
     catch (err) {
@@ -446,7 +450,6 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.deleteBranch = deleteBranch;
-const assert = __importStar(__nccwpck_require__(2613));
 const core = __importStar(__nccwpck_require__(7484));
 const get_context_1 = __nccwpck_require__(7740);
 const log_delete_branch_1 = __nccwpck_require__(6313);
@@ -469,7 +472,9 @@ async function deleteBranch(name) {
             ref: refFull
         });
         confirm = response.status;
-        assert.ok(response, 'response cannot be empty');
+        if (!response) {
+            throw new Error('response cannot be empty');
+        }
         core.info((0, log_delete_branch_1.logDeleteBranch)(refFull));
     }
     catch (err) {
@@ -634,7 +639,6 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getBranches = getBranches;
-const assert = __importStar(__nccwpck_require__(2613));
 const core = __importStar(__nccwpck_require__(7484));
 const get_context_1 = __nccwpck_require__(7740);
 const log_get_branches_1 = __nccwpck_require__(3180);
@@ -667,7 +671,9 @@ async function getBranches(includeProtectedBranches) {
             commitSha: branch.commit.sha
         })));
         branches = branchResponse;
-        assert.ok(branches, 'Response cannot be empty.');
+        if (!branches) {
+            throw new Error('Response cannot be empty.');
+        }
         core.info((0, log_get_branches_1.logGetBranches)(branches.length));
     }
     catch (err) {
@@ -978,7 +984,6 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getDefaultBranch = getDefaultBranch;
-const assert = __importStar(__nccwpck_require__(2613));
 const core = __importStar(__nccwpck_require__(7484));
 const get_context_1 = __nccwpck_require__(7740);
 /**
@@ -992,7 +997,9 @@ async function getDefaultBranch() {
         // Get the default branch from the repo info
         const response = await get_context_1.github.rest.repos.get({ owner: get_context_1.owner, repo: get_context_1.repo });
         result = response.data.default_branch;
-        assert.ok(result, 'default_branch cannot be empty');
+        if (!result) {
+            throw new Error('default_branch cannot be empty');
+        }
     }
     catch (err) {
         // Handle .wiki repo
@@ -1053,7 +1060,6 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getIssues = getIssues;
-const assert = __importStar(__nccwpck_require__(2613));
 const core = __importStar(__nccwpck_require__(7484));
 const get_context_1 = __nccwpck_require__(7740);
 /**
@@ -1074,7 +1080,9 @@ async function getIssues(staleBranchLabel) {
             per_page: 100
         }, response => response.data.map(issue => ({ issueTitle: issue.title, issueNumber: issue.number })));
         issues = issueResponse;
-        assert.ok(issues, 'Issue ID cannot be empty');
+        if (!issues) {
+            throw new Error('Issue ID cannot be empty');
+        }
     }
     catch (err) {
         if (err instanceof Error) {
@@ -1210,7 +1218,6 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getRateLimit = getRateLimit;
-const assert = __importStar(__nccwpck_require__(2613));
 const core = __importStar(__nccwpck_require__(7484));
 const get_time_1 = __nccwpck_require__(3692);
 const get_context_1 = __nccwpck_require__(7740);
@@ -1233,7 +1240,9 @@ async function getRateLimit() {
         rateLimitResponse.remaining = rateLimitRemaining;
         rateLimitResponse.reset = rateLimitResetMinutes;
         rateLimitResponse.resetDateTime = new Date(rateLimitReset);
-        assert.ok(rateLimitResponse, 'Rate Limit Response cannot be empty.');
+        if (!rateLimitResponse) {
+            throw new Error('Rate Limit Response cannot be empty.');
+        }
     }
     catch (err) {
         if (err instanceof Error) {
@@ -1289,7 +1298,6 @@ var __importStar = (this && this.__importStar) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getIssueBudget = getIssueBudget;
-const assert = __importStar(__nccwpck_require__(2613));
 const core = __importStar(__nccwpck_require__(7484));
 const get_context_1 = __nccwpck_require__(7740);
 const log_max_issues_1 = __nccwpck_require__(5242);
@@ -1317,7 +1325,9 @@ async function getIssueBudget(maxIssues, staleBranchLabel) {
         issues = issueResponse;
         issueCount = new Set(issues.map(filteredIssues => filteredIssues.issueNumber)).size;
         issueBudgetRemaining = Math.max(0, maxIssues - issueCount);
-        assert.ok(issues, 'Issue ID cannot be empty');
+        if (!issues) {
+            throw new Error('Issues cannot be empty');
+        }
     }
     catch (err) {
         if (err instanceof Error) {
@@ -34167,7 +34177,6 @@ var __webpack_exports__ = {};
 var exports = __webpack_exports__;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.checkIsMainModule = checkIsMainModule;
 const stale_branches_1 = __nccwpck_require__(5378);
 // Helper function to check if this is the main module
 // This can be mocked in tests to avoid manipulating require.main

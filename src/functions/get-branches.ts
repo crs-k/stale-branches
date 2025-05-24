@@ -1,4 +1,3 @@
-import * as assert from 'assert'
 import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
 import {BranchResponse} from '../types/branches'
@@ -39,7 +38,9 @@ export async function getBranches(includeProtectedBranches: boolean): Promise<Br
     )
     branches = branchResponse
 
-    assert.ok(branches, 'Response cannot be empty.')
+    if (!branches) {
+      throw new Error('Response cannot be empty.')
+    }
     core.info(logGetBranches(branches.length))
   } catch (err) {
     if (err instanceof Error) {

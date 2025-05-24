@@ -1,4 +1,3 @@
-import * as assert from 'assert'
 import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
 import {BranchComparison} from '../types/branch-comparison'
@@ -43,7 +42,9 @@ export async function compareBranches(head: string, inputCompareBranches: string
       branchComparison.branchStatus = branchComparisonResponse.data.status
       branchComparison.totalCommits = branchComparisonResponse.data.total_commits
 
-      assert.ok(branchComparison.branchStatus, 'Branch Comparison Status cannot be empty.')
+      if (!branchComparison.branchStatus) {
+        throw new Error('Branch Comparison Status cannot be empty.')
+      }
       core.info(logCompareBranches(branchComparison, base, head))
     } catch (err) {
       if (err instanceof Error) {

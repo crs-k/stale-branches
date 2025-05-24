@@ -1,4 +1,3 @@
-import * as assert from 'assert'
 import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
 import {createIssueTitleString} from './utils/create-issues-title-string'
@@ -58,7 +57,9 @@ export async function createIssue(
       ]
     })
     issueId = issueResponse.data.id
-    assert.ok(issueId, 'Issue ID cannot be empty')
+    if (!issueId) {
+      throw new Error('Issue ID cannot be empty')
+    }
     core.info(logNewIssue(branch))
   } catch (err) {
     if (err instanceof Error) {
