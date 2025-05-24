@@ -1,6 +1,6 @@
 import styles from 'ansi-styles'
 
-export function logBranchGroupColor(branchName, commitAge, daysBeforeStale, daysBeforeDelete): string {
+export function logBranchGroupColor(branchName: string, commitAge: number, daysBeforeStale: number, daysBeforeDelete: number): string {
   let groupColor = `[${styles.greenBright.open}${branchName}${styles.greenBright.close}]`
 
   //color group based on age of branch

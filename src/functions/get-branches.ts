@@ -1,4 +1,3 @@
-import * as assert from 'assert'
 import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
 import {BranchResponse} from '../types/branches'
@@ -33,13 +32,15 @@ export async function getBranches(includeProtectedBranches: boolean): Promise<Br
         branch =>
           ({
             branchName: branch.name,
-            commmitSha: branch.commit.sha
+            commitSha: branch.commit.sha
           }) as BranchResponse
       )
     )
     branches = branchResponse
 
-    assert.ok(branches, 'Response cannot be empty.')
+    if (!branches) {
+      throw new Error('Response cannot be empty.')
+    }
     core.info(logGetBranches(branches.length))
   } catch (err) {
     if (err instanceof Error) {
@@ -47,7 +48,7 @@ export async function getBranches(includeProtectedBranches: boolean): Promise<Br
     } else {
       core.setFailed(`Failed to retrieve branches for ${repo}.`)
     }
-    branches = [{branchName: '', commmitSha: ''}]
+    branches = [{branchName: '', commitSha: ''}]
   }
 
   return branches

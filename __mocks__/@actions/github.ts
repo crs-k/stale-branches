@@ -527,12 +527,12 @@ let defaultBranchResponse: ListDefaultBranchResponseDataType = {
 }
 
 let branchesFiltered: BranchResponse[] = [
-  {branchName: 'Branch 1', commmitSha: 'SHA 1'},
-  {branchName: 'Branch 2', commmitSha: 'SHA 2'},
-  {branchName: 'Branch 3', commmitSha: 'SHA 3'},
-  {branchName: 'Branch 4', commmitSha: 'SHA 4'},
-  {branchName: 'Branch 5', commmitSha: 'SHA 5'},
-  {branchName: 'Branch 6', commmitSha: 'SHA 6'}
+  {branchName: 'Branch 1', commitSha: 'SHA 1'},
+  {branchName: 'Branch 2', commitSha: 'SHA 2'},
+  {branchName: 'Branch 3', commitSha: 'SHA 3'},
+  {branchName: 'Branch 4', commitSha: 'SHA 4'},
+  {branchName: 'Branch 5', commitSha: 'SHA 5'},
+  {branchName: 'Branch 6', commitSha: 'SHA 6'}
 ]
 
 let branches: ListBranchesResponseDataType = {

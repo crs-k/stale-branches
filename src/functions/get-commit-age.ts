@@ -1,4 +1,3 @@
-import * as assert from 'assert'
 import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
 import {getDays} from './utils/get-time'
@@ -22,8 +21,10 @@ export async function getRecentCommitAge(sha: string): Promise<number> {
       per_page: 1,
       page: 1
     })
-    commitDate = commitResponse.data.commit.committer!.date
-    assert.ok(commitDate, 'Date cannot be empty.')
+    commitDate = commitResponse.data.commit.committer?.date || ''
+    if (!commitDate) {
+      throw new Error('Date cannot be empty.')
+    }
   } catch (err) {
     if (err instanceof Error) {
       core.setFailed(`Failed to retrieve commit for ${sha} in ${repo}. Error: ${err.message}`)

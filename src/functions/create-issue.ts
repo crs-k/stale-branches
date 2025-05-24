@@ -1,4 +1,3 @@
-import * as assert from 'assert'
 import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
 import {createIssueTitleString} from './utils/create-issues-title-string'
@@ -21,7 +20,14 @@ import {logNewIssue} from './logging/log-new-issue'
  *
  * @returns {number} The ID of the issue created
  */
-export async function createIssue(branch: string, commitAge: number, lastCommitter: string, daysBeforeDelete: number, staleBranchLabel: string, tagLastCommitter: boolean): Promise<number> {
+export async function createIssue(
+  branch: string,
+  commitAge: number,
+  lastCommitter: string,
+  daysBeforeDelete: number,
+  staleBranchLabel: string,
+  tagLastCommitter: boolean
+): Promise<number> {
   let issueId: number
   let bodyString: string
   const daysUntilDelete = Math.max(0, daysBeforeDelete - commitAge)
@@ -51,7 +57,9 @@ export async function createIssue(branch: string, commitAge: number, lastCommitt
       ]
     })
     issueId = issueResponse.data.id
-    assert.ok(issueId, 'Issue ID cannot be empty')
+    if (!issueId) {
+      throw new Error('Issue ID cannot be empty')
+    }
     core.info(logNewIssue(branch))
   } catch (err) {
     if (err instanceof Error) {

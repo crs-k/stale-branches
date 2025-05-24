@@ -1,4 +1,3 @@
-import * as assert from 'assert'
 import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
 import {createCommentString} from './utils/create-comment-string'
@@ -43,7 +42,14 @@ export async function createIssueComment(
   let bodyString: string
 
   if (commentUpdates === true) {
-    bodyString = createCommentString(branch, lastCommitter, commitAge, daysBeforeDelete, tagLastCommitter, ignoredCommitInfo)
+    bodyString = createCommentString(
+      branch,
+      lastCommitter,
+      commitAge,
+      daysBeforeDelete,
+      tagLastCommitter,
+      ignoredCommitInfo
+    )
 
     try {
       const issueResponse = await github.rest.issues.createComment({
@@ -62,10 +68,13 @@ export async function createIssueComment(
 
       createdAt = issueResponse.data.created_at
       commentUrl = issueResponse.data.html_url
-      assert.ok(createdAt, 'Created At cannot be empty')
+      if (!createdAt) {
+        throw new Error('Created At cannot be empty')
+      }
       core.info(logUpdateIssue(issueNumber, createdAt, commentUrl))
     } catch (err) {
-      if (err instanceof Error) core.info(`No existing issue returned for issue number: ${issueNumber}. Error: ${err.message}`)
+      if (err instanceof Error)
+        core.info(`No existing issue returned for issue number: ${issueNumber}. Error: ${err.message}`)
       createdAt = ''
     }
   }

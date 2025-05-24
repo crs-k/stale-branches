@@ -1,6 +1,6 @@
 import styles from 'ansi-styles'
 
-export function logMaxIssues(issueBudgetRemaining): string {
+export function logMaxIssues(issueBudgetRemaining: number): string {
   let maxIssues = `${styles.bold.open}[${styles.magenta.open}${issueBudgetRemaining}${styles.magenta.close}] ${styles.blueBright.open}max-issues budget remaining${styles.blueBright.close}.${styles.bold.close}`
 
   //color group based on age of branch

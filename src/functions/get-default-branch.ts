@@ -1,4 +1,3 @@
-import * as assert from 'assert'
 import * as core from '@actions/core'
 import {github, owner, repo} from './get-context'
 
@@ -13,7 +12,9 @@ export async function getDefaultBranch(): Promise<string> {
     // Get the default branch from the repo info
     const response = await github.rest.repos.get({owner, repo})
     result = response.data.default_branch
-    assert.ok(result, 'default_branch cannot be empty')
+    if (!result) {
+      throw new Error('default_branch cannot be empty')
+    }
   } catch (err) {
     // Handle .wiki repo
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
