@@ -175,4 +175,63 @@ describe('Get Context Function', () => {
     await validateInputs()
     expect(core.setFailed).toHaveBeenCalledWith(`Failed to validate inputs.`)
   })
+
+  test('Expect Failure: branches-filter-regex must be 50 characters or less', async () => {
+    core.setFailed = jest.fn()
+    const longRegex = 'a'.repeat(51) // 51 characters
+    core.getBooleanInput = jest.fn().mockReturnValue(true)
+    core.getInput = jest
+      .fn()
+      .mockReturnValueOnce('1') // days-before-stale
+      .mockReturnValueOnce('5') // days-before-delete
+      .mockReturnValueOnce('5') // max-issues
+      .mockReturnValueOnce('Stale Branch Label') // stale-branch-label
+      .mockReturnValueOnce('save') // compare-branches
+      .mockReturnValueOnce(longRegex) // branches-filter-regex (too long)
+      .mockReturnValueOnce('') // ignore-commit-messages
+      .mockReturnValueOnce('') // ignore-committers
+      .mockReturnValueOnce('') // ignore-default-branch-commits
+    
+    await validateInputs()
+    expect(core.setFailed).toHaveBeenCalledWith('Failed to validate inputs. Error: branches-filter-regex must be 50 characters or less')
+  })
+
+  test('Expect Success: With ignore-committers and explicit ignore-default-branch-commits', async () => {
+    core.setFailed = jest.fn()
+    core.getBooleanInput = jest.fn().mockReturnValue(true)
+    core.getInput = jest
+      .fn()
+      .mockReturnValueOnce('1') // days-before-stale
+      .mockReturnValueOnce('5') // days-before-delete
+      .mockReturnValueOnce('5') // max-issues
+      .mockReturnValueOnce('Stale Branch Label') // stale-branch-label
+      .mockReturnValueOnce('save') // compare-branches
+      .mockReturnValueOnce('') // branches-filter-regex
+      .mockReturnValueOnce('skip this message') // ignore-commit-messages
+      .mockReturnValueOnce('user1, user2, user3') // ignore-committers
+      .mockReturnValueOnce('false') // ignore-default-branch-commits (explicit false)
+    
+    const result = await validateInputs()
+    expect(result.ignoreCommitters).toEqual(['user1', 'user2', 'user3'])
+    expect(result.ignoreDefaultBranchCommits).toBe(false)
+  })
+
+  test('Expect Success: Without ignore-commit-messages sets ignore-default-branch-commits to false', async () => {
+    core.setFailed = jest.fn()
+    core.getBooleanInput = jest.fn().mockReturnValue(true)
+    core.getInput = jest
+      .fn()
+      .mockReturnValueOnce('1') // days-before-stale
+      .mockReturnValueOnce('5') // days-before-delete
+      .mockReturnValueOnce('5') // max-issues
+      .mockReturnValueOnce('Stale Branch Label') // stale-branch-label
+      .mockReturnValueOnce('save') // compare-branches
+      .mockReturnValueOnce('') // branches-filter-regex
+      .mockReturnValueOnce('') // ignore-commit-messages (empty)
+      .mockReturnValueOnce('') // ignore-committers (empty)
+      .mockReturnValueOnce('') // ignore-default-branch-commits (empty)
+    
+    const result = await validateInputs()
+    expect(result.ignoreDefaultBranchCommits).toBe(false)
+  })
 })
