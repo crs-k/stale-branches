@@ -29,4 +29,32 @@ describe('Get Default Branch Function', () => {
     await getDefaultBranch()
     expect(core.setFailed).toHaveBeenCalledWith(`Failed to get default branch: Failed to get default branch`)
   })
+
+  test('Returns main for .wiki repo on 404 error', async () => {
+    // Mock the repo getter to return a .wiki repo name
+    const getContextModule = require('../../src/functions/get-context')
+    const originalRepo = getContextModule.repo
+    
+    // Mock the repo value
+    Object.defineProperty(getContextModule, 'repo', {
+      value: 'test-repo.wiki',
+      configurable: true
+    })
+
+    core.setFailed = jest.fn()
+    const reposSpy = jest.spyOn(github.rest.repos, 'get').mockRejectedValueOnce({
+      status: 404
+    })
+
+    const result = await getDefaultBranch()
+
+    expect(result).toBe('main')
+    expect(core.setFailed).not.toHaveBeenCalled()
+
+    // Restore original repo value
+    Object.defineProperty(getContextModule, 'repo', {
+      value: originalRepo,
+      configurable: true
+    })
+  })
 })

@@ -193,4 +193,63 @@ describe('getRecentCommitInfo', () => {
     expect(info.ignoredCount).toBe(0)
     expect(info.usedFallback).toBe(false)
   })
+
+  it('breaks early when commit age exceeds max age days with valid commit date', async () => {
+    // Create commits where first is valid, second is too old
+    const now = new Date()
+    const recent = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString() // 3 days ago (valid)
+    const tooOld = new Date(now.getTime() - 15 * 24 * 60 * 60 * 1000).toISOString() // 15 days ago (too old)
+    
+    // Order: newest to oldest (first commit is valid, second is too old)
+    const commits = [
+      {...mockCommits[0], sha: 'sha1', commit: {...mockCommits[0].commit, committer: {...mockCommits[0].commit.committer, date: recent}}},
+      {...mockCommits[1], sha: 'sha2', commit: {...mockCommits[1].commit, committer: {...mockCommits[1].commit.committer, date: tooOld}}}
+    ]
+    
+    require('../../src/functions/get-context').github = {
+      rest: {
+        repos: {
+          listCommits: jest.fn().mockResolvedValueOnce({data: commits}).mockResolvedValue({data: []})
+        }
+      }
+    }
+    
+    // Set maxAgeDays to 10. First commit (3 days) is valid, second commit (15 days) is too old.
+    // Should use the first commit and break when it hits the second
+    const info = await getRecentCommitInfo('sha1', [], 10, [], new Set(), true)
+    expect(info.committer).toBe('alice') // Should return the first commit (valid)
+    expect(info.age).toBe(3) // Should return the age of the first commit
+    expect(info.ignoredCount).toBe(0)
+  })
+
+  it('handles edge case where commit exceeds max age but commitDate is already set', async () => {
+    const now = new Date()
+    const recent = new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString() // 3 days ago (valid)
+    const tooOld = new Date(now.getTime() - 15 * 24 * 60 * 60 * 1000).toISOString() // 15 days ago (too old)
+    
+    // Create scenario where first commit is valid and sets commitDate,
+    // then a subsequent commit exceeds maxAge but commitDate is already set
+    const commits = [
+      {...mockCommits[0], sha: 'sha1', commit: {...mockCommits[0].commit, committer: {...mockCommits[0].commit.committer, date: recent}}},
+      {...mockCommits[1], sha: 'sha2', commit: {...mockCommits[1].commit, committer: {...mockCommits[1].commit.committer, date: tooOld}}}
+    ]
+    
+    require('../../src/functions/get-context').github = {
+      rest: {
+        repos: {
+          listCommits: jest.fn()
+            .mockResolvedValueOnce({data: [commits[0]]}) // First page with valid commit
+            .mockResolvedValueOnce({data: [commits[1]]}) // Second page with old commit
+            .mockResolvedValue({data: []}) // No more pages
+        }
+      }
+    }
+    
+    // Set maxAgeDays to 10. This should process the first commit (valid),
+    // then on the second page, hit the too-old commit and trigger lines 72-73
+    const info = await getRecentCommitInfo('sha1', [], 10, [], new Set(), true)
+    expect(info.committer).toBe('alice') // Should return the first commit
+    expect(info.age).toBe(3) // Age of the first commit
+    expect(info.ignoredCount).toBe(0)
+  })
 })

@@ -107,4 +107,45 @@ describe('getBranchProtectionStatus', () => {
     expect(result.isProtected).toBe(true)
     expect(result.canDelete).toBe(true)
   })
+
+  it('returns unprotected when repo get fails', async () => {
+    jest.spyOn(github.rest.repos, 'get').mockRejectedValueOnce(new Error('API Error'))
+    const result = await getBranchProtectionStatus('feature')
+    expect(result.isProtected).toBe(false)
+    expect(result.canDelete).toBe(true)
+    expect(result.protectionType).toBe('')
+  })
+
+  it('returns unprotected when branch protection allows deletions', async () => {
+    jest.spyOn(github.rest.repos, 'get').mockResolvedValueOnce({data: {default_branch: 'main'}} as any)
+    jest.spyOn(github.rest.repos, 'getBranchProtection').mockResolvedValueOnce({
+      data: {allow_deletions: {enabled: true}}
+    } as any)
+    jest.spyOn(github.rest.repos, 'getBranchRules').mockResolvedValueOnce({
+      data: [] as any,
+      headers: {},
+      status: 200,
+      url: 'mock-url'
+    })
+    const result = await getBranchProtectionStatus('feature')
+    expect(result.isProtected).toBe(false)
+    expect(result.canDelete).toBe(true)
+  })
+
+  it('returns protected when branch protection API fails with non-404 error', async () => {
+    jest.spyOn(github.rest.repos, 'get').mockResolvedValueOnce({data: {default_branch: 'main'}} as any)
+    jest.spyOn(github.rest.repos, 'getBranchProtection').mockImplementationOnce(() => {
+      throw {status: 500, message: 'Server Error'}
+    })
+    jest.spyOn(github.rest.repos, 'getBranchRules').mockResolvedValueOnce({
+      data: [] as any,
+      headers: {},
+      status: 200,
+      url: 'mock-url'
+    })
+    const result = await getBranchProtectionStatus('feature')
+    expect(result.isProtected).toBe(true)
+    expect(result.canDelete).toBe(false)
+    expect(result.protectionType).toBe('error')
+  })
 })
