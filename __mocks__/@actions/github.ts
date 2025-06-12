@@ -762,6 +762,23 @@ let paginate = jest.fn().mockReturnValue(branchesFiltered)
 
 let get = jest.fn().mockReturnValue(defaultBranchResponse)
 
+// Mock for getRateLimit
+let getRateLimit = jest.fn().mockReturnValue({
+  data: {
+    resources: {
+      core: {
+        limit: 5000,
+        used: 1000,
+        remaining: 4000,
+        reset: 1640995200
+      }
+    }
+  }
+})
+
+// Mock for getPr
+let pullsList = jest.fn().mockReturnValue({data: []})
+
 const github = {
   rest: {
     git: {deleteRef},
@@ -776,6 +793,12 @@ const github = {
       listBranches,
       getCommit,
       compareCommitsWithBasehead
+    },
+    rateLimit: {
+      get: getRateLimit
+    },
+    pulls: {
+      list: pullsList
     }
   },
   paginate

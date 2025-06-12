@@ -12,6 +12,27 @@ import {github} from '../../src/functions/get-context'
 import styles from 'ansi-styles'
 
 describe('Get Branches Function', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    
+    // Set up default paginate mock to actually call the mapper function
+    ;(github.paginate as any) = jest.fn().mockImplementation(async (endpoint: any, options: any, mapper?: any) => {
+      // Mock the raw response that would come from the API
+      const mockResponse = {
+        data: [
+          {name: 'branch1', commit: {sha: 'sha1'}},
+          {name: 'branch2', commit: {sha: 'sha2'}},
+          {name: 'branch3', commit: {sha: 'sha3'}},
+          {name: 'branch4', commit: {sha: 'sha4'}},
+          {name: 'branch5', commit: {sha: 'sha5'}},
+          {name: 'branch6', commit: {sha: 'sha6'}}
+        ]
+      }
+      // Call the mapper function to achieve coverage
+      return mapper ? mapper(mockResponse) : []
+    })
+  })
+  
   test('github.paginate endpoint is called', async () => {
     core.info = jest.fn()
     assert.ok = jest.fn()

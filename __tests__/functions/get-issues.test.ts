@@ -13,6 +13,19 @@ let staleBranchLabel = 'Stale Branch Label'
 describe('Get Issues Function', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    
+    // Set up default paginate mock to actually call the mapper function
+    ;(github.paginate as any) = jest.fn().mockImplementation(async (endpoint: any, options: any, mapper?: any) => {
+      // Mock the raw response that would come from the API
+      const mockResponse = {
+        data: [
+          {title: 'Issue 1', number: 1},
+          {title: 'Issue 2', number: 2}
+        ]
+      }
+      // Call the mapper function to achieve coverage
+      return mapper ? mapper(mockResponse) : []
+    })
   })
   test('github.paginate endpoint is called', async () => {
     core.info = jest.fn()
