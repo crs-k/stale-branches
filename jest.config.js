@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 // Sync object
 const config = {
-    collectCoverageFrom: ["*/**/*.ts"],
+    collectCoverageFrom: ["src/**/*.ts"],
     verbose: true,
     clearMocks: true,
     testMatch: ['**/*.test.ts'],
