@@ -48,7 +48,7 @@
     "ansi-styles": "5.2.0",
     "eslint": "9.29.0",
     "eslint-plugin-github": "5.1.8",
-    "eslint-plugin-jest": "28.13.3",
+    "eslint-plugin-jest": "28.13.5",
     "eslint-plugin-prettier": "5.4.1",
     "globals": "16.2.0",
     "js-yaml": "4.1.0",
