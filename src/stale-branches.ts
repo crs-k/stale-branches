@@ -232,7 +232,7 @@ export async function run(): Promise<void> {
 
       // Delete expired branches
       const branchComparison = await compareBranches(branchToCheck.branchName, validInputs.compareBranches)
-      if (commitAge > validInputs.daysBeforeDelete && branchComparison.save === false) {
+      if (commitAge > validInputs.daysBeforeDelete && branchComparison.save === false && !skipDueToActivePR) {
         if (!validInputs.dryRun) {
           await deleteBranch(branchToCheck.branchName)
           outputDeletes.push(branchToCheck.branchName)
