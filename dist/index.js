@@ -2331,7 +2331,7 @@ function run() {
                 }
                 // Delete expired branches
                 const branchComparison = yield (0, compare_branches_1.compareBranches)(branchToCheck.branchName, validInputs.compareBranches);
-                if (commitAge > validInputs.daysBeforeDelete && branchComparison.save === false) {
+                if (commitAge > validInputs.daysBeforeDelete && branchComparison.save === false && !skipDueToActivePR) {
                     if (!validInputs.dryRun) {
                         yield (0, delete_branch_1.deleteBranch)(branchToCheck.branchName);
                         outputDeletes.push(branchToCheck.branchName);
