@@ -639,6 +639,49 @@ describe('Stale Branches Main Function', () => {
     expect(mockCreateIssue).not.toHaveBeenCalled()
   })
 
+  test('prevents deletion of branches with active PRs when prCheck is enabled', async () => {
+    mockValidateInputs.mockResolvedValueOnce({
+      daysBeforeStale: 30,
+      daysBeforeDelete: 90,
+      commentUpdates: true,
+      maxIssues: 5,
+      tagLastCommitter: true,
+      staleBranchLabel: 'stale',
+      compareBranches: 'off',
+      rateLimit: false,
+      prCheck: true,
+      dryRun: false,
+      ignoreIssueInteraction: false,
+      includeProtectedBranches: false,
+      branchesFilterRegex: '',
+      ignoreDefaultBranchCommits: false
+    })
+
+    // Mock age to be greater than daysBeforeDelete (95 > 90) to trigger deletion attempt
+    mockGetRecentCommitAge.mockResolvedValue(95)
+    mockGetRecentCommitInfo.mockResolvedValue({
+      committer: 'testuser',
+      age: 95,
+      sha: 'abc123',
+      ignoredCount: 0,
+      usedFallback: false
+    })
+
+    mockGetPr.mockResolvedValue(1) // Active PR found - should prevent deletion
+    mockCompareBranches.mockResolvedValue({
+      branchStatus: 'ahead',
+      aheadBy: 1,
+      behindBy: 0,
+      totalCommits: 1,
+      save: false
+    })
+
+    await run()
+    
+    expect(mockGetPr).toHaveBeenCalled()
+    expect(mockDeleteBranch).not.toHaveBeenCalled() // Should not delete due to active PR
+  })
+
   test('handles dry run mode for issue closing in closeIssueWrappedLogs', async () => {
     mockValidateInputs.mockResolvedValueOnce({
       daysBeforeStale: 30,
