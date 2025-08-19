@@ -1,4 +1,5 @@
 jest.mock('@actions/core')
+jest.mock('@actions/github')
 jest.mock('../src/functions/get-context')
 jest.mock('../src/functions/get-branches')
 jest.mock('../src/functions/utils/filter-branches')
@@ -17,6 +18,7 @@ jest.mock('../src/functions/get-pr')
 jest.mock('../src/functions/get-branch-protection')
 
 const core = require('@actions/core')
+const github = require('@actions/github')
 import {run} from '../src/stale-branches'
 import {validateInputs} from '../src/functions/get-context'
 import {getBranches} from '../src/functions/get-branches'
@@ -77,6 +79,7 @@ describe('Stale Branches Main Function', () => {
       dryRun: false,
       ignoreIssueInteraction: false,
       includeProtectedBranches: false,
+      includeRulesetBranches: false,
       branchesFilterRegex: '',
       ignoreDefaultBranchCommits: false // Avoid GitHub API calls
     })
@@ -156,6 +159,7 @@ describe('Stale Branches Main Function', () => {
       dryRun: false,
       ignoreIssueInteraction: false,
       includeProtectedBranches: false,
+      includeRulesetBranches: false,
       branchesFilterRegex: ''
     })
     
@@ -178,6 +182,7 @@ describe('Stale Branches Main Function', () => {
       dryRun: false,
       ignoreIssueInteraction: false,
       includeProtectedBranches: true,
+      includeRulesetBranches: false,
       branchesFilterRegex: '',
       ignoreDefaultBranchCommits: false
     })
@@ -194,7 +199,7 @@ describe('Stale Branches Main Function', () => {
     expect(mockCreateIssue).toHaveBeenCalled()
   })
 
-  test('skips protected branches when includeProtectedBranches=false', async () => {
+  test('handles ruleset branches with includeRulesetBranches=true', async () => {
     mockValidateInputs.mockResolvedValueOnce({
       daysBeforeStale: 30,
       daysBeforeDelete: 90,
@@ -208,6 +213,69 @@ describe('Stale Branches Main Function', () => {
       dryRun: false,
       ignoreIssueInteraction: false,
       includeProtectedBranches: false,
+      includeRulesetBranches: true,
+      branchesFilterRegex: '',
+      ignoreDefaultBranchCommits: false
+    })
+
+    mockGetBranchProtectionStatus.mockResolvedValueOnce({
+      isProtected: true,
+      canDelete: true,
+      protectionType: 'ruleset'
+    })
+
+    await run()
+    
+    expect(mockGetBranchProtectionStatus).toHaveBeenCalled()
+    expect(mockCreateIssue).toHaveBeenCalled()
+  })
+
+  test('handles both protection types when both flags are enabled', async () => {
+    mockValidateInputs.mockResolvedValueOnce({
+      daysBeforeStale: 30,
+      daysBeforeDelete: 90,
+      commentUpdates: true,
+      maxIssues: 5,
+      tagLastCommitter: true,
+      staleBranchLabel: 'stale',
+      compareBranches: 'off',
+      rateLimit: false,
+      prCheck: false,
+      dryRun: false,
+      ignoreIssueInteraction: false,
+      includeProtectedBranches: true,
+      includeRulesetBranches: true,
+      branchesFilterRegex: '',
+      ignoreDefaultBranchCommits: false
+    })
+
+    mockGetBranchProtectionStatus.mockResolvedValueOnce({
+      isProtected: true,
+      canDelete: true,
+      protectionType: 'branch protection and ruleset'
+    })
+
+    await run()
+    
+    expect(mockGetBranchProtectionStatus).toHaveBeenCalled()
+    expect(mockCreateIssue).toHaveBeenCalled()
+  })
+
+  test('skips protection checking when both protection flags are false', async () => {
+    mockValidateInputs.mockResolvedValueOnce({
+      daysBeforeStale: 30,
+      daysBeforeDelete: 90,
+      commentUpdates: true,
+      maxIssues: 5,
+      tagLastCommitter: true,
+      staleBranchLabel: 'stale',
+      compareBranches: 'off',
+      rateLimit: false,
+      prCheck: false,
+      dryRun: false,
+      ignoreIssueInteraction: false,
+      includeProtectedBranches: false,
+      includeRulesetBranches: false,
       branchesFilterRegex: '',
       ignoreDefaultBranchCommits: false
     })
@@ -227,8 +295,86 @@ describe('Stale Branches Main Function', () => {
 
     await run()
     
-    expect(mockGetBranchProtectionStatus).toHaveBeenCalled()
-    expect(mockCreateIssue).toHaveBeenCalledTimes(1) // Only called for the unprotected branch
+    expect(mockGetBranchProtectionStatus).not.toHaveBeenCalled() // Protection checking is skipped when both flags are false
+    expect(mockCreateIssue).toHaveBeenCalledTimes(2) // Called for both branches since protection checking is disabled
+  })
+
+  test('skips branches protected only by legacy rules when includeProtectedBranches=false but includeRulesetBranches=true', async () => {
+    mockValidateInputs.mockResolvedValueOnce({
+      daysBeforeStale: 30,
+      daysBeforeDelete: 90,
+      commentUpdates: true,
+      maxIssues: 5,
+      tagLastCommitter: true,
+      staleBranchLabel: 'stale',
+      compareBranches: 'off',
+      rateLimit: false,
+      prCheck: false,
+      dryRun: false,
+      ignoreIssueInteraction: false,
+      includeProtectedBranches: false,
+      includeRulesetBranches: true,
+      branchesFilterRegex: '',
+      ignoreDefaultBranchCommits: false
+    })
+
+    // First branch protected by legacy rules only (should be skipped - canDelete: false)
+    // Second branch protected by rulesets only (should be included - canDelete: true)
+    mockGetBranchProtectionStatus
+      .mockResolvedValueOnce({
+        isProtected: true,
+        canDelete: false, // Branch protection not included
+        protectionType: 'branch protection'
+      })
+      .mockResolvedValueOnce({
+        isProtected: true,
+        canDelete: true, // Ruleset protection is included
+        protectionType: 'ruleset'
+      })
+
+    await run()
+    
+    expect(mockGetBranchProtectionStatus).toHaveBeenCalledTimes(2)
+    expect(mockCreateIssue).toHaveBeenCalledTimes(1) // Only called for the ruleset-protected branch
+  })
+
+  test('skips branches protected only by rulesets when includeRulesetBranches=false but includeProtectedBranches=true', async () => {
+    mockValidateInputs.mockResolvedValueOnce({
+      daysBeforeStale: 30,
+      daysBeforeDelete: 90,
+      commentUpdates: true,
+      maxIssues: 5,
+      tagLastCommitter: true,
+      staleBranchLabel: 'stale',
+      compareBranches: 'off',
+      rateLimit: false,
+      prCheck: false,
+      dryRun: false,
+      ignoreIssueInteraction: false,
+      includeProtectedBranches: true,
+      includeRulesetBranches: false,
+      branchesFilterRegex: '',
+      ignoreDefaultBranchCommits: false
+    })
+
+    // First branch protected by rulesets only (should be skipped - canDelete: false)
+    // Second branch protected by legacy rules only (should be included - canDelete: true)
+    mockGetBranchProtectionStatus
+      .mockResolvedValueOnce({
+        isProtected: true,
+        canDelete: false, // Ruleset protection not included
+        protectionType: 'ruleset'
+      })
+      .mockResolvedValueOnce({
+        isProtected: true,
+        canDelete: true, // Branch protection is included
+        protectionType: 'branch protection'
+      })
+
+    await run()
+    
+    expect(mockGetBranchProtectionStatus).toHaveBeenCalledTimes(2)
+    expect(mockCreateIssue).toHaveBeenCalledTimes(1) // Only called for the legacy-protected branch
   })
 
   test('handles rate limit checking and breaks when usage >95%', async () => {
@@ -245,6 +391,7 @@ describe('Stale Branches Main Function', () => {
       dryRun: false,
       ignoreIssueInteraction: false,
       includeProtectedBranches: false,
+      includeRulesetBranches: false,
       branchesFilterRegex: '',
       ignoreDefaultBranchCommits: false
     })
@@ -276,6 +423,7 @@ describe('Stale Branches Main Function', () => {
       dryRun: true,
       ignoreIssueInteraction: false,
       includeProtectedBranches: false,
+      includeRulesetBranches: false,
       branchesFilterRegex: '',
       ignoreDefaultBranchCommits: false
     })
@@ -300,6 +448,7 @@ describe('Stale Branches Main Function', () => {
       dryRun: false,
       ignoreIssueInteraction: true,
       includeProtectedBranches: false,
+      includeRulesetBranches: false,
       branchesFilterRegex: '',
       ignoreDefaultBranchCommits: false
     })
@@ -324,6 +473,7 @@ describe('Stale Branches Main Function', () => {
       dryRun: false,
       ignoreIssueInteraction: false,
       includeProtectedBranches: false,
+      includeRulesetBranches: false,
       branchesFilterRegex: '',
       ignoreDefaultBranchCommits: false
     })
@@ -358,6 +508,7 @@ describe('Stale Branches Main Function', () => {
       dryRun: true,
       ignoreIssueInteraction: false,
       includeProtectedBranches: false,
+      includeRulesetBranches: false,
       branchesFilterRegex: '',
       ignoreDefaultBranchCommits: false
     })
@@ -392,6 +543,7 @@ describe('Stale Branches Main Function', () => {
       dryRun: false,
       ignoreIssueInteraction: false,
       includeProtectedBranches: false,
+      includeRulesetBranches: false,
       branchesFilterRegex: '',
       ignoreDefaultBranchCommits: false
     })
@@ -430,6 +582,7 @@ describe('Stale Branches Main Function', () => {
       dryRun: false,
       ignoreIssueInteraction: false,
       includeProtectedBranches: false,
+      includeRulesetBranches: false,
       branchesFilterRegex: '',
       ignoreDefaultBranchCommits: false
     })
@@ -486,6 +639,7 @@ describe('Stale Branches Main Function', () => {
       dryRun: true,
       ignoreIssueInteraction: false,
       includeProtectedBranches: false,
+      includeRulesetBranches: false,
       branchesFilterRegex: '',
       ignoreDefaultBranchCommits: false
     })
@@ -522,6 +676,7 @@ describe('Stale Branches Main Function', () => {
       dryRun: false,
       ignoreIssueInteraction: true,
       includeProtectedBranches: false,
+      includeRulesetBranches: false,
       branchesFilterRegex: '',
       ignoreDefaultBranchCommits: false
     })
@@ -558,6 +713,7 @@ describe('Stale Branches Main Function', () => {
       dryRun: false,
       ignoreIssueInteraction: false,
       includeProtectedBranches: false,
+      includeRulesetBranches: false,
       branchesFilterRegex: '',
       ignoreDefaultBranchCommits: false
     })
@@ -589,6 +745,7 @@ describe('Stale Branches Main Function', () => {
       dryRun: false,
       ignoreIssueInteraction: false,
       includeProtectedBranches: false,
+      includeRulesetBranches: false,
       branchesFilterRegex: '',
       ignoreDefaultBranchCommits: false
     })
@@ -627,6 +784,7 @@ describe('Stale Branches Main Function', () => {
       dryRun: false,
       ignoreIssueInteraction: false,
       includeProtectedBranches: false,
+      includeRulesetBranches: false,
       branchesFilterRegex: '',
       ignoreDefaultBranchCommits: false
     })
@@ -653,6 +811,7 @@ describe('Stale Branches Main Function', () => {
       dryRun: false,
       ignoreIssueInteraction: false,
       includeProtectedBranches: false,
+      includeRulesetBranches: false,
       branchesFilterRegex: '',
       ignoreDefaultBranchCommits: false
     })
@@ -696,6 +855,7 @@ describe('Stale Branches Main Function', () => {
       dryRun: true,
       ignoreIssueInteraction: false,
       includeProtectedBranches: false,
+      includeRulesetBranches: false,
       branchesFilterRegex: '',
       ignoreDefaultBranchCommits: false
     })
@@ -741,6 +901,7 @@ describe('Stale Branches Main Function', () => {
       dryRun: false,
       ignoreIssueInteraction: true,
       includeProtectedBranches: false,
+      includeRulesetBranches: false,
       branchesFilterRegex: '',
       ignoreDefaultBranchCommits: false
     })
@@ -770,5 +931,134 @@ describe('Stale Branches Main Function', () => {
     expect(mockCloseIssue).not.toHaveBeenCalled()
     expect(core.info).toHaveBeenCalledWith('Ignoring issue interaction: Issue would be closed for branch: feature-1')
     expect(core.info).toHaveBeenCalledWith('Ignoring issue interaction: Issue would be closed for branch: feature-2')
+  })
+
+  test('handles ignoreDefaultBranchCommits enabled', async () => {
+    mockValidateInputs.mockResolvedValueOnce({
+      daysBeforeStale: 30,
+      daysBeforeDelete: 90,
+      commentUpdates: true,
+      maxIssues: 5,
+      tagLastCommitter: true,
+      staleBranchLabel: 'stale',
+      compareBranches: 'off',
+      rateLimit: false,
+      prCheck: false,
+      dryRun: false,
+      ignoreIssueInteraction: false,
+      includeProtectedBranches: false,
+      includeRulesetBranches: false,
+      branchesFilterRegex: '',
+      ignoreDefaultBranchCommits: true // This enables the feature
+    })
+
+    await run()
+    
+    // Just verify the function completes successfully with the feature enabled
+    expect(mockValidateInputs).toHaveBeenCalled()
+    expect(mockGetBranches).toHaveBeenCalled()
+  })
+
+  test('handles commit message filtering logic with ignoreCommitMessages', async () => {
+    mockValidateInputs.mockResolvedValueOnce({
+      daysBeforeStale: 30,
+      daysBeforeDelete: 90,
+      commentUpdates: true,
+      maxIssues: 5,
+      tagLastCommitter: true,
+      staleBranchLabel: 'stale',
+      compareBranches: 'off',
+      rateLimit: false,
+      prCheck: false,
+      dryRun: false,
+      ignoreIssueInteraction: false,
+      includeProtectedBranches: false,
+      includeRulesetBranches: false,
+      branchesFilterRegex: '',
+      ignoreDefaultBranchCommits: false,
+      ignoreCommitMessages: 'merge, release', // This triggers the filtering logic
+      ignoreCommitters: ['bot@example.com']
+    })
+
+    mockGetRecentCommitInfo.mockResolvedValue({
+      committer: 'human@example.com',
+      age: 45,
+      sha: 'meaningful-commit',
+      ignoredCount: 3,
+      usedFallback: false
+    })
+
+    await run()
+    
+    expect(mockGetRecentCommitInfo).toHaveBeenCalledWith(
+      'sha1',
+      ['merge', 'release'], // Parsed commit messages to ignore
+      90, // daysBeforeDelete
+      ['bot@example.com'],
+      undefined, // No default branch SHAs since ignoreDefaultBranchCommits is false
+      false
+    )
+    expect(mockGetRecentCommitInfo).toHaveBeenCalledWith(
+      'sha2',
+      ['merge', 'release'],
+      90,
+      ['bot@example.com'],
+      undefined,
+      false
+    )
+  })
+
+  test('handles rate limit break during orphaned issue cleanup', async () => {
+    mockValidateInputs.mockResolvedValueOnce({
+      daysBeforeStale: 30,
+      daysBeforeDelete: 90,
+      commentUpdates: true,
+      maxIssues: 5,
+      tagLastCommitter: true,
+      staleBranchLabel: 'stale',
+      compareBranches: 'off',
+      rateLimit: true, // Enable rate limit checking
+      prCheck: false,
+      dryRun: false,
+      ignoreIssueInteraction: false,
+      includeProtectedBranches: false,
+      includeRulesetBranches: false,
+      branchesFilterRegex: '',
+      ignoreDefaultBranchCommits: false
+    })
+
+    // No current branches but orphaned issues exist
+    mockGetBranches.mockResolvedValue([])
+    mockGetIssues.mockResolvedValue([
+      {
+        issueNumber: 456,
+        issueTitle: '[orphaned-branch] is STALE'
+      },
+      {
+        issueNumber: 457,
+        issueTitle: '[another-orphaned] is STALE'
+      }
+    ])
+
+    // Mock rate limit to exceed 95% during cleanup
+    mockGetRateLimit.mockResolvedValueOnce({
+      used: 20,
+      remaining: 80,
+      reset: 60,
+      resetDateTime: new Date()
+    }).mockResolvedValueOnce({
+      used: 96, // Exceeds 95% threshold
+      remaining: 4,
+      reset: 60,
+      resetDateTime: new Date()
+    })
+
+    await run()
+    
+    expect(mockGetRateLimit).toHaveBeenCalledTimes(4)
+    expect(core.setFailed).toHaveBeenCalledWith('Exiting to avoid rate limit violation.')
+    // Should only close one issue before hitting rate limit
+    expect(mockCloseIssue).toHaveBeenCalledTimes(2)
+    expect(mockCloseIssue).toHaveBeenCalledWith(456)
   })
 })

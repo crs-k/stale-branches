@@ -2,7 +2,7 @@ import styles from 'ansi-styles'
 
 export function logLastCommitColor(commitAge, daysBeforeStale, daysBeforeDelete, ignoredCommitInfo?: {ignoredCount: number; usedFallback: boolean}, committer?: string, sha?: string): string {
   if (ignoredCommitInfo && ignoredCommitInfo.usedFallback) {
-    return `${styles.redBright.open}No meaningful commit found in the last ${daysBeforeDelete} days (days-before-delete).${styles.redBright.close} ${styles.cyan.open}(ignored ${ignoredCommitInfo.ignoredCount} commit${ignoredCommitInfo.ignoredCount > 1 ? 's' : ''} matching filter, used fallback)${styles.cyan.close}`
+    return `${styles.redBright.open}No meaningful commit found in the last ${daysBeforeDelete} days (days-before-delete).${styles.redBright.close} ${styles.cyan.open}(ignored ${ignoredCommitInfo.ignoredCount} commit${ignoredCommitInfo.ignoredCount > 1 ? 's' : ''} matching filter, used days-before-delete fallback)${styles.cyan.close}`
   }
 
   let label = 'Last Meaningful Commit:'
@@ -25,7 +25,7 @@ export function logLastCommitColor(commitAge, daysBeforeStale, daysBeforeDelete,
   }
 
   if (ignoredCommitInfo && ignoredCommitInfo.ignoredCount > 0) {
-    commitColor += ` ${styles.cyan.open}(ignored ${ignoredCommitInfo.ignoredCount} commit${ignoredCommitInfo.ignoredCount > 1 ? 's' : ''} matching filter${ignoredCommitInfo.usedFallback ? ', used fallback' : ''})${styles.cyan.close}`
+    commitColor += ` ${styles.cyan.open}(ignored ${ignoredCommitInfo.ignoredCount} commit${ignoredCommitInfo.ignoredCount > 1 ? 's' : ''} matching filter${ignoredCommitInfo.usedFallback ? ', used days-before-delete fallback' : ''})${styles.cyan.close}`
   }
   return commitColor
 }

@@ -592,12 +592,13 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getBranchProtectionStatus = getBranchProtectionStatus;
 const core = __importStar(__nccwpck_require__(7484));
 const get_context_1 = __nccwpck_require__(7740);
+const get_ruleset_protection_1 = __nccwpck_require__(661);
 /**
  * Returns the protection status for a single branch
  * @param {string} branchName
  * @returns {Promise<{isProtected: boolean, protectionType: string, canDelete: boolean}>}
  */
-function getBranchProtectionStatus(branchName) {
+function getBranchProtectionStatus(branchName, includeProtectedBranches, includeRulesetBranches) {
     return __awaiter(this, void 0, void 0, function* () {
         let defaultBranch;
         try {
@@ -613,40 +614,77 @@ function getBranchProtectionStatus(branchName) {
         let isProtected = false;
         let protectionType = '';
         let canDelete = true;
-        // Check branch protection
-        try {
-            const protection = yield get_context_1.github.rest.repos.getBranchProtection({ owner: get_context_1.owner, repo: get_context_1.repo, branch: branchName });
-            if (protection.data && protection.data.allow_deletions && protection.data.allow_deletions.enabled) {
-                canDelete = true;
-            }
-            else {
+        let hasPermissionIssues = false;
+        let hasBranchProtection = false;
+        let hasRulesetProtection = false;
+        // Check branch protection only if includeProtectedBranches is true
+        if (includeProtectedBranches) {
+            try {
+                const protection = yield get_context_1.github.rest.repos.getBranchProtection({ owner: get_context_1.owner, repo: get_context_1.repo, branch: branchName });
+                // If we get here (no 404), the branch HAS protection rules
+                hasBranchProtection = true;
                 isProtected = true;
                 protectionType = 'branch protection';
-                canDelete = false;
+                // Check if deletions are explicitly allowed despite protection
+                if (protection.data && protection.data.allow_deletions && protection.data.allow_deletions.enabled) {
+                    // Branch protection allows deletions
+                    canDelete = true;
+                }
+                else {
+                    // Branch protection prevents deletions
+                    canDelete = false;
+                }
+            }
+            catch (err) {
+                if (err.status === 404) {
+                    // 404 means no branch protection exists - branch is unprotected
+                    // This is the expected case for unprotected branches
+                    core.debug(`No branch protection found for ${branchName} (404 - expected for unprotected branches)`);
+                }
+                else if (err.status === 403) {
+                    // 403 Forbidden - token lacks required permissions
+                    // Log warning but continue processing rather than failing the action
+                    core.warning(`GitHub token lacks permission to read branch protection for ${branchName}. Please ensure your token has 'Administration' repository permissions (read). Treating as unprotected. Error: ${err.message}`);
+                    hasPermissionIssues = true;
+                }
+                else {
+                    // Log other unexpected errors (rate limits, network issues, etc.)
+                    core.warning(`Failed to check branch protection for ${branchName}: ${err.message || 'Unknown error'}. Treating as unprotected.`);
+                }
             }
         }
-        catch (err) {
-            if (err.status !== 404) {
-                isProtected = true;
-                protectionType = 'error';
-                canDelete = false;
-            }
-        }
-        // Check rulesets
-        try {
-            const rules = yield get_context_1.github.rest.repos.getBranchRules({ owner: get_context_1.owner, repo: get_context_1.repo, branch: branchName });
-            if (rules.data && rules.data.some(rule => typeof rule.deletion !== 'undefined' && rule.deletion === false)) {
-                isProtected = true;
+        // Check rulesets only if includeRulesetBranches is true
+        if (includeRulesetBranches) {
+            const rulesetStatus = yield (0, get_ruleset_protection_1.getRulesetProtectionStatus)(branchName);
+            hasRulesetProtection = rulesetStatus.hasRulesetProtection;
+            if (hasRulesetProtection) {
                 protectionType = protectionType ? protectionType + ' and ruleset' : 'ruleset';
-                canDelete = false;
+                isProtected = true;
+                canDelete = rulesetStatus.canDelete;
+            }
+            if (rulesetStatus.hasPermissionIssues) {
+                hasPermissionIssues = true;
             }
         }
-        catch (err) {
-            // ignore
+        // Determine if deletion is allowed based on protection status and include settings
+        if (isProtected) {
+            // If protection rules themselves prevent deletion, check include settings
+            if (!canDelete) {
+                if (hasBranchProtection && includeProtectedBranches) {
+                    canDelete = true;
+                }
+                if (hasRulesetProtection && includeRulesetBranches) {
+                    canDelete = true;
+                }
+            }
+            // If protection rules allow deletion, keep canDelete as true (don't override)
         }
-        const includeProtectedBranches = core.getInput('include-protected-branches').toLowerCase() === 'true';
-        if (isProtected && includeProtectedBranches) {
-            canDelete = true;
+        // If we had permission issues, add a note to the protection type for transparency
+        if (hasPermissionIssues && protectionType === '') {
+            protectionType = 'unknown (permission denied)';
+        }
+        else if (hasPermissionIssues) {
+            protectionType += ' (partial check - permission denied)';
         }
         return { isProtected, protectionType, canDelete };
     });
@@ -979,6 +1017,7 @@ function validateInputs() {
             const dryRun = core.getBooleanInput('dry-run');
             const ignoreIssueInteraction = core.getBooleanInput('ignore-issue-interaction');
             const includeProtectedBranches = core.getBooleanInput('include-protected-branches');
+            const includeRulesetBranches = core.getBooleanInput('include-ruleset-branches');
             const ignoreCommitMessages = core.getInput('ignore-commit-messages');
             const ignoreCommittersInput = core.getInput('ignore-committers');
             const ignoreDefaultBranchCommitsInput = core.getInput('ignore-default-branch-commits');
@@ -996,6 +1035,7 @@ function validateInputs() {
             result.dryRun = dryRun;
             result.ignoreIssueInteraction = ignoreIssueInteraction;
             result.includeProtectedBranches = includeProtectedBranches;
+            result.includeRulesetBranches = includeRulesetBranches;
             if (ignoreCommitMessages) {
                 result.ignoreCommitMessages = ignoreCommitMessages;
             }
@@ -1385,6 +1425,97 @@ function getRateLimit() {
 
 /***/ }),
 
+/***/ 661:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.getRulesetProtectionStatus = getRulesetProtectionStatus;
+const core = __importStar(__nccwpck_require__(7484));
+const get_context_1 = __nccwpck_require__(7740);
+/**
+ * Returns the ruleset protection status for a single branch
+ * @param {string} branchName
+ * @returns {Promise<{hasRulesetProtection: boolean, canDelete: boolean, hasPermissionIssues: boolean}>}
+ */
+function getRulesetProtectionStatus(branchName) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let hasRulesetProtection = false;
+        let canDelete = true;
+        let hasPermissionIssues = false;
+        try {
+            const rules = yield get_context_1.github.rest.repos.getBranchRules({ owner: get_context_1.owner, repo: get_context_1.repo, branch: branchName });
+            if (rules.data && rules.data.some(rule => rule.deletion === false)) {
+                hasRulesetProtection = true;
+                canDelete = false;
+            }
+        }
+        catch (err) {
+            if (err.status === 404) {
+                // No rulesets is normal
+                core.debug(`No rulesets found for ${branchName} (404 - expected when no rulesets exist)`);
+            }
+            else if (err.status === 403) {
+                // 403 Forbidden - token lacks required permissions
+                // Log warning but continue processing rather than failing the action
+                core.warning(`GitHub token lacks permission to read repository rulesets for ${branchName}. Please ensure your token has 'Administration' repository permissions (read). Treating as no ruleset restrictions. Error: ${err.message}`);
+                hasPermissionIssues = true;
+            }
+            else {
+                // Log other unexpected errors (rate limits, network issues, etc.)
+                core.warning(`Failed to check rulesets for ${branchName}: ${err.message || 'Unknown error'}. Treating as no ruleset restrictions.`);
+            }
+        }
+        return { hasRulesetProtection, canDelete, hasPermissionIssues };
+    });
+}
+
+
+/***/ }),
+
 /***/ 6492:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -1542,20 +1673,27 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.logBranchProtection = logBranchProtection;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(4412));
 /**
- * Returns a log string for branch protection status, or an empty string if not protected.
+ * Returns a log string for branch protection status with detailed information.
  *
  * @param {boolean} isProtected - Whether the branch is protected
- * @param {boolean} includeProtectedBranches - Whether protected branches are included for staleness/deletion
+ * @param {boolean} canDelete - Whether the branch can be deleted based on include settings
+ * @param {string} protectionType - Type of protection (e.g., 'branch protection', 'ruleset', 'default branch')
+ * @param {string} branchName - Name of the branch being checked
  * @returns {string} The log message for branch protection status
  */
-function logBranchProtection(isProtected, includeProtectedBranches) {
-    if (!isProtected)
-        return '';
-    if (includeProtectedBranches) {
-        return `${ansi_styles_1.default.bold.open}${ansi_styles_1.default.yellowBright.open}protected branch: true${ansi_styles_1.default.yellowBright.close}${ansi_styles_1.default.bold.close} (included)`;
+function logBranchProtection(isProtected, canDelete, protectionType, branchName) {
+    if (isProtected) {
+        const typeInfo = protectionType ? ` (${protectionType})` : '';
+        if (canDelete) {
+            return `${ansi_styles_1.default.bold.open}${ansi_styles_1.default.yellowBright.open}protected branch: true${typeInfo}${ansi_styles_1.default.yellowBright.close}${ansi_styles_1.default.bold.close} (included)`;
+        }
+        else {
+            return `${ansi_styles_1.default.bold.open}${ansi_styles_1.default.redBright.open}protected branch: true${typeInfo}${ansi_styles_1.default.redBright.close}${ansi_styles_1.default.bold.close} (skipped)`;
+        }
     }
     else {
-        return `${ansi_styles_1.default.bold.open}${ansi_styles_1.default.redBright.open}protected branch: true${ansi_styles_1.default.redBright.close}${ansi_styles_1.default.bold.close} (skipped)`;
+        // Log unprotected status for better debugging
+        return `${ansi_styles_1.default.bold.open}${ansi_styles_1.default.greenBright.open}protected branch: false${ansi_styles_1.default.greenBright.close}${ansi_styles_1.default.bold.close} (processing)`;
     }
 }
 
@@ -1684,7 +1822,7 @@ exports.logLastCommitColor = logLastCommitColor;
 const ansi_styles_1 = __importDefault(__nccwpck_require__(4412));
 function logLastCommitColor(commitAge, daysBeforeStale, daysBeforeDelete, ignoredCommitInfo, committer, sha) {
     if (ignoredCommitInfo && ignoredCommitInfo.usedFallback) {
-        return `${ansi_styles_1.default.redBright.open}No meaningful commit found in the last ${daysBeforeDelete} days (days-before-delete).${ansi_styles_1.default.redBright.close} ${ansi_styles_1.default.cyan.open}(ignored ${ignoredCommitInfo.ignoredCount} commit${ignoredCommitInfo.ignoredCount > 1 ? 's' : ''} matching filter, used fallback)${ansi_styles_1.default.cyan.close}`;
+        return `${ansi_styles_1.default.redBright.open}No meaningful commit found in the last ${daysBeforeDelete} days (days-before-delete).${ansi_styles_1.default.redBright.close} ${ansi_styles_1.default.cyan.open}(ignored ${ignoredCommitInfo.ignoredCount} commit${ignoredCommitInfo.ignoredCount > 1 ? 's' : ''} matching filter, used days-before-delete fallback)${ansi_styles_1.default.cyan.close}`;
     }
     let label = 'Last Meaningful Commit:';
     let commitColor = `${label} ${ansi_styles_1.default.magenta.open}${commitAge.toString()}${ansi_styles_1.default.magenta.close} days ago`;
@@ -1706,7 +1844,7 @@ function logLastCommitColor(commitAge, daysBeforeStale, daysBeforeDelete, ignore
         commitColor = `${ansi_styles_1.default.green.open}${commitColor}${ansi_styles_1.default.green.close}`;
     }
     if (ignoredCommitInfo && ignoredCommitInfo.ignoredCount > 0) {
-        commitColor += ` ${ansi_styles_1.default.cyan.open}(ignored ${ignoredCommitInfo.ignoredCount} commit${ignoredCommitInfo.ignoredCount > 1 ? 's' : ''} matching filter${ignoredCommitInfo.usedFallback ? ', used fallback' : ''})${ansi_styles_1.default.cyan.close}`;
+        commitColor += ` ${ansi_styles_1.default.cyan.open}(ignored ${ignoredCommitInfo.ignoredCount} commit${ignoredCommitInfo.ignoredCount > 1 ? 's' : ''} matching filter${ignoredCommitInfo.usedFallback ? ', used days-before-delete fallback' : ''})${ansi_styles_1.default.cyan.close}`;
     }
     return commitColor;
 }
@@ -1911,7 +2049,7 @@ function createCommentString(branch, lastCommitter, commitAge, daysBeforeDelete,
             break;
     }
     if (ignoredCommitInfo && ignoredCommitInfo.ignoredCount > 0) {
-        bodyString += `\r \r _Note: Ignored ${ignoredCommitInfo.ignoredCount} commit${ignoredCommitInfo.ignoredCount > 1 ? 's' : ''} matching filter${ignoredCommitInfo.usedFallback ? ', used fallback' : ''}._`;
+        bodyString += `\r \r _Note: Ignored ${ignoredCommitInfo.ignoredCount} commit${ignoredCommitInfo.ignoredCount > 1 ? 's' : ''} matching filter${ignoredCommitInfo.usedFallback ? ', used days-before-delete fallback' : ''}._`;
     }
     return bodyString;
 }
@@ -2214,8 +2352,11 @@ function run() {
             }
             // Assess Branches
             for (const branchToCheck of branches) {
-                // Check branch protection for this branch
-                const protection = yield (0, get_branch_protection_1.getBranchProtectionStatus)(branchToCheck.branchName);
+                // Check branch protection for this branch only if we need to know the protection status
+                let protection = { isProtected: false, protectionType: '', canDelete: true };
+                if (validInputs.includeProtectedBranches || validInputs.includeRulesetBranches) {
+                    protection = yield (0, get_branch_protection_1.getBranchProtectionStatus)(branchToCheck.branchName, validInputs.includeProtectedBranches, validInputs.includeRulesetBranches);
+                }
                 //Get age of last commit, generate issue title, and filter existing issues to current branch
                 let commitAge;
                 let ignoredCommitInfo = undefined;
@@ -2256,14 +2397,15 @@ function run() {
                 }
                 // Start output group for current branch assessment (after commitAge is known)
                 core.startGroup((0, log_branch_group_color_1.logBranchGroupColor)(branchToCheck.branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete));
-                // Log branch protection status for all protected branches
-                const protectionMsg = (0, log_branch_protection_1.logBranchProtection)(protection.isProtected, validInputs.includeProtectedBranches);
-                if (protectionMsg) {
+                // Log branch protection status only if we checked it
+                if (validInputs.includeProtectedBranches || validInputs.includeRulesetBranches) {
+                    const protectionMsg = (0, log_branch_protection_1.logBranchProtection)(protection.isProtected, protection.canDelete, protection.protectionType, branchToCheck.branchName);
                     core.info(protectionMsg);
-                    if (!validInputs.includeProtectedBranches) {
-                        core.endGroup();
-                        continue;
-                    }
+                }
+                // Skip protected branches if not including them
+                if (protection.isProtected && !protection.canDelete) {
+                    core.endGroup();
+                    continue;
                 }
                 // Log last commit age
                 core.info((0, log_last_commit_color_1.logLastCommitColor)(commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete, ignoredCommitInfo, committer, lastMeaningfulSha));
@@ -15535,7 +15677,7 @@ module.exports = {
 
 
 const { parseSetCookie } = __nccwpck_require__(8915)
-const { stringify } = __nccwpck_require__(3834)
+const { stringify, getHeadersList } = __nccwpck_require__(3834)
 const { webidl } = __nccwpck_require__(4222)
 const { Headers } = __nccwpck_require__(6349)
 
@@ -15611,13 +15753,14 @@ function getSetCookies (headers) {
 
   webidl.brandCheck(headers, Headers, { strict: false })
 
-  const cookies = headers.getSetCookie()
+  const cookies = getHeadersList(headers).cookies
 
   if (!cookies) {
     return []
   }
 
-  return cookies.map((pair) => parseSetCookie(pair))
+  // In older versions of undici, cookies is a list of name:value.
+  return cookies.map((pair) => parseSetCookie(Array.isArray(pair) ? pair[1] : pair))
 }
 
 /**
@@ -16045,15 +16188,14 @@ module.exports = {
 /***/ }),
 
 /***/ 3834:
-/***/ ((module) => {
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
 "use strict";
 
 
-/**
- * @param {string} value
- * @returns {boolean}
- */
+const assert = __nccwpck_require__(2613)
+const { kHeadersList } = __nccwpck_require__(6443)
+
 function isCTLExcludingHtab (value) {
   if (value.length === 0) {
     return false
@@ -16314,13 +16456,31 @@ function stringify (cookie) {
   return out.join('; ')
 }
 
+let kHeadersListNode
+
+function getHeadersList (headers) {
+  if (headers[kHeadersList]) {
+    return headers[kHeadersList]
+  }
+
+  if (!kHeadersListNode) {
+    kHeadersListNode = Object.getOwnPropertySymbols(headers).find(
+      (symbol) => symbol.description === 'headers list'
+    )
+
+    assert(kHeadersListNode, 'Headers cannot be parsed')
+  }
+
+  const headersList = headers[kHeadersListNode]
+  assert(headersList)
+
+  return headersList
+}
+
 module.exports = {
   isCTLExcludingHtab,
-  validateCookieName,
-  validateCookiePath,
-  validateCookieValue,
-  toIMFDate,
-  stringify
+  stringify,
+  getHeadersList
 }
 
 
@@ -20324,7 +20484,6 @@ const {
   isValidHeaderName,
   isValidHeaderValue
 } = __nccwpck_require__(5523)
-const util = __nccwpck_require__(9023)
 const { webidl } = __nccwpck_require__(4222)
 const assert = __nccwpck_require__(2613)
 
@@ -20878,9 +21037,6 @@ Object.defineProperties(Headers.prototype, {
   [Symbol.toStringTag]: {
     value: 'Headers',
     configurable: true
-  },
-  [util.inspect.custom]: {
-    enumerable: false
   }
 })
 
@@ -30057,20 +30213,6 @@ class Pool extends PoolBase {
       ? { ...options.interceptors }
       : undefined
     this[kFactory] = factory
-
-    this.on('connectionError', (origin, targets, error) => {
-      // If a connection error occurs, we remove the client from the pool,
-      // and emit a connectionError event. They will not be re-used.
-      // Fixes https://github.com/nodejs/undici/issues/3895
-      for (const target of targets) {
-        // Do not use kRemoveClient here, as it will close the client,
-        // but the client cannot be closed in this state.
-        const idx = this[kClients].indexOf(target)
-        if (idx !== -1) {
-          this[kClients].splice(idx, 1)
-        }
-      }
-    })
   }
 
   [kGetDispatcher] () {
