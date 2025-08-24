@@ -36,7 +36,7 @@ export function createCommentString(
   }
 
   if (ignoredCommitInfo && ignoredCommitInfo.ignoredCount > 0) {
-    bodyString += `\r \r _Note: Ignored ${ignoredCommitInfo.ignoredCount} commit${ignoredCommitInfo.ignoredCount > 1 ? 's' : ''} matching filter${ignoredCommitInfo.usedFallback ? ', used fallback' : ''}._`
+    bodyString += `\r \r _Note: Ignored ${ignoredCommitInfo.ignoredCount} commit${ignoredCommitInfo.ignoredCount > 1 ? 's' : ''} matching filter${ignoredCommitInfo.usedFallback ? ', used days-before-delete fallback' : ''}._`
   }
 
   return bodyString

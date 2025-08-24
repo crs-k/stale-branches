@@ -56,7 +56,7 @@ describe('Create Comment String Function', () => {
 
     const result = createCommentString(branch, lastCommitter, commitAge, daysBeforeDelete, true, ignoredCommitInfo)
     
-    expect(result).toContain('_Note: Ignored 2 commits matching filter, used fallback._')
+    expect(result).toContain('_Note: Ignored 2 commits matching filter, used days-before-delete fallback._')
   })
 
   test('creates comment string without ignored commit info when count is 0', () => {

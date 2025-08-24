@@ -44,10 +44,66 @@ Inputs are defined in [`action.yml`](action.yml). None are required.:
 | `pr-check`                      | If this is enabled, the action will first check for incoming/outgoing PRs associated with the branch. If a branch has an active pr, it will be ignored.                                                                                                                                                                                                                                                                                                                                                                       | false                                                                                                    |
 | `dry-run`                       | If this is enabled, the action will not delete or tag any branches.                                                                                                                                                                                                                                                                                                                                                                                                                                                           | false                                                                                                    |
 | `ignore-issue-interaction`      | If this is enabled, the action will not interact with Github issues.                                                                                                                                                                                                                                                                                                                                                                                                                                                          | false                                                                                                    |
-| `include-protected-branches`    | If this is enabled, the action will include protected branches in the process.<br>**Note: When you use this, the token passed to `repo-token` must include "Administration" repository permissions (read)**. For details, see https://docs.github.com/en/rest/branches/branch-protection?apiVersion=2022-11-28                                                                                                                                                                                                                | false                                                                                                    |
+| `include-protected-branches`    | If this is enabled, the action will include branches with legacy branch protection rules in the process.<br>**⚠️ IMPORTANT: When you use this, the token passed to `repo-token` must include "Administration" repository permissions (read)**. This is required to check branch protection rules. See the [Token Permissions](#token-permissions) section below for details.                                                                                                                                             | false                                                                                                    |
+| `include-ruleset-branches`      | If this is enabled, the action will include branches protected by repository rulesets in the process.<br>**⚠️ IMPORTANT: When you use this, the token passed to `repo-token` must include "Administration" repository permissions (read)**. This is required to check repository rulesets. See the [Token Permissions](#token-permissions) section below for details.                                                                                                                                                      | false                                                                                                    |
 | `ignore-commit-messages`        | Comma-separated list of commit messages (or substrings) to ignore when determining commit age. If provided, commits with these messages will be ignored when calculating branch age. e.g. Ignore commits produced by automated workflows.                                                                                                                                                                                                                                                                                     |
 | `ignore-committers`             | Comma-separated list of committer usernames to ignore when calculating the most recent commit.                                                                                                                                                                                                                                                                                                                                                                                                                                | ''                                                                                                       |
 | `ignore-default-branch-commits` | If true, ignore commits that are also present in the default branch when determining the last meaningful commit. This fetches all default branch commits up to the staleness window (days-before-delete), ensuring robust filtering even for large/active repos.                                                                                                                                                                                                                                                              | false                                                                                                    |
+
+### Token Permissions
+
+The action requires different GitHub token permissions depending on which features you use:
+
+#### Standard Operation (Default)
+For basic stale branch detection and deletion, the default `GITHUB_TOKEN` permissions are sufficient:
+
+```yaml
+permissions:
+  issues: write
+  contents: write
+```
+
+**Note:** Commit filtering features (`ignore-commit-messages`, `ignore-committers`, `ignore-default-branch-commits`) work with these standard permissions and require no additional token permissions.
+
+#### Protected Branch Processing
+
+**Legacy Branch Protection (`include-protected-branches: true`):**
+
+Fine-grained personal access token:
+
+- Repository permissions: **Read access to administration**
+
+Classic personal access token:
+
+- `repo` scope (full repository access)
+
+**Repository Rulesets (`include-ruleset-branches: true`):**
+
+Fine-grained personal access token:
+
+- Repository permissions: **Read access to metadata**
+
+Classic personal access token:
+
+- `repo` scope (full repository access)
+
+**Using Both Features:**
+
+Fine-grained personal access token:
+
+- Repository permissions: **Read access to administration and metadata**
+
+Classic personal access token:
+
+- `repo` scope (full repository access)
+
+⚠️ **Important Notes**:
+
+- The default `GITHUB_TOKEN` does not have administration permissions and cannot be used with protected branch features
+- For rulesets only, you can use a fine-grained token with just `metadata` permissions
+- For legacy branch protection, you need `administration` permissions
+- You can enable `include-protected-branches` and `include-ruleset-branches` independently
+- Classic tokens require the full `repo` scope due to their coarse-grained nature
 
 ### Outputs
 
@@ -65,6 +121,9 @@ Outputs are defined in [`action.yml`](action.yml):
   - Stale branches are yellow
   - Dead branches are red
   - Skipped branches are blue
+- Branch protection status is logged for all branches:
+  - `protected branch: false (processing)` - unprotected branches
+  - `protected branch: true (included)` or `(skipped)` - protected branches
 
 ![image](https://user-images.githubusercontent.com/26232872/155919116-50a2ded9-2839-4957-aaa2-caa9c40c91c9.png)
 
@@ -128,6 +187,8 @@ jobs:
           pr-check: false
           dry-run: false
           ignore-issue-interaction: false
+          include-protected-branches: false
+          include-ruleset-branches: false
           ignore-commit-messages: ''
           ignore-committers: ''
 ```
@@ -155,6 +216,56 @@ with:
 
 This will ignore any commit with a message containing "WIP" or "auto-update", any commit made by the users `dependabot[bot]` or `github-actions[bot]`, and any commit that is also present in the
 default branch (such as merges from `main`).
+
+### Using with Repository Rulesets
+
+If your repository uses modern repository rulesets instead of legacy branch protection rules, you can enable only ruleset checking:
+
+```yaml
+# .github/workflows/stale-branches.yml
+
+name: Stale Branches
+
+on:
+  schedule:
+    - cron: '0 6 * * 1-5'
+
+permissions:
+  issues: write
+  contents: write
+
+jobs:
+  stale_branches:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Stale Branches
+        uses: crs-k/stale-branches@v5.0.0
+        with:
+          repo-token: '${{ secrets.PERSONAL_ACCESS_TOKEN }}'
+          include-protected-branches: false  # Disable legacy branch protection checks
+          include-ruleset-branches: true     # Enable repository ruleset checks
+```
+
+This is particularly useful when using fine-grained personal access tokens that have access to rulesets but not legacy branch protection rules.
+
+## Troubleshooting
+
+### Branch Protection Issues
+
+**Problem**: "All branches are being marked as protected"
+
+- **Cause**: This was a bug in version 8.2.0 where API errors incorrectly marked branches as protected
+- **Solution**: Update to the latest version which fixes this issue
+
+**Problem**: "403 Forbidden errors when checking branch protection"
+
+- **Cause**: Your token doesn't have the required permissions for branch protection or rulesets
+- **Solution**:
+  - If you only need ruleset checking: Use `include-ruleset-branches: true` and `include-protected-branches: false`
+  - If you only need legacy branch protection: Use `include-protected-branches: true` and `include-ruleset-branches: false`
+  - For both: Ensure your token has "Administration" repository permissions
+
+**API Error Handling**: If GitHub API calls fail, you'll see warning messages but branches will be treated as unprotected to prevent false positives.
 
 ## Contributing
 

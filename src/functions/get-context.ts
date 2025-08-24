@@ -76,6 +76,7 @@ export async function validateInputs(): Promise<Inputs> {
     const dryRun = core.getBooleanInput('dry-run')
     const ignoreIssueInteraction = core.getBooleanInput('ignore-issue-interaction')
     const includeProtectedBranches = core.getBooleanInput('include-protected-branches')
+    const includeRulesetBranches = core.getBooleanInput('include-ruleset-branches')
     const ignoreCommitMessages = core.getInput('ignore-commit-messages')
     const ignoreCommittersInput = core.getInput('ignore-committers')
     const ignoreDefaultBranchCommitsInput = core.getInput('ignore-default-branch-commits')
@@ -94,6 +95,7 @@ export async function validateInputs(): Promise<Inputs> {
     result.dryRun = dryRun
     result.ignoreIssueInteraction = ignoreIssueInteraction
     result.includeProtectedBranches = includeProtectedBranches
+    result.includeRulesetBranches = includeRulesetBranches
     if (ignoreCommitMessages) {
       result.ignoreCommitMessages = ignoreCommitMessages
     }

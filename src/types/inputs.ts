@@ -95,13 +95,22 @@ export interface Inputs {
   ignoreIssueInteraction: boolean
 
   /**
-   * If this is enabled, the action will include protected branches in the process
+   * If this is enabled, the action will include branches with legacy branch protection rules in the process
    *
    * Must meet YAML 1.2 "Core Schema" specification.
    *
    * Support boolean input list: `true | True | TRUE | false | False | FALSE`.
    */
   includeProtectedBranches: boolean
+
+  /**
+   * If this is enabled, the action will include branches protected by repository rulesets in the process
+   *
+   * Must meet YAML 1.2 "Core Schema" specification.
+   *
+   * Support boolean input list: `true | True | TRUE | false | False | FALSE`.
+   */
+  includeRulesetBranches: boolean
 
   /**
    * Comma-separated list of commit messages (or substrings) to ignore when determining commit age.

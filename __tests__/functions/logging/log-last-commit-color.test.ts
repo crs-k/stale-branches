@@ -9,7 +9,7 @@ describe('logLastCommitColor', () => {
     const ignoredCommitInfo = { ignoredCount: 3, usedFallback: true }
     
     const result = logLastCommitColor(commitAge, daysBeforeStale, daysBeforeDelete, ignoredCommitInfo)
-    const expected = `${styles.redBright.open}No meaningful commit found in the last ${daysBeforeDelete} days (days-before-delete).${styles.redBright.close} ${styles.cyan.open}(ignored ${ignoredCommitInfo.ignoredCount} commits matching filter, used fallback)${styles.cyan.close}`
+    const expected = `${styles.redBright.open}No meaningful commit found in the last ${daysBeforeDelete} days (days-before-delete).${styles.redBright.close} ${styles.cyan.open}(ignored ${ignoredCommitInfo.ignoredCount} commits matching filter, used days-before-delete fallback)${styles.cyan.close}`
     
     expect(result).toBe(expected)
   })
@@ -21,7 +21,7 @@ describe('logLastCommitColor', () => {
     const ignoredCommitInfo = { ignoredCount: 1, usedFallback: true }
     
     const result = logLastCommitColor(commitAge, daysBeforeStale, daysBeforeDelete, ignoredCommitInfo)
-    const expected = `${styles.redBright.open}No meaningful commit found in the last ${daysBeforeDelete} days (days-before-delete).${styles.redBright.close} ${styles.cyan.open}(ignored ${ignoredCommitInfo.ignoredCount} commit matching filter, used fallback)${styles.cyan.close}`
+    const expected = `${styles.redBright.open}No meaningful commit found in the last ${daysBeforeDelete} days (days-before-delete).${styles.redBright.close} ${styles.cyan.open}(ignored ${ignoredCommitInfo.ignoredCount} commit matching filter, used days-before-delete fallback)${styles.cyan.close}`
     
     expect(result).toBe(expected)
   })

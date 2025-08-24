@@ -93,8 +93,11 @@ export async function run(): Promise<void> {
 
     // Assess Branches
     for (const branchToCheck of branches) {
-      // Check branch protection for this branch
-      const protection = await getBranchProtectionStatus(branchToCheck.branchName)
+      // Check branch protection for this branch only if we need to know the protection status
+      let protection = {isProtected: false, protectionType: '', canDelete: true}
+      if (validInputs.includeProtectedBranches || validInputs.includeRulesetBranches) {
+        protection = await getBranchProtectionStatus(branchToCheck.branchName, validInputs.includeProtectedBranches, validInputs.includeRulesetBranches)
+      }
       //Get age of last commit, generate issue title, and filter existing issues to current branch
       let commitAge: number
       let ignoredCommitInfo: {ignoredCount: number; usedFallback: boolean} | undefined = undefined
@@ -144,14 +147,16 @@ export async function run(): Promise<void> {
       // Start output group for current branch assessment (after commitAge is known)
       core.startGroup(logBranchGroupColor(branchToCheck.branchName, commitAge, validInputs.daysBeforeStale, validInputs.daysBeforeDelete))
 
-      // Log branch protection status for all protected branches
-      const protectionMsg = logBranchProtection(protection.isProtected, validInputs.includeProtectedBranches)
-      if (protectionMsg) {
+      // Log branch protection status only if we checked it
+      if (validInputs.includeProtectedBranches || validInputs.includeRulesetBranches) {
+        const protectionMsg = logBranchProtection(protection.isProtected, protection.canDelete, protection.protectionType, branchToCheck.branchName)
         core.info(protectionMsg)
-        if (!validInputs.includeProtectedBranches) {
-          core.endGroup()
-          continue
-        }
+      }
+      
+      // Skip protected branches if not including them
+      if (protection.isProtected && !protection.canDelete) {
+        core.endGroup()
+        continue
       }
 
       // Log last commit age
