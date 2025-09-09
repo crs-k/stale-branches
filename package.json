@@ -50,7 +50,7 @@
     "eslint-plugin-github": "5.1.8",
     "eslint-plugin-jest": "29.0.1",
     "eslint-plugin-prettier": "5.5.4",
-    "globals": "16.3.0",
+    "globals": "16.4.0",
     "js-yaml": "4.1.0",
     "npm-package-json-lint": "9.0.0",
     "prettier": "3.6.2",
