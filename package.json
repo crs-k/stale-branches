@@ -44,7 +44,7 @@
     "@types/node": "24.5.1",
     "@typescript-eslint/eslint-plugin": "8.44.0",
     "@typescript-eslint/parser": "8.44.0",
-    "@vercel/ncc": "0.38.3",
+    "@vercel/ncc": "0.38.4",
     "ansi-styles": "5.2.0",
     "eslint": "9.35.0",
     "eslint-plugin-github": "5.1.8",
