@@ -53,7 +53,7 @@
     "globals": "16.5.0",
     "js-yaml": "4.1.1",
     "npm-package-json-lint": "9.0.0",
-    "prettier": "3.7.3",
+    "prettier": "3.7.4",
     "ts-jest": "29.4.6",
     "typescript": "5.9.3"
   },
