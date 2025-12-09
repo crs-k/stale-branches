@@ -29,7 +29,7 @@
     "actions"
   ],
   "dependencies": {
-    "@actions/core": "1.11.1",
+    "@actions/core": "2.0.0",
     "@actions/github": "6.0.0",
     "@octokit/plugin-paginate-rest": "13.2.1",
     "@octokit/types": "12.5.0",
