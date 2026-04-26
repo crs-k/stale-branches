@@ -4,7 +4,7 @@ Feel free to:
 - Report a bug
 - Submit a fix
 - Submit a feature
-- Correct my spelling and grammar
+- Correct my spelling and grammar 
 - Propose new features
 
 ## [Github Flow](https://docs.github.com/en/get-started/quickstart/github-flow)
