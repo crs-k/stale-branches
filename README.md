@@ -5,6 +5,21 @@
 
 # Stale Branches
 
+## Table of Contents
+
+- [Usage](#usage)
+  - [Pre-requisites](#pre-requisites)
+  - [Inputs](#inputs)
+  - [Token Permissions](#token-permissions)
+  - [Outputs](#outputs)
+- [Example workflow](#example-workflow)
+  - [With defaults](#with-defaults)
+  - [With Inputs](#with-inputs)
+  - [Ignoring Commits](#ignoring-commits-by-message-committer-and-default-branch)
+  - [Using with Repository Rulesets](#using-with-repository-rulesets)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
+
 Finds and deletes stale branches. By default it aligns with
 [this](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-branches-in-your-repository/viewing-branches-in-your-repository) definition, but can be
 configured for other use cases.
@@ -46,7 +61,7 @@ Inputs are defined in [`action.yml`](action.yml). None are required.:
 | `ignore-issue-interaction`      | If this is enabled, the action will not interact with Github issues.                                                                                                                                                                                                                                                                                                                                                                                                                                                          | false                                                                                                    |
 | `include-protected-branches`    | If this is enabled, the action will include branches with legacy branch protection rules in the process.<br>**⚠️ IMPORTANT: When you use this, the token passed to `repo-token` must include "Administration" repository permissions (read)**. This is required to check branch protection rules. See the [Token Permissions](#token-permissions) section below for details.                                                                                                                                             | false                                                                                                    |
 | `include-ruleset-branches`      | If this is enabled, the action will include branches protected by repository rulesets in the process.<br>**⚠️ IMPORTANT: When you use this, the token passed to `repo-token` must include "Administration" repository permissions (read)**. This is required to check repository rulesets. See the [Token Permissions](#token-permissions) section below for details.                                                                                                                                                      | false                                                                                                    |
-| `ignore-commit-messages`        | Comma-separated list of commit messages (or substrings) to ignore when determining commit age. If provided, commits with these messages will be ignored when calculating branch age. e.g. Ignore commits produced by automated workflows.                                                                                                                                                                                                                                                                                     |
+| `ignore-commit-messages`        | Comma-separated list of commit messages (or substrings) to ignore when determining commit age. If provided, commits with these messages will be ignored when calculating branch age. e.g. Ignore commits produced by automated workflows.                                                                                                                                                                                                                                                                                     | `''`                                                                                                     |
 | `ignore-committers`             | Comma-separated list of committer usernames to ignore when calculating the most recent commit.                                                                                                                                                                                                                                                                                                                                                                                                                                | ''                                                                                                       |
 | `ignore-default-branch-commits` | If true, ignore commits that are also present in the default branch when determining the last meaningful commit. This fetches all default branch commits up to the staleness window (days-before-delete), ensuring robust filtering even for large/active repos.                                                                                                                                                                                                                                                              | false                                                                                                    |
 
@@ -149,7 +164,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Stale Branches
-        uses: crs-k/stale-branches@v5.0.0
+        uses: crs-k/stale-branches@v8.2.2
 ```
 
 ### With Inputs
@@ -172,7 +187,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Stale Branches
-        uses: crs-k/stale-branches@v5.0.0
+        uses: crs-k/stale-branches@v8.2.2
         with:
           repo-token: '${{ secrets.GITHUB_TOKEN }}'
           days-before-stale: 120
@@ -191,6 +206,7 @@ jobs:
           include-ruleset-branches: false
           ignore-commit-messages: ''
           ignore-committers: ''
+          ignore-default-branch-commits: false
 ```
 
 ### Ignoring Commits by Message, Committer, and Default Branch
@@ -239,7 +255,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Stale Branches
-        uses: crs-k/stale-branches@v5.0.0
+        uses: crs-k/stale-branches@v8.2.2
         with:
           repo-token: '${{ secrets.PERSONAL_ACCESS_TOKEN }}'
           include-protected-branches: false  # Disable legacy branch protection checks
