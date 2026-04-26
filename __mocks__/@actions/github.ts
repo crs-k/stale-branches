@@ -252,9 +252,7 @@ let defaultBranchResponse: ListDefaultBranchResponseDataType = {
       allow_squash_merge: true,
       allow_auto_merge: false,
       delete_branch_on_merge: true,
-      allow_merge_commit: true,
-      subscribers_count: 42,
-      network_count: 0
+      allow_merge_commit: true
     },
     temp_clone_token: 'ABTLWHOULUVAXGTRYU7OC2876QJ2O',
     allow_squash_merge: true,
@@ -393,8 +391,6 @@ let defaultBranchResponse: ListDefaultBranchResponseDataType = {
       allow_auto_merge: false,
       delete_branch_on_merge: true,
       allow_merge_commit: true,
-      subscribers_count: 42,
-      network_count: 0,
       license: {
         key: 'mit',
         name: 'MIT License',
@@ -510,8 +506,6 @@ let defaultBranchResponse: ListDefaultBranchResponseDataType = {
       allow_auto_merge: false,
       delete_branch_on_merge: true,
       allow_merge_commit: true,
-      subscribers_count: 42,
-      network_count: 0,
       license: {
         key: 'mit',
         name: 'MIT License',
