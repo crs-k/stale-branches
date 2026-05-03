@@ -29,13 +29,10 @@ export async function getBranches(includeProtectedBranches: boolean): Promise<Br
 
   try {
     const branchResponse = await github.paginate(github.rest.repos.listBranches, listBranchesParams, response =>
-      response.data.map(
-        branch =>
-          ({
-            branchName: branch.name,
-            commmitSha: branch.commit.sha
-          }) as BranchResponse
-      )
+      response.data.map(branch => ({
+        branchName: branch.name,
+        commmitSha: branch.commit.sha
+      }))
     )
     branches = branchResponse
 

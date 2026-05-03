@@ -1,8 +1,5 @@
 import * as core from '@actions/core'
-import {BranchResponse} from '../types/branches'
 import {github, owner, repo} from './get-context'
-import {RulesetResponse} from '../types/github-api'
-import {RequestError} from '@octokit/request-error'
 import {getRulesetProtectionStatus} from './get-ruleset-protection'
 
 /**
@@ -19,7 +16,7 @@ export async function getBranchProtectionStatus(
   try {
     const repoInfo = await github.rest.repos.get({owner, repo})
     defaultBranch = repoInfo.data.default_branch
-  } catch (err) {
+  } catch {
     return {isProtected: false, protectionType: '', canDelete: true}
   }
 
@@ -43,7 +40,7 @@ export async function getBranchProtectionStatus(
       isProtected = true
       protectionType = 'branch protection'
       // Check if deletions are explicitly allowed despite protection
-      if (protection.data && protection.data.allow_deletions && protection.data.allow_deletions.enabled) {
+      if (protection.data?.allow_deletions?.enabled) {
         // Branch protection allows deletions
         canDelete = true
       } else {
@@ -51,20 +48,21 @@ export async function getBranchProtectionStatus(
         canDelete = false
       }
     } catch (err) {
-      if ((err as any).status === 404) {
+      const httpErr = err as {status?: number; message?: string}
+      if (httpErr.status === 404) {
         // 404 means no branch protection exists - branch is unprotected
         // This is the expected case for unprotected branches
         core.debug(`No branch protection found for ${branchName} (404 - expected for unprotected branches)`)
-      } else if ((err as any).status === 403) {
+      } else if (httpErr.status === 403) {
         // 403 Forbidden - token lacks required permissions
         // Log warning but continue processing rather than failing the action
         core.warning(
-          `GitHub token lacks permission to read branch protection for ${branchName}. Please ensure your token has 'Administration' repository permissions (read). Treating as unprotected. Error: ${(err as any).message}`
+          `GitHub token lacks permission to read branch protection for ${branchName}. Please ensure your token has 'Administration' repository permissions (read). Treating as unprotected. Error: ${httpErr.message}`
         )
         hasPermissionIssues = true
       } else {
         // Log other unexpected errors (rate limits, network issues, etc.)
-        core.warning(`Failed to check branch protection for ${branchName}: ${(err as any).message || 'Unknown error'}. Treating as unprotected.`)
+        core.warning(`Failed to check branch protection for ${branchName}: ${httpErr.message ?? 'Unknown error'}. Treating as unprotected.`)
       }
     }
   }
@@ -74,7 +72,7 @@ export async function getBranchProtectionStatus(
     const rulesetStatus = await getRulesetProtectionStatus(branchName)
     hasRulesetProtection = rulesetStatus.hasRulesetProtection
     if (hasRulesetProtection) {
-      protectionType = protectionType ? protectionType + ' and ruleset' : 'ruleset'
+      protectionType = protectionType ? `${protectionType} and ruleset` : 'ruleset'
       isProtected = true
       canDelete = rulesetStatus.canDelete
     }

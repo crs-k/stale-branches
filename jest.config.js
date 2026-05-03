@@ -7,7 +7,7 @@ const config = {
     clearMocks: true,
     testMatch: ['**/*.test.ts'],
     transform: {
-        '^.+\\.tsx?$': 'ts-jest'
+        '^.+\\.tsx?$': ['ts-jest', {tsconfig: {types: ['jest', 'node']}}]
     },
     transformIgnorePatterns: [
         'node_modules/(?!@octokit/.*)'

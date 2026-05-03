@@ -17,7 +17,7 @@
     "lint": "npm run npmpackagejsonlint . && npm run eslint",
     "eslint": "eslint src/**/*.ts",
     "npmpackagejsonlint": "npmPkgJsonLint .",
-    "package": "set NODE_OPTIONS=--openssl-legacy-provider && ncc build --source-map",
+    "package": "esbuild lib/main.js --bundle --platform=node --conditions=import --outfile=dist/index.js --sourcemap",
     "test": "jest --coverage",
     "all": "npm run format && npm run lint && npm test && npm run build && npm run package"
   },
@@ -29,31 +29,32 @@
     "actions"
   ],
   "dependencies": {
-    "@actions/core": "2.0.1",
-    "@actions/github": "8.0.1",
+    "@actions/core": "3.0.1",
+    "@actions/github": "9.1.1",
     "@octokit/types": "16.0.0",
     "@types/semver": "7.7.1",
     "assert": "2.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "3.3.5",
-    "@eslint/js": "9.39.2",
+    "@eslint/js": "10.0.1",
     "@types/jest": "29.5.14",
     "@types/node": "25.6.0",
     "@typescript-eslint/eslint-plugin": "8.59.0",
     "@typescript-eslint/parser": "8.59.0",
-    "@vercel/ncc": "0.38.4",
+    "esbuild": "0.25.8",
     "ansi-styles": "5.2.0",
-    "eslint": "9.39.2",
+    "eslint": "10.2.1",
     "eslint-plugin-github": "5.1.8",
     "eslint-plugin-jest": "29.11.0",
     "eslint-plugin-prettier": "5.5.4",
-    "globals": "16.5.0",
+    "globals": "17.5.0",
+    "jest": "29.7.0",
     "js-yaml": "4.1.1",
     "npm-package-json-lint": "9.0.0",
     "prettier": "3.7.4",
-    "ts-jest": "29.4.6",
-    "typescript": "5.9.3"
+    "ts-jest": "29.4.9",
+    "typescript": "6.0.3"
   },
   "engines": {
     "node": ">=20.0.0"

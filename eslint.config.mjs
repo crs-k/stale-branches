@@ -24,7 +24,23 @@ export default [{
         "**/jest.config.js",
         "**/__mocks__/",
     ],
-}, ...compat.extends("plugin:github/recommended", "plugin:jest/recommended", "prettier"), {
+}, ...compat.extends("plugin:github/recommended", "prettier").map(config => {
+    const { rules = {}, ...rest } = config;
+    const filteredRules = Object.fromEntries(
+        Object.entries(rules).filter(([key]) =>
+            !key.startsWith('filenames/') && !key.startsWith('eslint-comments/')
+        )
+    );
+    return {
+        ...rest,
+        files: ["**/*.ts", "**/*.js"],
+        rules: filteredRules,
+    };
+}), ...compat.extends("plugin:jest/recommended").map(config => ({
+    ...config,
+    files: ["**/*.test.ts", "**/__tests__/**/*.ts"],
+})), {
+    files: ["**/*.ts", "**/*.js"],
     plugins: {
         jest,
         "@typescript-eslint": typescriptEslint,
@@ -70,7 +86,7 @@ export default [{
             allowExpressions: true,
         }],
 
-        "@typescript-eslint/func-call-spacing": ["error", "never"],
+        "func-call-spacing": ["error", "never"],
         "@typescript-eslint/no-array-constructor": "error",
         "@typescript-eslint/no-empty-interface": "error",
         "@typescript-eslint/no-explicit-any": "error",
@@ -91,9 +107,7 @@ export default [{
         "@typescript-eslint/promise-function-async": "error",
         "@typescript-eslint/require-array-sort-compare": "error",
         "@typescript-eslint/restrict-plus-operands": "error",
-        semi: "off",
-        "@typescript-eslint/semi": ["error", "never"],
-        "@typescript-eslint/type-annotation-spacing": "error",
+        semi: ["error", "never"],
         "@typescript-eslint/unbound-method": "error",
         "@typescript-eslint/method-signature-style": "error",
         "@typescript-eslint/no-dynamic-delete": "error",
