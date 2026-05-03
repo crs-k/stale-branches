@@ -265,4 +265,37 @@ describe('getBranchProtectionStatus - Branch Protection', () => {
     expect(warningSpy).toHaveBeenCalledWith(expect.stringContaining('GitHub token lacks permission to read repository rulesets for feature'))
     warningSpy.mockRestore()
   })
+
+  it('uses Unknown error message when branch protection error has no message property', async () => {
+    const core = require('@actions/core')
+    const warningSpy = jest.spyOn(core, 'warning').mockImplementation()
+    jest.spyOn(github.rest.repos, 'get').mockResolvedValueOnce({data: {default_branch: 'main'}} as any)
+    // Throw error without a message property to cover the `?? 'Unknown error'` branch
+    jest.spyOn(github.rest.repos, 'getBranchProtection').mockImplementationOnce(() => {
+      throw {status: 500}
+    })
+    jest.spyOn(github.rest.repos, 'getBranchRules').mockResolvedValueOnce({data: [], headers: {}, status: 200, url: 'mock-url'} as any)
+
+    const result = await getBranchProtectionStatus('feature', true, true)
+    expect(result.isProtected).toBe(false)
+    expect(result.canDelete).toBe(true)
+    expect(warningSpy).toHaveBeenCalledWith(expect.stringContaining('Unknown error'))
+    warningSpy.mockRestore()
+  })
+
+  it('returns ruleset-only protection when includeProtectedBranches=false but ruleset blocks deletion', async () => {
+    jest.spyOn(github.rest.repos, 'get').mockResolvedValueOnce({data: {default_branch: 'main'}} as any)
+    jest.spyOn(github.rest.repos, 'getBranchRules').mockResolvedValueOnce({
+      data: [{deletion: false}],
+      headers: {},
+      status: 200,
+      url: 'mock-url'
+    } as any)
+
+    const result = await getBranchProtectionStatus('feature', false, true)
+    expect(result.isProtected).toBe(true)
+    expect(result.canDelete).toBe(true)
+    // protectionType starts empty so the ternary assigns 'ruleset' (not 'X and ruleset')
+    expect(result.protectionType).toBe('ruleset')
+  })
 })

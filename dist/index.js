@@ -27142,7 +27142,7 @@ var require_log_last_commit_color = __commonJS({
         commitColor = `${ansi_styles_1.default.green.open}${commitColor}${ansi_styles_1.default.green.close}`;
       }
       if (ignoredCommitInfo && ignoredCommitInfo.ignoredCount > 0) {
-        commitColor += ` ${ansi_styles_1.default.cyan.open}(ignored ${ignoredCommitInfo.ignoredCount} commit${ignoredCommitInfo.ignoredCount > 1 ? "s" : ""} matching filter${ignoredCommitInfo.usedFallback ? ", used days-before-delete fallback" : ""})${ansi_styles_1.default.cyan.close}`;
+        commitColor += ` ${ansi_styles_1.default.cyan.open}(ignored ${ignoredCommitInfo.ignoredCount} commit${ignoredCommitInfo.ignoredCount > 1 ? "s" : ""} matching filter)${ansi_styles_1.default.cyan.close}`;
       }
       return commitColor;
     }

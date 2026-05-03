@@ -1061,4 +1061,111 @@ describe('Stale Branches Main Function', () => {
     expect(mockCloseIssue).toHaveBeenCalledTimes(2)
     expect(mockCloseIssue).toHaveBeenCalledWith(456)
   })
+
+  test('triggers rate limit break specifically during orphaned issues cleanup loop', async () => {
+    mockValidateInputs.mockResolvedValueOnce({
+      daysBeforeStale: 30,
+      daysBeforeDelete: 90,
+      commentUpdates: true,
+      maxIssues: 5,
+      tagLastCommitter: true,
+      staleBranchLabel: 'stale',
+      compareBranches: 'off',
+      rateLimit: true,
+      prCheck: false,
+      dryRun: false,
+      ignoreIssueInteraction: false,
+      includeProtectedBranches: false,
+      includeRulesetBranches: false,
+      branchesFilterRegex: '',
+      ignoreDefaultBranchCommits: false
+    })
+
+    // Skip branches loop entirely so rate limit is only checked in orphaned issues loop
+    mockFilterBranches.mockResolvedValueOnce([])
+
+    // One orphaned issue — no matching branch, so it stays in existingIssue after the branches loop
+    mockGetIssues.mockResolvedValue([{issueNumber: 999, issueTitle: '[orphaned-branch] is STALE'}])
+
+    // First rate limit call (in orphaned issues loop) exceeds 95%
+    mockGetRateLimit.mockResolvedValueOnce({
+      used: 96,
+      remaining: 4,
+      reset: 60,
+      resetDateTime: new Date()
+    })
+
+    await run()
+
+    // Rate limit break fires before closeIssue is ever called
+    expect(core.setFailed).toHaveBeenCalledWith('Exiting to avoid rate limit violation.')
+    expect(mockCloseIssue).not.toHaveBeenCalled()
+    expect(mockGetRateLimit).toHaveBeenCalledTimes(1)
+  })
+
+  test('ignoreDefaultBranchCommits: collects recent default-branch SHAs within delete window', async () => {
+    mockValidateInputs.mockResolvedValueOnce({
+      daysBeforeStale: 30,
+      daysBeforeDelete: 90,
+      commentUpdates: true,
+      maxIssues: 5,
+      tagLastCommitter: true,
+      staleBranchLabel: 'stale',
+      compareBranches: 'off',
+      rateLimit: false,
+      prCheck: false,
+      dryRun: false,
+      ignoreIssueInteraction: false,
+      includeProtectedBranches: false,
+      includeRulesetBranches: false,
+      branchesFilterRegex: '',
+      ignoreDefaultBranchCommits: true
+    })
+
+    // A commit dated 5 days ago — within the 90-day delete window
+    const recentDate = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString()
+    const githubMocked = jest.requireMock('../src/functions/get-context').github
+    githubMocked.rest.repos.listCommits.mockResolvedValueOnce({
+      data: [{sha: 'recent-sha', commit: {committer: {date: recentDate}}}]
+    })
+
+    await run()
+
+    // Function should complete without error; listCommits was called to collect default-branch SHAs
+    expect(core.setFailed).not.toHaveBeenCalled()
+    expect(githubMocked.rest.repos.listCommits).toHaveBeenCalled()
+  })
+
+  test('ignoreDefaultBranchCommits: stops collecting when commit age exceeds daysBeforeDelete', async () => {
+    mockValidateInputs.mockResolvedValueOnce({
+      daysBeforeStale: 10,
+      daysBeforeDelete: 20,
+      commentUpdates: true,
+      maxIssues: 5,
+      tagLastCommitter: true,
+      staleBranchLabel: 'stale',
+      compareBranches: 'off',
+      rateLimit: false,
+      prCheck: false,
+      dryRun: false,
+      ignoreIssueInteraction: false,
+      includeProtectedBranches: false,
+      includeRulesetBranches: false,
+      branchesFilterRegex: '',
+      ignoreDefaultBranchCommits: true
+    })
+
+    // A commit dated 30 days ago — exceeds the 20-day daysBeforeDelete threshold
+    const oldDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+    const githubMocked = jest.requireMock('../src/functions/get-context').github
+    githubMocked.rest.repos.listCommits.mockResolvedValueOnce({
+      data: [{sha: 'old-sha', commit: {committer: {date: oldDate}}}]
+    })
+
+    await run()
+
+    // Function should complete; done=true is set when commitAge > maxAgeDays, ending collection
+    expect(core.setFailed).not.toHaveBeenCalled()
+    expect(githubMocked.rest.repos.listCommits).toHaveBeenCalled()
+  })
 })

@@ -99,4 +99,18 @@ describe('getRulesetProtectionStatus', () => {
     expect(result.canDelete).toBe(true)
     expect(result.hasPermissionIssues).toBe(false)
   })
+
+  it('uses Unknown error message when ruleset error has no message property', async () => {
+    const warningSpy = jest.spyOn(core, 'warning').mockImplementation()
+    // Throw error without a message property to cover the `?? 'Unknown error'` branch
+    jest.spyOn(github.rest.repos, 'getBranchRules').mockImplementationOnce(() => {
+      throw {status: 500}
+    })
+    const result = await getRulesetProtectionStatus('feature')
+    expect(result.hasRulesetProtection).toBe(false)
+    expect(result.canDelete).toBe(true)
+    expect(result.hasPermissionIssues).toBe(false)
+    expect(warningSpy).toHaveBeenCalledWith(expect.stringContaining('Unknown error'))
+    warningSpy.mockRestore()
+  })
 })

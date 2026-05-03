@@ -25,7 +25,8 @@ export function logLastCommitColor(commitAge, daysBeforeStale, daysBeforeDelete,
   }
 
   if (ignoredCommitInfo && ignoredCommitInfo.ignoredCount > 0) {
-    commitColor += ` ${styles.cyan.open}(ignored ${ignoredCommitInfo.ignoredCount} commit${ignoredCommitInfo.ignoredCount > 1 ? 's' : ''} matching filter${ignoredCommitInfo.usedFallback ? ', used days-before-delete fallback' : ''})${styles.cyan.close}`
+    // usedFallback is always false here; the true case is handled by the early return above
+    commitColor += ` ${styles.cyan.open}(ignored ${ignoredCommitInfo.ignoredCount} commit${ignoredCommitInfo.ignoredCount > 1 ? 's' : ''} matching filter)${styles.cyan.close}`
   }
   return commitColor
 }

@@ -252,4 +252,158 @@ describe('getRecentCommitInfo', () => {
     expect(info.age).toBe(3) // Age of the first commit
     expect(info.ignoredCount).toBe(0)
   })
+
+  it('uses default empty array for ignoredMessages when parameter is omitted', async () => {
+    const now = new Date()
+    const recent = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString()
+    const commits = [{
+      sha: 'sha1',
+      commit: {message: 'feat: something', committer: {date: recent}, author: {name: 'Alice'}},
+      committer: {login: 'alice'},
+      author: {login: 'alice'}
+    }]
+    require('../../src/functions/get-context').github = {
+      rest: {
+        repos: {
+          listCommits: jest.fn().mockResolvedValueOnce({data: commits}).mockResolvedValue({data: []})
+        }
+      }
+    }
+    // Call without providing ignoredMessages — default [] should be used
+    const result = await getRecentCommitInfo('sha1')
+    expect(result.committer).toBe('alice')
+    expect(result.ignoredCount).toBe(0)
+  })
+
+  it('handles commit without a message (uses empty string fallback)', async () => {
+    const now = new Date()
+    const recent = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString()
+    const commits = [{
+      sha: 'sha1',
+      // commit.message is missing — exercises the `|| ''` branch
+      commit: {committer: {date: recent}},
+      committer: {login: 'alice'},
+      author: {login: 'alice'}
+    }]
+    require('../../src/functions/get-context').github = {
+      rest: {
+        repos: {
+          listCommits: jest.fn().mockResolvedValueOnce({data: commits}).mockResolvedValue({data: []})
+        }
+      }
+    }
+    const result = await getRecentCommitInfo('sha1', ['should-not-match'])
+    expect(result.committer).toBe('alice')
+    expect(result.ignoredCount).toBe(0)
+  })
+
+  it('skips commits that have no committer date', async () => {
+    const now = new Date()
+    const recent = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString()
+    const commits = [
+      {
+        sha: 'sha1',
+        // No committer.date — should be skipped via `if (!commitDateStr) continue`
+        commit: {message: 'no date', committer: {}},
+        committer: {login: 'alice'},
+        author: {login: 'alice'}
+      },
+      {
+        sha: 'sha2',
+        commit: {message: 'has date', committer: {date: recent}},
+        committer: {login: 'bob'},
+        author: {login: 'bob'}
+      }
+    ]
+    require('../../src/functions/get-context').github = {
+      rest: {
+        repos: {
+          listCommits: jest.fn().mockResolvedValueOnce({data: commits}).mockResolvedValue({data: []})
+        }
+      }
+    }
+    const result = await getRecentCommitInfo('sha1', [])
+    // alice is skipped (no date), bob is returned
+    expect(result.committer).toBe('bob')
+  })
+
+  it('uses author.login as committer fallback when committer.login is absent', async () => {
+    const now = new Date()
+    const recent = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString()
+    const commits = [{
+      sha: 'sha1',
+      commit: {message: 'x', committer: {date: recent}, author: {name: 'AuthorName'}},
+      committer: null, // no login
+      author: {login: 'author-login'}
+    }]
+    require('../../src/functions/get-context').github = {
+      rest: {
+        repos: {
+          listCommits: jest.fn().mockResolvedValueOnce({data: commits}).mockResolvedValue({data: []})
+        }
+      }
+    }
+    const result = await getRecentCommitInfo('sha1', [])
+    expect(result.committer).toBe('author-login')
+  })
+
+  it('uses commit.committer.name when both logins are absent', async () => {
+    const now = new Date()
+    const recent = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString()
+    const commits = [{
+      sha: 'sha1',
+      commit: {message: 'x', committer: {date: recent, name: 'CommitterName'}, author: {}},
+      committer: null,
+      author: null
+    }]
+    require('../../src/functions/get-context').github = {
+      rest: {
+        repos: {
+          listCommits: jest.fn().mockResolvedValueOnce({data: commits}).mockResolvedValue({data: []})
+        }
+      }
+    }
+    const result = await getRecentCommitInfo('sha1', [])
+    expect(result.committer).toBe('CommitterName')
+  })
+
+  it('uses commit.author.name when logins and committer.name are absent', async () => {
+    const now = new Date()
+    const recent = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString()
+    const commits = [{
+      sha: 'sha1',
+      commit: {message: 'x', committer: {date: recent}, author: {name: 'AuthorName'}},
+      committer: null,
+      author: null
+    }]
+    require('../../src/functions/get-context').github = {
+      rest: {
+        repos: {
+          listCommits: jest.fn().mockResolvedValueOnce({data: commits}).mockResolvedValue({data: []})
+        }
+      }
+    }
+    const result = await getRecentCommitInfo('sha1', [])
+    expect(result.committer).toBe('AuthorName')
+  })
+
+  it('falls back to Unknown when all committer fields are absent', async () => {
+    const now = new Date()
+    const recent = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString()
+    const commits = [{
+      sha: 'sha1',
+      commit: {message: 'x', committer: {date: recent}, author: {}},
+      committer: null,
+      author: null
+    }]
+    require('../../src/functions/get-context').github = {
+      rest: {
+        repos: {
+          listCommits: jest.fn().mockResolvedValueOnce({data: commits}).mockResolvedValue({data: []})
+        }
+      }
+    }
+    const result = await getRecentCommitInfo('sha1', [])
+    expect(result.committer).toBe('Unknown')
+  })
 })

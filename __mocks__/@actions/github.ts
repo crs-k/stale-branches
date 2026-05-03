@@ -787,7 +787,8 @@ const github = {
       get,
       listBranches,
       getCommit,
-      compareCommitsWithBasehead
+      compareCommitsWithBasehead,
+      listCommits: jest.fn().mockResolvedValue({data: []})
     },
     rateLimit: {
       get: getRateLimit

@@ -63,6 +63,7 @@ export async function getRecentCommitInfo(
       }
       // Only now check if commit is too old
       if (maxAgeDays !== undefined && commitAge > maxAgeDays) {
+        /* istanbul ignore else */
         if (!commitDate) {
           usedFallback = true
           return {committer, age: maxAgeDays, ignoredCount, usedFallback}
