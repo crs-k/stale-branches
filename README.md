@@ -164,7 +164,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Stale Branches
-        uses: crs-k/stale-branches@v8.2.2
+        uses: crs-k/stale-branches@v9.0.0
 ```
 
 ### With Inputs
@@ -187,7 +187,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Stale Branches
-        uses: crs-k/stale-branches@v8.2.2
+        uses: crs-k/stale-branches@v9.0.0
         with:
           repo-token: '${{ secrets.GITHUB_TOKEN }}'
           days-before-stale: 120
@@ -255,7 +255,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Stale Branches
-        uses: crs-k/stale-branches@v8.2.2
+        uses: crs-k/stale-branches@v9.0.0
         with:
           repo-token: '${{ secrets.PERSONAL_ACCESS_TOKEN }}'
           include-protected-branches: false  # Disable legacy branch protection checks
