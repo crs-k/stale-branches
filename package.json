@@ -44,7 +44,7 @@
     "@typescript-eslint/parser": "8.59.0",
     "esbuild": "0.25.8",
     "ansi-styles": "5.2.0",
-    "eslint": "9.39.4",
+    "eslint": "10.3.0",
     "eslint-plugin-github": "5.1.8",
     "eslint-plugin-jest": "29.11.0",
     "eslint-plugin-prettier": "5.5.4",
