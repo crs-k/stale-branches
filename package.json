@@ -42,7 +42,7 @@
     "@types/node": "25.6.0",
     "@typescript-eslint/eslint-plugin": "8.59.2",
     "@typescript-eslint/parser": "8.59.2",
-    "esbuild": "0.25.8",
+    "esbuild": "0.28.0",
     "ansi-styles": "5.2.0",
     "eslint": "9.39.4",
     "eslint-plugin-github": "5.1.8",
