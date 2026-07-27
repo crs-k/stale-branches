@@ -1,19 +1,7 @@
-import jest from "eslint-plugin-jest";
 import typescriptEslint from "@typescript-eslint/eslint-plugin";
 import globals from "globals";
 import tsParser from "@typescript-eslint/parser";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import js from "@eslint/js";
-import { FlatCompat } from "@eslint/eslintrc";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const compat = new FlatCompat({
-    baseDirectory: __dirname,
-    recommendedConfig: js.configs.recommended,
-    allConfig: js.configs.all
-});
 
 export default [{
     ignores: [
@@ -24,32 +12,18 @@ export default [{
         "**/jest.config.js",
         "**/__mocks__/",
     ],
-}, ...compat.extends("plugin:github/recommended", "prettier").map(config => {
-    const { rules = {}, ...rest } = config;
-    const filteredRules = Object.fromEntries(
-        Object.entries(rules).filter(([key]) =>
-            !key.startsWith('filenames/') && !key.startsWith('eslint-comments/')
-        )
-    );
-    return {
-        ...rest,
-        files: ["**/*.ts", "**/*.js"],
-        rules: filteredRules,
-    };
-}), ...compat.extends("plugin:jest/recommended").map(config => ({
-    ...config,
-    files: ["**/*.test.ts", "**/__tests__/**/*.ts"],
-})), {
+}, {
+    ...js.configs.recommended,
+    files: ["**/*.ts", "**/*.js"],
+}, {
     files: ["**/*.ts", "**/*.js"],
     plugins: {
-        jest,
         "@typescript-eslint": typescriptEslint,
     },
 
     languageOptions: {
         globals: {
             ...globals.node,
-            ...jest.environments.globals.globals,
         },
 
         parser: tsParser,
@@ -66,6 +40,7 @@ export default [{
         "eslint-comments/no-use": "off",
         "import/no-namespace": "off",
         "no-unused-vars": "off",
+        "no-undef": "off",
         "no-shadow": "off",
         "@typescript-eslint/no-shadow": "error",
         "@typescript-eslint/no-unused-vars": "error",

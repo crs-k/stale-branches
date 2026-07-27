@@ -7,12 +7,18 @@ const config = {
     clearMocks: true,
     testMatch: ['**/*.test.ts'],
     transform: {
-        '^.+\\.tsx?$': ['ts-jest', {tsconfig: {types: ['jest', 'node']}}]
+        '^.+\\.tsx?$': ['babel-jest', {
+            presets: [
+                ['@babel/preset-env', {targets: {node: 'current'}}],
+                ['@babel/preset-typescript', {allowDeclareFields: true}]
+            ]
+        }]
     },
     transformIgnorePatterns: [
         'node_modules/(?!@octokit/.*)'
     ],
     moduleNameMapper: {
+        '^assert$': '<rootDir>/__mocks__/assert.ts',
         '^@octokit/request-error$': '<rootDir>/__mocks__/request-error.ts'
     }
 };

@@ -14,8 +14,6 @@ import {logMaxIssues} from './logging/log-max-issues'
  * @returns {string} The maximum amount of issues that can be created during a workflow run
  */
 export async function getIssueBudget(maxIssues: number, staleBranchLabel: string): Promise<number> {
-  let issues: IssueResponse[]
-  let issueCount = 0
   let issueBudgetRemaining: number
   try {
     const issueResponse = await github.paginate(
@@ -29,8 +27,8 @@ export async function getIssueBudget(maxIssues: number, staleBranchLabel: string
       },
       response => response.data.map(issue => ({issueTitle: issue.title, issueNumber: issue.number}))
     )
-    issues = issueResponse
-    issueCount = new Set(issues.map(filteredIssues => filteredIssues.issueNumber)).size
+    const issues: IssueResponse[] = issueResponse
+    const issueCount = new Set(issues.map(filteredIssues => filteredIssues.issueNumber)).size
     issueBudgetRemaining = Math.max(0, maxIssues - issueCount)
     assert.ok(issues, 'Issue ID cannot be empty')
   } catch (err) {
