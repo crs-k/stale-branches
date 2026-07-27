@@ -14,7 +14,7 @@ let inputCompare = 'off'
 describe('Compare Branches Function', () => {
   test('compareCommitsWithBasehead endpoint is called with compare input off', async () => {
     const data = await compareBranches(head, inputCompare)
-    expect(github.rest.repos.compareCommitsWithBasehead).toBeCalledTimes(0)
+    expect(github.rest.repos.compareCommitsWithBasehead).toHaveBeenCalledTimes(0)
     expect(data).toEqual({save: false})
   })
 

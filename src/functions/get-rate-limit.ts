@@ -1,6 +1,5 @@
 import * as assert from 'assert'
 import * as core from '@actions/core'
-// eslint-disable-next-line import/no-unresolved
 import {GetResponseTypeFromEndpointMethod} from '@octokit/types'
 import {RateLimit} from '../types/rate-limit'
 import {getMinutes} from './utils/get-time'
@@ -14,10 +13,9 @@ type ListIssuesResponseDataType = GetResponseTypeFromEndpointMethod<typeof githu
  * @returns {RateLimit} data related to current rate limit usage @see {@link RateLimit}
  */
 export async function getRateLimit(): Promise<RateLimit> {
-  let rateLimit = {} as unknown as ListIssuesResponseDataType
   const rateLimitResponse = {} as unknown as RateLimit
   try {
-    rateLimit = await github.rest.rateLimit.get()
+    const rateLimit: ListIssuesResponseDataType = await github.rest.rateLimit.get()
 
     const rateLimitUsed = Math.round((rateLimit.data.resources.core.used / rateLimit.data.resources.core.limit) * 100)
     const rateLimitRemaining = Math.round((rateLimit.data.resources.core.remaining / rateLimit.data.resources.core.limit) * 100)

@@ -7,7 +7,6 @@ import {github, owner, repo} from './get-context'
  * @returns {pullRequests} A count of active pull requests for a branch
  */
 export async function getPr(branch: string): Promise<number> {
-  let pullRequests = 0
   try {
     // Check for incoming PRs
     const incomingPrResponse = await github.rest.pulls.list({
@@ -23,15 +22,13 @@ export async function getPr(branch: string): Promise<number> {
       head: `${owner}:${branch}`
     })
 
-    pullRequests = incomingPrResponse.data.length + outgoingPrResponse.data.length
+    return incomingPrResponse.data.length + outgoingPrResponse.data.length
   } catch (err) {
     if (err instanceof Error) {
       core.setFailed(`Failed to retrieve pull requests for ${branch}. Error: ${err.message}`)
     } else {
       core.setFailed(`Failed to retrieve pull requests for ${branch}.`)
     }
-    pullRequests = 0
+    return 0
   }
-
-  return pullRequests
 }

@@ -11,6 +11,7 @@
     "url": "https://github.com/crs-k/stale-branches/issues"
   },
   "scripts": {
+    "audit": "npm audit --audit-level=low",
     "build": "tsc",
     "format": "prettier --write src/**/*.ts",
     "format-check": "prettier --check src/**/*.ts",
@@ -19,7 +20,7 @@
     "npmpackagejsonlint": "npmPkgJsonLint .",
     "package": "esbuild lib/main.js --bundle --platform=node --conditions=import --outfile=dist/index.js --sourcemap",
     "test": "jest --coverage",
-    "all": "npm run format && npm run lint && npm test && npm run build && npm run package"
+    "all": "npm run format && npm run lint && npm test && npm run build && npm run package && npm run audit"
   },
   "repository": {
     "type": "git",
@@ -36,27 +37,31 @@
     "assert": "2.1.0"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "3.3.5",
-    "@eslint/js": "9.39.4",
-    "@types/jest": "29.5.14",
-    "@types/node": "25.9.3",
-    "@typescript-eslint/eslint-plugin": "8.61.1",
-    "@typescript-eslint/parser": "8.61.1",
+    "@babel/core": "7.29.7",
+    "@babel/preset-env": "7.29.7",
+    "@babel/preset-typescript": "7.29.7",
+    "@eslint/js": "10.0.1",
+    "@types/jest": "30.0.0",
+    "@types/node": "26.1.1",
+    "@typescript-eslint/eslint-plugin": "8.65.0",
+    "@typescript-eslint/parser": "8.65.0",
     "esbuild": "0.28.1",
     "ansi-styles": "5.2.0",
-    "eslint": "9.39.4",
-    "eslint-plugin-github": "5.1.8",
-    "eslint-plugin-jest": "29.15.2",
-    "eslint-plugin-prettier": "5.5.6",
-    "globals": "17.6.0",
-    "jest": "29.7.0",
-    "js-yaml": "4.3.0",
-    "npm-package-json-lint": "9.0.0",
-    "prettier": "3.8.4",
-    "ts-jest": "29.4.11",
+    "babel-jest": "30.4.1",
+    "eslint": "10.8.0",
+    "globals": "17.8.0",
+    "jest": "30.4.2",
+    "js-yaml": "5.2.2",
+    "npm-package-json-lint": "10.4.1",
+    "prettier": "3.9.6",
     "typescript": "6.0.3"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": "^22.13.0 || >=24"
+  },
+  "overrides": {
+    "glob": "13.0.6",
+    "minimatch": "10.2.5",
+    "test-exclude": "7.0.2"
   }
 }
