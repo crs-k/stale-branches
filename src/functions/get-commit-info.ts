@@ -65,8 +65,13 @@ export async function getRecentCommitInfo(
       if (maxAgeDays !== undefined && commitAge > maxAgeDays) {
         /* istanbul ignore else */
         if (!commitDate) {
+          // This commit passed the ignore filters, so it *is* the most recent meaningful
+          // commit — it simply predates the search window. Report its real age rather
+          // than clamping to maxAgeDays: callers compare with `age > daysBeforeDelete`,
+          // and maxAgeDays is daysBeforeDelete, so clamping made that unsatisfiable and
+          // the oldest branches could never be deleted.
           usedFallback = true
-          return {committer, age: maxAgeDays, ignoredCount, usedFallback}
+          return {committer, age: commitAge, ignoredCount, usedFallback}
         } else {
           found = true
           break
