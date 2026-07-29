@@ -1,6 +1,6 @@
 import * as assert from 'assert'
 import * as core from '@actions/core'
-import {GetResponseTypeFromEndpointMethod} from '@octokit/types'
+import type {GetResponseTypeFromEndpointMethod} from '@octokit/types'
 import {RateLimit} from '../types/rate-limit'
 import {getMinutes} from './utils/get-time'
 import {github} from './get-context'

@@ -26356,140 +26356,236 @@ var require_get_context = __commonJS({
 });
 
 // node_modules/ansi-styles/index.js
-var require_ansi_styles = __commonJS({
-  "node_modules/ansi-styles/index.js"(exports2, module2) {
-    "use strict";
-    var ANSI_BACKGROUND_OFFSET = 10;
-    var wrapAnsi256 = (offset = 0) => (code) => `\x1B[${38 + offset};5;${code}m`;
-    var wrapAnsi16m = (offset = 0) => (red, green, blue) => `\x1B[${38 + offset};2;${red};${green};${blue}m`;
-    function assembleStyles() {
-      const codes = /* @__PURE__ */ new Map();
-      const styles = {
-        modifier: {
-          reset: [0, 0],
-          // 21 isn't widely supported and 22 does the same thing
-          bold: [1, 22],
-          dim: [2, 22],
-          italic: [3, 23],
-          underline: [4, 24],
-          overline: [53, 55],
-          inverse: [7, 27],
-          hidden: [8, 28],
-          strikethrough: [9, 29]
-        },
-        color: {
-          black: [30, 39],
-          red: [31, 39],
-          green: [32, 39],
-          yellow: [33, 39],
-          blue: [34, 39],
-          magenta: [35, 39],
-          cyan: [36, 39],
-          white: [37, 39],
-          // Bright color
-          blackBright: [90, 39],
-          redBright: [91, 39],
-          greenBright: [92, 39],
-          yellowBright: [93, 39],
-          blueBright: [94, 39],
-          magentaBright: [95, 39],
-          cyanBright: [96, 39],
-          whiteBright: [97, 39]
-        },
-        bgColor: {
-          bgBlack: [40, 49],
-          bgRed: [41, 49],
-          bgGreen: [42, 49],
-          bgYellow: [43, 49],
-          bgBlue: [44, 49],
-          bgMagenta: [45, 49],
-          bgCyan: [46, 49],
-          bgWhite: [47, 49],
-          // Bright color
-          bgBlackBright: [100, 49],
-          bgRedBright: [101, 49],
-          bgGreenBright: [102, 49],
-          bgYellowBright: [103, 49],
-          bgBlueBright: [104, 49],
-          bgMagentaBright: [105, 49],
-          bgCyanBright: [106, 49],
-          bgWhiteBright: [107, 49]
-        }
+var ansi_styles_exports = {};
+__export(ansi_styles_exports, {
+  backgroundColorNames: () => backgroundColorNames,
+  colorNames: () => colorNames,
+  default: () => ansi_styles_default,
+  foregroundColorNames: () => foregroundColorNames,
+  modifierNames: () => modifierNames,
+  underlineColorNames: () => underlineColorNames
+});
+function assembleStyles() {
+  const codes = /* @__PURE__ */ new Map();
+  for (const [groupName, group2] of Object.entries(styles)) {
+    for (const [styleName, style] of Object.entries(group2)) {
+      styles[styleName] = {
+        open: `\x1B[${style[0]}m`,
+        close: `\x1B[${style[1]}m`
       };
-      styles.color.gray = styles.color.blackBright;
-      styles.bgColor.bgGray = styles.bgColor.bgBlackBright;
-      styles.color.grey = styles.color.blackBright;
-      styles.bgColor.bgGrey = styles.bgColor.bgBlackBright;
-      for (const [groupName, group2] of Object.entries(styles)) {
-        for (const [styleName, style] of Object.entries(group2)) {
-          styles[styleName] = {
-            open: `\x1B[${style[0]}m`,
-            close: `\x1B[${style[1]}m`
-          };
-          group2[styleName] = styles[styleName];
-          codes.set(style[0], style[1]);
-        }
-        Object.defineProperty(styles, groupName, {
-          value: group2,
-          enumerable: false
-        });
-      }
-      Object.defineProperty(styles, "codes", {
-        value: codes,
-        enumerable: false
-      });
-      styles.color.close = "\x1B[39m";
-      styles.bgColor.close = "\x1B[49m";
-      styles.color.ansi256 = wrapAnsi256();
-      styles.color.ansi16m = wrapAnsi16m();
-      styles.bgColor.ansi256 = wrapAnsi256(ANSI_BACKGROUND_OFFSET);
-      styles.bgColor.ansi16m = wrapAnsi16m(ANSI_BACKGROUND_OFFSET);
-      Object.defineProperties(styles, {
-        rgbToAnsi256: {
-          value: (red, green, blue) => {
-            if (red === green && green === blue) {
-              if (red < 8) {
-                return 16;
-              }
-              if (red > 248) {
-                return 231;
-              }
-              return Math.round((red - 8) / 247 * 24) + 232;
-            }
-            return 16 + 36 * Math.round(red / 255 * 5) + 6 * Math.round(green / 255 * 5) + Math.round(blue / 255 * 5);
-          },
-          enumerable: false
-        },
-        hexToRgb: {
-          value: (hex) => {
-            const matches = /(?<colorString>[a-f\d]{6}|[a-f\d]{3})/i.exec(hex.toString(16));
-            if (!matches) {
-              return [0, 0, 0];
-            }
-            let { colorString } = matches.groups;
-            if (colorString.length === 3) {
-              colorString = colorString.split("").map((character) => character + character).join("");
-            }
-            const integer = Number.parseInt(colorString, 16);
-            return [
-              integer >> 16 & 255,
-              integer >> 8 & 255,
-              integer & 255
-            ];
-          },
-          enumerable: false
-        },
-        hexToAnsi256: {
-          value: (hex) => styles.rgbToAnsi256(...styles.hexToRgb(hex)),
-          enumerable: false
-        }
-      });
-      return styles;
+      group2[styleName] = styles[styleName];
+      codes.set(Number(String(style[0]).split(/[:;]/v, 1)[0]), style[1]);
     }
-    Object.defineProperty(module2, "exports", {
-      enumerable: true,
-      get: assembleStyles
+    Object.defineProperty(styles, groupName, {
+      value: group2,
+      enumerable: false
     });
+  }
+  Object.defineProperty(styles, "codes", {
+    value: codes,
+    enumerable: false
+  });
+  styles.color.close = "\x1B[39m";
+  styles.bgColor.close = "\x1B[49m";
+  styles.underlineColor.close = "\x1B[59m";
+  styles.color.ansi = wrapAnsi16();
+  styles.color.ansi256 = wrapAnsi256();
+  styles.color.ansi16m = wrapAnsi16m();
+  styles.bgColor.ansi = wrapAnsi16(ANSI_BACKGROUND_OFFSET);
+  styles.bgColor.ansi256 = wrapAnsi256(ANSI_BACKGROUND_OFFSET);
+  styles.bgColor.ansi16m = wrapAnsi16m(ANSI_BACKGROUND_OFFSET);
+  styles.underlineColor.ansi = wrapUnderlineAnsi;
+  styles.underlineColor.ansi256 = wrapAnsi256(ANSI_UNDERLINE_OFFSET);
+  styles.underlineColor.ansi16m = wrapAnsi16m(ANSI_UNDERLINE_OFFSET);
+  Object.defineProperties(styles, {
+    rgbToAnsi256: {
+      value(red, green, blue) {
+        if (red === green && green === blue) {
+          if (red < 8) {
+            return 16;
+          }
+          if (red > 248) {
+            return 231;
+          }
+          return Math.round((red - 8) / 247 * 24) + 232;
+        }
+        return 16 + 36 * Math.round(red / 255 * 5) + 6 * Math.round(green / 255 * 5) + Math.round(blue / 255 * 5);
+      },
+      enumerable: false
+    },
+    hexToRgb: {
+      value(hex) {
+        const matches = /[\da-f]{6}|[\da-f]{3}/iv.exec(hex.toString(16));
+        if (!matches) {
+          return [0, 0, 0];
+        }
+        let [colorString] = matches;
+        if (colorString.length === 3) {
+          colorString = [...colorString].map((character) => character + character).join("");
+        }
+        const integer = Number.parseInt(colorString, 16);
+        return [
+          /* eslint-disable no-bitwise -- We need the speed */
+          integer >> 16 & 255,
+          integer >> 8 & 255,
+          integer & 255
+          /* eslint-enable no-bitwise */
+        ];
+      },
+      enumerable: false
+    },
+    hexToAnsi256: {
+      value: (hex) => styles.rgbToAnsi256(...styles.hexToRgb(hex)),
+      enumerable: false
+    },
+    ansi256ToAnsi: {
+      value(code) {
+        if (code < 8) {
+          return 30 + code;
+        }
+        if (code < 16) {
+          return 90 + (code - 8);
+        }
+        let red;
+        let green;
+        let blue;
+        if (code >= 232) {
+          red = ((code - 232) * 10 + 8) / 255;
+          green = red;
+          blue = red;
+        } else {
+          code -= 16;
+          const remainder = code % 36;
+          red = Math.floor(code / 36) / 5;
+          green = Math.floor(remainder / 6) / 5;
+          blue = remainder % 6 / 5;
+        }
+        const value = Math.max(red, green, blue) * 2;
+        if (value === 0) {
+          return 30;
+        }
+        let result = 30 + (Math.round(blue) << 2 | Math.round(green) << 1 | Math.round(red));
+        if (value === 2) {
+          result += 60;
+        }
+        return result;
+      },
+      enumerable: false
+    },
+    rgbToAnsi: {
+      value: (red, green, blue) => styles.ansi256ToAnsi(styles.rgbToAnsi256(red, green, blue)),
+      enumerable: false
+    },
+    hexToAnsi: {
+      value: (hex) => styles.ansi256ToAnsi(styles.hexToAnsi256(hex)),
+      enumerable: false
+    }
+  });
+  return styles;
+}
+var ANSI_BACKGROUND_OFFSET, ANSI_UNDERLINE_OFFSET, wrapAnsi16, wrapAnsi256, wrapAnsi16m, wrapUnderlineAnsi, blackBright, bgBlackBright, styles, modifierNames, foregroundColorNames, backgroundColorNames, underlineColorNames, colorNames, ansiStyles, ansi_styles_default;
+var init_ansi_styles = __esm({
+  "node_modules/ansi-styles/index.js"() {
+    ANSI_BACKGROUND_OFFSET = 10;
+    ANSI_UNDERLINE_OFFSET = 20;
+    wrapAnsi16 = (offset = 0) => (code) => `\x1B[${code + offset}m`;
+    wrapAnsi256 = (offset = 0) => (code) => `\x1B[${38 + offset};5;${code}m`;
+    wrapAnsi16m = (offset = 0) => (red, green, blue) => `\x1B[${38 + offset};2;${red};${green};${blue}m`;
+    wrapUnderlineAnsi = (code) => `\x1B[58;5;${code < 90 ? code - 30 : code - 90 + 8}m`;
+    blackBright = [90, 39];
+    bgBlackBright = [100, 49];
+    styles = {
+      modifier: {
+        reset: [0, 0],
+        // 21 isn't widely supported and 22 does the same thing
+        bold: [1, 22],
+        dim: [2, 22],
+        italic: [3, 23],
+        underline: [4, 24],
+        // Extended underline styles (`SGR 4:x` sub-parameters). Not in upstream `ansi-styles`.
+        underlineDouble: ["4:2", 24],
+        underlineCurly: ["4:3", 24],
+        underlineDotted: ["4:4", 24],
+        underlineDashed: ["4:5", 24],
+        overline: [53, 55],
+        inverse: [7, 27],
+        hidden: [8, 28],
+        strikethrough: [9, 29]
+      },
+      color: {
+        black: [30, 39],
+        red: [31, 39],
+        green: [32, 39],
+        yellow: [33, 39],
+        blue: [34, 39],
+        magenta: [35, 39],
+        cyan: [36, 39],
+        white: [37, 39],
+        // Bright color
+        blackBright,
+        gray: blackBright,
+        grey: blackBright,
+        redBright: [91, 39],
+        greenBright: [92, 39],
+        yellowBright: [93, 39],
+        blueBright: [94, 39],
+        magentaBright: [95, 39],
+        cyanBright: [96, 39],
+        whiteBright: [97, 39]
+      },
+      bgColor: {
+        bgBlack: [40, 49],
+        bgRed: [41, 49],
+        bgGreen: [42, 49],
+        bgYellow: [43, 49],
+        bgBlue: [44, 49],
+        bgMagenta: [45, 49],
+        bgCyan: [46, 49],
+        bgWhite: [47, 49],
+        // Bright color
+        bgBlackBright,
+        bgGray: bgBlackBright,
+        bgGrey: bgBlackBright,
+        bgRedBright: [101, 49],
+        bgGreenBright: [102, 49],
+        bgYellowBright: [103, 49],
+        bgBlueBright: [104, 49],
+        bgMagentaBright: [105, 49],
+        bgCyanBright: [106, 49],
+        bgWhiteBright: [107, 49]
+      },
+      // Underline color (`SGR 58`/`59`). Not in upstream `ansi-styles`.
+      underlineColor: {
+        underlineBlack: ["58;5;0", 59],
+        underlineRed: ["58;5;1", 59],
+        underlineGreen: ["58;5;2", 59],
+        underlineYellow: ["58;5;3", 59],
+        underlineBlue: ["58;5;4", 59],
+        underlineMagenta: ["58;5;5", 59],
+        underlineCyan: ["58;5;6", 59],
+        underlineWhite: ["58;5;7", 59],
+        // Bright color
+        underlineBlackBright: ["58;5;8", 59],
+        underlineGray: ["58;5;8", 59],
+        // Alias of `underlineBlackBright`
+        underlineGrey: ["58;5;8", 59],
+        // Alias of `underlineBlackBright`
+        underlineRedBright: ["58;5;9", 59],
+        underlineGreenBright: ["58;5;10", 59],
+        underlineYellowBright: ["58;5;11", 59],
+        underlineBlueBright: ["58;5;12", 59],
+        underlineMagentaBright: ["58;5;13", 59],
+        underlineCyanBright: ["58;5;14", 59],
+        underlineWhiteBright: ["58;5;15", 59]
+      }
+    };
+    modifierNames = Object.keys(styles.modifier);
+    foregroundColorNames = Object.keys(styles.color);
+    backgroundColorNames = Object.keys(styles.bgColor);
+    underlineColorNames = Object.keys(styles.underlineColor);
+    colorNames = [...foregroundColorNames, ...backgroundColorNames];
+    ansiStyles = assembleStyles();
+    ansi_styles_default = ansiStyles;
   }
 });
 
@@ -26502,7 +26598,7 @@ var require_log_close_issue = __commonJS({
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.logCloseIssue = logCloseIssue;
-    var ansi_styles_1 = __importDefault(require_ansi_styles());
+    var ansi_styles_1 = __importDefault((init_ansi_styles(), __toCommonJS(ansi_styles_exports)));
     function logCloseIssue(issueNumber, state) {
       const closeIssue = `Issue ${ansi_styles_1.default.cyan.open}#${issueNumber}${ansi_styles_1.default.cyan.close}'s state was changed to ${ansi_styles_1.default.redBright.open}${state}${ansi_styles_1.default.redBright.close}.`;
       return closeIssue;
@@ -26657,7 +26753,7 @@ var require_log_compare_branches = __commonJS({
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.logCompareBranches = logCompareBranches;
-    var ansi_styles_1 = __importDefault(require_ansi_styles());
+    var ansi_styles_1 = __importDefault((init_ansi_styles(), __toCommonJS(ansi_styles_exports)));
     function logCompareBranches(branchComparison, base, head) {
       let compareBranches;
       compareBranches = `${ansi_styles_1.default.bold.open}${head} has a status of [${branchComparison.branchStatus}] in comparison to ${base}. ${head} is ahead by ${branchComparison.aheadBy} commits and behind by ${branchComparison.behindBy} commits.${ansi_styles_1.default.bold.close}`;
@@ -26788,7 +26884,7 @@ var require_log_new_issue = __commonJS({
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.logNewIssue = logNewIssue;
     var create_issues_title_string_1 = require_create_issues_title_string();
-    var ansi_styles_1 = __importDefault(require_ansi_styles());
+    var ansi_styles_1 = __importDefault((init_ansi_styles(), __toCommonJS(ansi_styles_exports)));
     function logNewIssue(branchName) {
       const issueTitleString = (0, create_issues_title_string_1.createIssueTitleString)(branchName);
       const newIssue = `${ansi_styles_1.default.bold.open}New issue created:${ansi_styles_1.default.bold.close} ${ansi_styles_1.default.magentaBright.open}${issueTitleString}${ansi_styles_1.default.magentaBright.close}.`;
@@ -26922,7 +27018,7 @@ var require_log_update_issue = __commonJS({
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.logUpdateIssue = logUpdateIssue;
-    var ansi_styles_1 = __importDefault(require_ansi_styles());
+    var ansi_styles_1 = __importDefault((init_ansi_styles(), __toCommonJS(ansi_styles_exports)));
     function logUpdateIssue(issueNumber, createdAt, commentUrl) {
       const updateIssue = `Issue ${ansi_styles_1.default.cyan.open}#${issueNumber}${ansi_styles_1.default.cyan.close} comment was created at ${ansi_styles_1.default.magenta.open}${createdAt}${ansi_styles_1.default.magenta.close}. ${commentUrl}`;
       return updateIssue;
@@ -27022,7 +27118,7 @@ var require_log_delete_branch = __commonJS({
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.logDeleteBranch = logDeleteBranch;
-    var ansi_styles_1 = __importDefault(require_ansi_styles());
+    var ansi_styles_1 = __importDefault((init_ansi_styles(), __toCommonJS(ansi_styles_exports)));
     function logDeleteBranch(refFull) {
       const deleteBranch = `Branch: ${ansi_styles_1.default.redBright.open}${refFull}${ansi_styles_1.default.redBright.close} has been ${ansi_styles_1.default.redBright.open}deleted${ansi_styles_1.default.redBright.close}.`;
       return deleteBranch;
@@ -27112,7 +27208,7 @@ var require_log_get_branches = __commonJS({
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.logGetBranches = logGetBranches;
-    var ansi_styles_1 = __importDefault(require_ansi_styles());
+    var ansi_styles_1 = __importDefault((init_ansi_styles(), __toCommonJS(ansi_styles_exports)));
     function logGetBranches(branchLength) {
       const getBranches = `${ansi_styles_1.default.bold.open}[${ansi_styles_1.default.magenta.open}${branchLength}${ansi_styles_1.default.magenta.close}] ${ansi_styles_1.default.blueBright.open}branches found${ansi_styles_1.default.blueBright.close}.${ansi_styles_1.default.bold.close}`;
       return getBranches;
@@ -27214,7 +27310,7 @@ var require_log_max_issues = __commonJS({
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.logMaxIssues = logMaxIssues;
-    var ansi_styles_1 = __importDefault(require_ansi_styles());
+    var ansi_styles_1 = __importDefault((init_ansi_styles(), __toCommonJS(ansi_styles_exports)));
     function logMaxIssues(issueBudgetRemaining) {
       let maxIssues = `${ansi_styles_1.default.bold.open}[${ansi_styles_1.default.magenta.open}${issueBudgetRemaining}${ansi_styles_1.default.magenta.close}] ${ansi_styles_1.default.blueBright.open}max-issues budget remaining${ansi_styles_1.default.blueBright.close}.${ansi_styles_1.default.bold.close}`;
       if (issueBudgetRemaining < 1) {
@@ -27548,7 +27644,7 @@ var require_log_active_branch = __commonJS({
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.logActiveBranch = logActiveBranch;
-    var ansi_styles_1 = __importDefault(require_ansi_styles());
+    var ansi_styles_1 = __importDefault((init_ansi_styles(), __toCommonJS(ansi_styles_exports)));
     function logActiveBranch(branchName) {
       const closeIssue = `[${ansi_styles_1.default.green.open}${branchName}${ansi_styles_1.default.green.close}] has become active again.`;
       return closeIssue;
@@ -27565,7 +27661,7 @@ var require_log_branch_group_color = __commonJS({
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.logBranchGroupColor = logBranchGroupColor;
-    var ansi_styles_1 = __importDefault(require_ansi_styles());
+    var ansi_styles_1 = __importDefault((init_ansi_styles(), __toCommonJS(ansi_styles_exports)));
     function logBranchGroupColor(branchName, commitAge, daysBeforeStale, daysBeforeDelete) {
       let groupColor = `[${ansi_styles_1.default.greenBright.open}${branchName}${ansi_styles_1.default.greenBright.close}]`;
       if (commitAge > daysBeforeDelete) {
@@ -27589,7 +27685,7 @@ var require_log_last_commit_color = __commonJS({
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.logLastCommitColor = logLastCommitColor;
-    var ansi_styles_1 = __importDefault(require_ansi_styles());
+    var ansi_styles_1 = __importDefault((init_ansi_styles(), __toCommonJS(ansi_styles_exports)));
     function logLastCommitColor(commitAge, daysBeforeStale, daysBeforeDelete, ignoredCommitInfo, committer, sha) {
       if (ignoredCommitInfo && ignoredCommitInfo.usedFallback) {
         return `${ansi_styles_1.default.redBright.open}No meaningful commit found in the last ${daysBeforeDelete} days (days-before-delete).${ansi_styles_1.default.redBright.close} ${ansi_styles_1.default.cyan.open}(ignored ${ignoredCommitInfo.ignoredCount} commit${ignoredCommitInfo.ignoredCount > 1 ? "s" : ""} matching filter, used days-before-delete fallback)${ansi_styles_1.default.cyan.close}`;
@@ -27627,7 +27723,7 @@ var require_log_orphaned_issues = __commonJS({
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.logOrphanedIssues = logOrphanedIssues;
-    var ansi_styles_1 = __importDefault(require_ansi_styles());
+    var ansi_styles_1 = __importDefault((init_ansi_styles(), __toCommonJS(ansi_styles_exports)));
     function logOrphanedIssues(orphanCount) {
       const orphanedIssues = `${ansi_styles_1.default.bold.open}[${ansi_styles_1.default.magenta.open}${orphanCount}${ansi_styles_1.default.magenta.close}] ${ansi_styles_1.default.blueBright.open}orphaned issues found${ansi_styles_1.default.blueBright.close}.${ansi_styles_1.default.bold.close}`;
       return orphanedIssues;
@@ -27644,7 +27740,7 @@ var require_log_rate_limit_break = __commonJS({
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.logRateLimitBreak = logRateLimitBreak;
-    var ansi_styles_1 = __importDefault(require_ansi_styles());
+    var ansi_styles_1 = __importDefault((init_ansi_styles(), __toCommonJS(ansi_styles_exports)));
     function logRateLimitBreak(rateLimit) {
       const rateLimitBreak = `Exiting due to rate limit usage of ${ansi_styles_1.default.redBright.open}${rateLimit.used}%${ansi_styles_1.default.redBright.close}. Rate limit resets in ${ansi_styles_1.default.magenta.open}${rateLimit.reset}${ansi_styles_1.default.magenta.close} minutes @ ${ansi_styles_1.default.magenta.open}${rateLimit.resetDateTime}${ansi_styles_1.default.magenta.close}.`;
       return rateLimitBreak;
@@ -27661,7 +27757,7 @@ var require_log_total_assessed = __commonJS({
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.logTotalAssessed = logTotalAssessed;
-    var ansi_styles_1 = __importDefault(require_ansi_styles());
+    var ansi_styles_1 = __importDefault((init_ansi_styles(), __toCommonJS(ansi_styles_exports)));
     function logTotalAssessed(outputStales, outputTotal) {
       const totalAssessed = `${ansi_styles_1.default.bold.open}${ansi_styles_1.default.blueBright.open}Stale Branches Assessed${ansi_styles_1.default.blueBright.close}: [${ansi_styles_1.default.yellowBright.open}${outputStales}${ansi_styles_1.default.yellowBright.close}/${ansi_styles_1.default.magenta.open}${outputTotal}${ansi_styles_1.default.magenta.close}]${ansi_styles_1.default.bold.close}`;
       return totalAssessed;
@@ -27678,7 +27774,7 @@ var require_log_total_deleted = __commonJS({
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.logTotalDeleted = logTotalDeleted;
-    var ansi_styles_1 = __importDefault(require_ansi_styles());
+    var ansi_styles_1 = __importDefault((init_ansi_styles(), __toCommonJS(ansi_styles_exports)));
     function logTotalDeleted(outputDeletes, outputStales) {
       const totalDeleted = `${ansi_styles_1.default.bold.open}${ansi_styles_1.default.blueBright.open}Stale Branches Deleted${ansi_styles_1.default.blueBright.close}: [${ansi_styles_1.default.redBright.open}${outputDeletes}${ansi_styles_1.default.redBright.close}/${ansi_styles_1.default.yellowBright.open}${outputStales}${ansi_styles_1.default.yellowBright.close}]${ansi_styles_1.default.bold.close}`;
       return totalDeleted;
@@ -27695,7 +27791,7 @@ var require_log_filter_branches = __commonJS({
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.logFilterBranches = logFilterBranches;
-    var ansi_styles_1 = __importDefault(require_ansi_styles());
+    var ansi_styles_1 = __importDefault((init_ansi_styles(), __toCommonJS(ansi_styles_exports)));
     function logFilterBranches(branchLength) {
       return `${ansi_styles_1.default.bold.open}[${ansi_styles_1.default.magenta.open}${branchLength}${ansi_styles_1.default.magenta.close}] ${ansi_styles_1.default.blueBright.open}passed the RegEx filter${ansi_styles_1.default.blueBright.close}.${ansi_styles_1.default.bold.close}`;
     }
@@ -27838,7 +27934,7 @@ var require_log_skipped_branch = __commonJS({
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.logSkippedBranch = logSkippedBranch;
-    var ansi_styles_1 = __importDefault(require_ansi_styles());
+    var ansi_styles_1 = __importDefault((init_ansi_styles(), __toCommonJS(ansi_styles_exports)));
     function logSkippedBranch(branchName, activePrs) {
       const skippedBranch = `${ansi_styles_1.default.bold.open}${branchName}${ansi_styles_1.default.bold.close} was skipped due to ${ansi_styles_1.default.magenta.open}${activePrs}${ansi_styles_1.default.magenta.close} active pull request(s).`;
       return skippedBranch;
@@ -28044,7 +28140,7 @@ var require_log_branch_protection = __commonJS({
     };
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.logBranchProtection = logBranchProtection;
-    var ansi_styles_1 = __importDefault(require_ansi_styles());
+    var ansi_styles_1 = __importDefault((init_ansi_styles(), __toCommonJS(ansi_styles_exports)));
     function logBranchProtection(isProtected, canDelete, protectionType, branchName) {
       if (isProtected) {
         const typeInfo = protectionType ? ` (${protectionType})` : "";
