@@ -1,6 +1,6 @@
 import * as githubActual from '../../src/functions/get-context'
 // eslint-disable-next-line import/named
-import {GetResponseTypeFromEndpointMethod} from '@octokit/types'
+import type {GetResponseTypeFromEndpointMethod} from '@octokit/types'
 import {BranchResponse} from '../../src/types/branches'
 import {Inputs} from '../../src/types/inputs'
 
