@@ -6,7 +6,30 @@ import {Inputs} from '../types/inputs'
 const repoToken = core.getInput('repo-token')
 core.setSecret(repoToken)
 export const github = getOctokit(repoToken)
-export const {owner: owner, repo: repo} = context.repo
+
+/**
+ * Resolves the target repository.
+ *
+ * When the `repository` input is provided (in `owner/repo` form) the action
+ * scans that repository instead of the one the workflow runs in. This lets a
+ * single workflow scan many repositories via a matrix. When the input is empty
+ * we fall back to the workflow's own repository via `context.repo`.
+ */
+function resolveRepository(): {owner: string; repo: string} {
+  const repository = (core.getInput('repository') || '').trim()
+  if (!repository) {
+    return context.repo
+  }
+
+  const [inputOwner, inputRepo, ...rest] = repository.split('/')
+  if (!inputOwner || !inputRepo || rest.length > 0) {
+    core.setFailed(`repository input '${repository}' is not valid. Expected 'owner/repo'.`)
+    return context.repo
+  }
+  return {owner: inputOwner, repo: inputRepo}
+}
+
+export const {owner, repo} = resolveRepository()
 
 /**
  * Validates the Action's inputs and assigns them to the Inputs type

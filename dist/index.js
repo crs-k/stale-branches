@@ -26268,7 +26268,19 @@ var require_get_context = __commonJS({
     var repoToken = core.getInput("repo-token");
     core.setSecret(repoToken);
     exports2.github = (0, github_1.getOctokit)(repoToken);
-    _a = github_1.context.repo, exports2.owner = _a.owner, exports2.repo = _a.repo;
+    function resolveRepository() {
+      const repository = (core.getInput("repository") || "").trim();
+      if (!repository) {
+        return github_1.context.repo;
+      }
+      const [inputOwner, inputRepo, ...rest] = repository.split("/");
+      if (!inputOwner || !inputRepo || rest.length > 0) {
+        core.setFailed(`repository input '${repository}' is not valid. Expected 'owner/repo'.`);
+        return github_1.context.repo;
+      }
+      return { owner: inputOwner, repo: inputRepo };
+    }
+    _a = resolveRepository(), exports2.owner = _a.owner, exports2.repo = _a.repo;
     async function validateInputs() {
       const result = {};
       try {

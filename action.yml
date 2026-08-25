@@ -6,6 +6,10 @@ inputs:
     description: "The token to be used to auth with GitHubs API. Can be passed in using `{{ secrets.GITHUB_TOKEN }}`"
     required: false
     default: ${{ github.token }}
+  repository:
+    description: "Repository to scan in `owner/repo` form. Defaults to the repository the workflow runs in (GITHUB_REPOSITORY)."
+    required: false
+    default: ""
   days-before-stale:
     description: "Number of days a branch has been inactive before it is considered stale. Default: 120."
     required: false
