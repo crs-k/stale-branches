@@ -235,3 +235,59 @@ describe('Get Context Function', () => {
     expect(result.ignoreDefaultBranchCommits).toBe(false)
   })
 })
+
+describe('resolveRepository (repository input)', () => {
+  afterEach(() => {
+    jest.dontMock('@actions/core')
+    jest.resetModules()
+  })
+
+  // Re-mocks '@actions/core' (in its own reset module registry) so a fresh
+  // require of get-context picks up a specific `repository` input value -
+  // owner/repo are computed once at module load, so this is the only way to
+  // exercise resolveRepository() with different inputs.
+  function loadWithRepositoryInput(repositoryValue: string): {owner: string; repo: string; setFailed: jest.Mock} {
+    const setFailed = jest.fn()
+    jest.resetModules()
+    jest.doMock('@actions/core', () => ({
+      getInput: jest.fn((name: string) => (name === 'repository' ? repositoryValue : 'token')),
+      getBooleanInput: jest.fn(),
+      setSecret: jest.fn(),
+      setFailed
+    }))
+    const mod = require('../../src/functions/get-context')
+    return {owner: mod.owner, repo: mod.repo, setFailed}
+  }
+
+  test('falls back to context.repo when repository input is empty', () => {
+    const {owner, repo, setFailed} = loadWithRepositoryInput('')
+
+    expect(owner).toBe('owner')
+    expect(repo).toBe('repo')
+    expect(setFailed).not.toHaveBeenCalled()
+  })
+
+  test('overrides owner/repo when a valid repository input is provided', () => {
+    const {owner, repo, setFailed} = loadWithRepositoryInput('octocat/Hello-World')
+
+    expect(owner).toBe('octocat')
+    expect(repo).toBe('Hello-World')
+    expect(setFailed).not.toHaveBeenCalled()
+  })
+
+  test('falls back to context.repo and fails when repository input is missing a segment', () => {
+    const {owner, repo, setFailed} = loadWithRepositoryInput('not-a-valid-repo')
+
+    expect(owner).toBe('owner')
+    expect(repo).toBe('repo')
+    expect(setFailed).toHaveBeenCalledWith(`repository input 'not-a-valid-repo' is not valid. Expected 'owner/repo'.`)
+  })
+
+  test('falls back to context.repo and fails when repository input has too many segments', () => {
+    const {owner, repo, setFailed} = loadWithRepositoryInput('owner/repo/extra')
+
+    expect(owner).toBe('owner')
+    expect(repo).toBe('repo')
+    expect(setFailed).toHaveBeenCalledWith(`repository input 'owner/repo/extra' is not valid. Expected 'owner/repo'.`)
+  })
+})
