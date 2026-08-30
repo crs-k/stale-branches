@@ -27514,7 +27514,7 @@ var require_get_commit_info = __commonJS({
           if (maxAgeDays !== void 0 && commitAge > maxAgeDays) {
             if (!commitDate) {
               usedFallback = true;
-              return { committer, age: maxAgeDays, ignoredCount, usedFallback };
+              return { committer, age: commitAge, ignoredCount, usedFallback };
             } else {
               found = true;
               break;

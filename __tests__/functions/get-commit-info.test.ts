@@ -148,6 +148,40 @@ describe('getRecentCommitInfo', () => {
     expect(info.usedFallback).toBe(true)
   })
 
+  it('reports the real age when the last meaningful commit predates the window, so it stays deletable', async () => {
+    // Regression: the fallback used to return `age: maxAgeDays`. Callers gate deletion on
+    // `age > daysBeforeDelete` and pass daysBeforeDelete as maxAgeDays, so the clamp made
+    // that comparison always false and the oldest branches were never deleted.
+    const now = new Date()
+    const maxAgeDays = 180
+    const commits = [
+      {
+        ...mockCommits[0],
+        sha: 'ignored-sha',
+        commit: {...mockCommits[0].commit, message: 'bot: autoupdate merged', committer: {date: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString()}}
+      },
+      {
+        ...mockCommits[1],
+        sha: 'old-meaningful-sha',
+        commit: {...mockCommits[1].commit, message: 'fix: real work', committer: {date: new Date(now.getTime() - 564 * 24 * 60 * 60 * 1000).toISOString()}}
+      }
+    ]
+    require('../../src/functions/get-context').github = {
+      rest: {
+        repos: {
+          listCommits: jest.fn().mockResolvedValueOnce({data: commits}).mockResolvedValue({data: []})
+        }
+      }
+    }
+
+    const info = await getRecentCommitInfo('sha', ['bot:'], maxAgeDays, [])
+
+    expect(info.usedFallback).toBe(true)
+    expect(info.ignoredCount).toBe(1)
+    expect(info.age).toBeGreaterThan(maxAgeDays)
+    expect(info.age).toBe(564)
+  })
+
   it('returns fallback if all commits are ignored by default branch presence', async () => {
     // All commits are in default branch and within window
     const now = new Date()
