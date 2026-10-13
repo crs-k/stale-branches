@@ -26906,7 +26906,7 @@ var require_create_comment_string = __commonJS({
           break;
       }
       if (ignoredCommitInfo && ignoredCommitInfo.ignoredCount > 0) {
-        bodyString += `\r \r _Note: Ignored ${ignoredCommitInfo.ignoredCount} commit${ignoredCommitInfo.ignoredCount > 1 ? "s" : ""} matching filter${ignoredCommitInfo.usedFallback ? ", used days-before-delete fallback" : ""}._`;
+        bodyString += `\r \r _Note: Ignored ${ignoredCommitInfo.ignoredCount} commit${ignoredCommitInfo.ignoredCount > 1 ? "s" : ""} matching filter${ignoredCommitInfo.usedFallback ? ", used days-before-delete fallback" : ""}${ignoredCommitInfo.allBranchCommitsIgnored ? ". Every commit on this branch matched, so its age is taken from its oldest commit" : ""}._`;
       }
       return bodyString;
     }
@@ -27539,6 +27539,52 @@ var require_get_commit_info = __commonJS({
   }
 });
 
+// lib/functions/get-branch-commit-info.js
+var require_get_branch_commit_info = __commonJS({
+  "lib/functions/get-branch-commit-info.js"(exports2) {
+    "use strict";
+    Object.defineProperty(exports2, "__esModule", { value: true });
+    exports2.getBranchCommitInfo = getBranchCommitInfo;
+    var get_context_1 = require_get_context();
+    var get_time_1 = require_get_time();
+    var PER_PAGE = 100;
+    function committerOf(commit) {
+      return commit.committer?.login || commit.author?.login || commit.commit?.committer?.name || commit.commit?.author?.name || "Unknown";
+    }
+    function ageOf(commit, now) {
+      return (0, get_time_1.getDays)(now, new Date(commit.commit.committer.date).getTime());
+    }
+    async function getBranchCommitInfo(sha, defaultBranch, ignoredMessages, ignoredCommitters = []) {
+      const now = Date.now();
+      const basehead = `${defaultBranch}...${sha}`;
+      const compare = async (page) => (await get_context_1.github.rest.repos.compareCommitsWithBasehead({ owner: get_context_1.owner, repo: get_context_1.repo, basehead, per_page: PER_PAGE, page })).data;
+      const ignoredCommitterNames = ignoredCommitters.map((name) => name.toLowerCase());
+      const firstPage = await compare(1);
+      if (firstPage.total_commits === 0) {
+        const tip = (await get_context_1.github.rest.repos.getCommit({ owner: get_context_1.owner, repo: get_context_1.repo, ref: sha })).data;
+        return { committer: committerOf(tip), age: ageOf(tip, now), ignoredCount: 0, usedFallback: false, sha: tip.sha };
+      }
+      let ignoredCount = 0;
+      for (let page = Math.ceil(firstPage.total_commits / PER_PAGE); page >= 1; page--) {
+        const commits = page === 1 ? firstPage.commits : (await compare(page)).commits;
+        for (const commit of [...commits].reverse()) {
+          if (!commit.commit?.committer?.date)
+            continue;
+          const committer = committerOf(commit);
+          const message = commit.commit?.message || "";
+          if (ignoredMessages.some((msg) => message.includes(msg)) || ignoredCommitterNames.includes(committer.toLowerCase())) {
+            ignoredCount++;
+            continue;
+          }
+          return { committer, age: ageOf(commit, now), ignoredCount, usedFallback: false, sha: commit.sha };
+        }
+      }
+      const oldest = firstPage.commits[0];
+      return { committer: committerOf(oldest), age: ageOf(oldest, now), ignoredCount, usedFallback: false, allBranchCommitsIgnored: true, sha: oldest.sha };
+    }
+  }
+});
+
 // lib/functions/logging/log-active-branch.js
 var require_log_active_branch = __commonJS({
   "lib/functions/logging/log-active-branch.js"(exports2) {
@@ -27594,7 +27640,7 @@ var require_log_last_commit_color = __commonJS({
       if (ignoredCommitInfo && ignoredCommitInfo.usedFallback) {
         return `${ansi_styles_1.default.redBright.open}No meaningful commit found in the last ${daysBeforeDelete} days (days-before-delete).${ansi_styles_1.default.redBright.close} ${ansi_styles_1.default.cyan.open}(ignored ${ignoredCommitInfo.ignoredCount} commit${ignoredCommitInfo.ignoredCount > 1 ? "s" : ""} matching filter, used days-before-delete fallback)${ansi_styles_1.default.cyan.close}`;
       }
-      let label = "Last Meaningful Commit:";
+      const label = ignoredCommitInfo?.allBranchCommitsIgnored ? "No meaningful commit of its own; oldest branch-only commit:" : "Last Meaningful Commit:";
       let commitColor = `${label} ${ansi_styles_1.default.magenta.open}${commitAge.toString()}${ansi_styles_1.default.magenta.close} days ago`;
       if (committer) {
         commitColor += ` by ${ansi_styles_1.default.bold.open}${committer}${ansi_styles_1.default.bold.close}`;
@@ -28115,6 +28161,8 @@ var require_stale_branches = __commonJS({
     var get_issues_1 = require_get_issues();
     var get_rate_limit_1 = require_get_rate_limit();
     var get_commit_info_1 = require_get_commit_info();
+    var get_branch_commit_info_1 = require_get_branch_commit_info();
+    var get_default_branch_1 = require_get_default_branch();
     var log_active_branch_1 = require_log_active_branch();
     var log_branch_group_color_1 = require_log_branch_group_color();
     var log_last_commit_color_1 = require_log_last_commit_color();
@@ -28129,7 +28177,6 @@ var require_stale_branches = __commonJS({
     var log_skipped_branch_1 = require_log_skipped_branch();
     var get_branch_protection_1 = require_get_branch_protection();
     var log_branch_protection_1 = require_log_branch_protection();
-    var get_context_2 = require_get_context();
     async function closeIssueWrappedLogs(issueNumber, validInputs, branchName) {
       if (!validInputs.ignoreIssueInteraction && !validInputs.dryRun) {
         return await (0, close_issue_1.closeIssue)(issueNumber);
@@ -28154,38 +28201,7 @@ var require_stale_branches = __commonJS({
         let existingIssue = await (0, get_issues_1.getIssues)(validInputs.staleBranchLabel);
         let issueBudgetRemaining = await (0, get_stale_issue_budget_1.getIssueBudget)(validInputs.maxIssues, validInputs.staleBranchLabel);
         let lastCommitLogin = "Unknown";
-        let defaultBranch = "";
-        let defaultBranchShas = void 0;
-        if (validInputs.ignoreDefaultBranchCommits) {
-          const repoMeta = await get_context_2.github.rest.repos.get({ owner: get_context_2.owner, repo: get_context_2.repo });
-          defaultBranch = repoMeta.data.default_branch;
-          let page = 1;
-          let shas = [];
-          let done = false;
-          const maxAgeDays = validInputs.daysBeforeDelete;
-          const now = Date.now();
-          while (!done) {
-            const resp = await get_context_2.github.rest.repos.listCommits({ owner: get_context_2.owner, repo: get_context_2.repo, sha: defaultBranch, per_page: 100, page });
-            if (resp.data.length === 0)
-              break;
-            for (const commit of resp.data) {
-              const commitDateStr = commit.commit?.committer?.date;
-              if (commitDateStr) {
-                const commitDateTime = new Date(commitDateStr).getTime();
-                const commitAge = Math.floor((now - commitDateTime) / (1e3 * 60 * 60 * 24));
-                if (commitAge > maxAgeDays) {
-                  done = true;
-                  break;
-                }
-              }
-              shas.push(commit.sha);
-            }
-            if (resp.data.length < 100)
-              done = true;
-            page++;
-          }
-          defaultBranchShas = new Set(shas);
-        }
+        const defaultBranch = validInputs.ignoreDefaultBranchCommits ? await (0, get_default_branch_1.getDefaultBranch)() : "";
         for (const branchToCheck of branches) {
           let protection = { isProtected: false, protectionType: "", canDelete: true };
           if (validInputs.includeProtectedBranches || validInputs.includeRulesetBranches) {
@@ -28195,9 +28211,26 @@ var require_stale_branches = __commonJS({
           let ignoredCommitInfo = void 0;
           let committer = void 0;
           let lastMeaningfulSha = void 0;
-          if (validInputs.ignoreCommitMessages && validInputs.ignoreCommitMessages.trim() !== "") {
-            const ignoredMessages = validInputs.ignoreCommitMessages.split(",").map((s) => s.trim()).filter(Boolean);
-            const commitInfo = await (0, get_commit_info_1.getRecentCommitInfo)(branchToCheck.commmitSha, ignoredMessages, validInputs.daysBeforeDelete, validInputs.ignoreCommitters, defaultBranchShas, validInputs.ignoreDefaultBranchCommits);
+          const ignoredMessages = (validInputs.ignoreCommitMessages || "").split(",").map((s) => s.trim()).filter(Boolean);
+          if (validInputs.ignoreDefaultBranchCommits) {
+            let commitInfo;
+            try {
+              commitInfo = await (0, get_branch_commit_info_1.getBranchCommitInfo)(branchToCheck.commmitSha, defaultBranch, ignoredMessages, validInputs.ignoreCommitters);
+            } catch (err) {
+              core.warning(`Skipping ${branchToCheck.branchName}: could not compare it with ${defaultBranch}: ${err instanceof Error ? err.message : String(err)}`);
+              const skippedIssueTitle = (0, create_issues_title_string_1.createIssueTitleString)(branchToCheck.branchName);
+              existingIssue = existingIssue.filter((branchIssue) => branchIssue.issueTitle !== skippedIssueTitle);
+              continue;
+            }
+            commitAge = commitInfo.age;
+            committer = commitInfo.committer;
+            lastMeaningfulSha = commitInfo.sha;
+            ignoredCommitInfo = { ignoredCount: commitInfo.ignoredCount, usedFallback: commitInfo.usedFallback, allBranchCommitsIgnored: commitInfo.allBranchCommitsIgnored };
+            if (validInputs.tagLastCommitter === true) {
+              lastCommitLogin = commitInfo.committer;
+            }
+          } else if (ignoredMessages.length > 0) {
+            const commitInfo = await (0, get_commit_info_1.getRecentCommitInfo)(branchToCheck.commmitSha, ignoredMessages, validInputs.daysBeforeDelete, validInputs.ignoreCommitters);
             commitAge = commitInfo.age;
             committer = commitInfo.committer;
             lastMeaningfulSha = commitInfo.sha;
@@ -28206,7 +28239,7 @@ var require_stale_branches = __commonJS({
               lastCommitLogin = commitInfo.committer;
             }
           } else {
-            const commitInfo = await (0, get_commit_info_1.getRecentCommitInfo)(branchToCheck.commmitSha, [], void 0, validInputs.ignoreCommitters, defaultBranchShas, validInputs.ignoreDefaultBranchCommits);
+            const commitInfo = await (0, get_commit_info_1.getRecentCommitInfo)(branchToCheck.commmitSha, [], void 0, validInputs.ignoreCommitters);
             commitAge = commitInfo.age;
             committer = commitInfo.committer;
             lastMeaningfulSha = commitInfo.sha;

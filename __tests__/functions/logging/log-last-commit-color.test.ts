@@ -131,4 +131,15 @@ describe('logLastCommitColor', () => {
     
     expect(result).toBe(expected)
   })
+
+  it('reports the real age when every commit on the branch matched the filters', () => {
+    const ignoredCommitInfo = {ignoredCount: 462, usedFallback: false, allBranchCommitsIgnored: true}
+
+    const result = logLastCommitColor(432, 120, 180, ignoredCommitInfo, 'dev', 'abc123')
+
+    expect(result).toBe(
+      `${styles.redBright.open}No meaningful commit of its own; oldest branch-only commit: ${styles.magenta.open}432${styles.magenta.close} days ago by ${styles.bold.open}dev${styles.bold.close} ${styles.cyan.open}SHA: abc123${styles.cyan.close}.${styles.redBright.close} ${styles.cyan.open}(ignored 462 commits matching filter)${styles.cyan.close}`
+    )
+    expect(result).not.toContain('days-before-delete')
+  })
 })

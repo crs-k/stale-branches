@@ -77,4 +77,13 @@ describe('Create Comment String Function', () => {
     
     expect(result).toContain('This branch will be automatically deleted in 0 days')
   })
+
+  test('explains the age source when every commit on the branch matched the filters', () => {
+    const ignoredCommitInfo = {ignoredCount: 3, usedFallback: false, allBranchCommitsIgnored: true}
+
+    const result = createCommentString(branch, lastCommitter, commitAge, daysBeforeDelete, true, ignoredCommitInfo)
+
+    expect(result).toContain('_Note: Ignored 3 commits matching filter. Every commit on this branch matched, so its age is taken from its oldest commit._')
+    expect(result).not.toContain('fallback')
+  })
 })

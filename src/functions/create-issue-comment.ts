@@ -36,7 +36,7 @@ export async function createIssueComment(
   daysBeforeDelete: number,
   staleBranchLabel: string,
   tagLastCommitter: boolean,
-  ignoredCommitInfo?: {ignoredCount: number; usedFallback: boolean}
+  ignoredCommitInfo?: {ignoredCount: number; usedFallback: boolean; allBranchCommitsIgnored?: boolean}
 ): Promise<string> {
   let createdAt = ''
   let commentUrl: string
