@@ -21,7 +21,7 @@ export function createCommentString(
   commitAge: number,
   daysBeforeDelete: number,
   tagLastCommitter: boolean,
-  ignoredCommitInfo?: {ignoredCount: number; usedFallback: boolean}
+  ignoredCommitInfo?: {ignoredCount: number; usedFallback: boolean; allBranchCommitsIgnored?: boolean}
 ): string {
   const daysUntilDelete = Math.max(0, daysBeforeDelete - commitAge)
 
@@ -36,7 +36,7 @@ export function createCommentString(
   }
 
   if (ignoredCommitInfo && ignoredCommitInfo.ignoredCount > 0) {
-    bodyString += `\r \r _Note: Ignored ${ignoredCommitInfo.ignoredCount} commit${ignoredCommitInfo.ignoredCount > 1 ? 's' : ''} matching filter${ignoredCommitInfo.usedFallback ? ', used days-before-delete fallback' : ''}._`
+    bodyString += `\r \r _Note: Ignored ${ignoredCommitInfo.ignoredCount} commit${ignoredCommitInfo.ignoredCount > 1 ? 's' : ''} matching filter${ignoredCommitInfo.usedFallback ? ', used days-before-delete fallback' : ''}${ignoredCommitInfo.allBranchCommitsIgnored ? '. Every commit on this branch matched, so its age is taken from its oldest commit' : ''}._`
   }
 
   return bodyString

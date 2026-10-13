@@ -71,7 +71,7 @@ export async function run(): Promise<void> {
       }
       //Get age of last commit, generate issue title, and filter existing issues to current branch
       let commitAge: number
-      let ignoredCommitInfo: {ignoredCount: number; usedFallback: boolean} | undefined = undefined
+      let ignoredCommitInfo: {ignoredCount: number; usedFallback: boolean; allBranchCommitsIgnored?: boolean} | undefined = undefined
       let committer: string | undefined = undefined
       let lastMeaningfulSha: string | undefined = undefined
       const ignoredMessages = (validInputs.ignoreCommitMessages || '')
@@ -83,7 +83,7 @@ export async function run(): Promise<void> {
         commitAge = commitInfo.age
         committer = commitInfo.committer
         lastMeaningfulSha = commitInfo.sha
-        ignoredCommitInfo = {ignoredCount: commitInfo.ignoredCount, usedFallback: commitInfo.usedFallback}
+        ignoredCommitInfo = {ignoredCount: commitInfo.ignoredCount, usedFallback: commitInfo.usedFallback, allBranchCommitsIgnored: commitInfo.allBranchCommitsIgnored}
         if (validInputs.tagLastCommitter === true) {
           lastCommitLogin = commitInfo.committer
         }

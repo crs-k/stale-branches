@@ -26906,7 +26906,7 @@ var require_create_comment_string = __commonJS({
           break;
       }
       if (ignoredCommitInfo && ignoredCommitInfo.ignoredCount > 0) {
-        bodyString += `\r \r _Note: Ignored ${ignoredCommitInfo.ignoredCount} commit${ignoredCommitInfo.ignoredCount > 1 ? "s" : ""} matching filter${ignoredCommitInfo.usedFallback ? ", used days-before-delete fallback" : ""}._`;
+        bodyString += `\r \r _Note: Ignored ${ignoredCommitInfo.ignoredCount} commit${ignoredCommitInfo.ignoredCount > 1 ? "s" : ""} matching filter${ignoredCommitInfo.usedFallback ? ", used days-before-delete fallback" : ""}${ignoredCommitInfo.allBranchCommitsIgnored ? ". Every commit on this branch matched, so its age is taken from its oldest commit" : ""}._`;
       }
       return bodyString;
     }
@@ -27580,7 +27580,7 @@ var require_get_branch_commit_info = __commonJS({
         }
       }
       const oldest = firstPage.commits[0];
-      return { committer: committerOf(oldest), age: ageOf(oldest, now), ignoredCount, usedFallback: true, sha: oldest.sha };
+      return { committer: committerOf(oldest), age: ageOf(oldest, now), ignoredCount, usedFallback: false, allBranchCommitsIgnored: true, sha: oldest.sha };
     }
   }
 });
@@ -27640,7 +27640,7 @@ var require_log_last_commit_color = __commonJS({
       if (ignoredCommitInfo && ignoredCommitInfo.usedFallback) {
         return `${ansi_styles_1.default.redBright.open}No meaningful commit found in the last ${daysBeforeDelete} days (days-before-delete).${ansi_styles_1.default.redBright.close} ${ansi_styles_1.default.cyan.open}(ignored ${ignoredCommitInfo.ignoredCount} commit${ignoredCommitInfo.ignoredCount > 1 ? "s" : ""} matching filter, used days-before-delete fallback)${ansi_styles_1.default.cyan.close}`;
       }
-      let label = "Last Meaningful Commit:";
+      const label = ignoredCommitInfo?.allBranchCommitsIgnored ? "No meaningful commit of its own; oldest branch-only commit:" : "Last Meaningful Commit:";
       let commitColor = `${label} ${ansi_styles_1.default.magenta.open}${commitAge.toString()}${ansi_styles_1.default.magenta.close} days ago`;
       if (committer) {
         commitColor += ` by ${ansi_styles_1.default.bold.open}${committer}${ansi_styles_1.default.bold.close}`;
@@ -28217,7 +28217,7 @@ var require_stale_branches = __commonJS({
             commitAge = commitInfo.age;
             committer = commitInfo.committer;
             lastMeaningfulSha = commitInfo.sha;
-            ignoredCommitInfo = { ignoredCount: commitInfo.ignoredCount, usedFallback: commitInfo.usedFallback };
+            ignoredCommitInfo = { ignoredCount: commitInfo.ignoredCount, usedFallback: commitInfo.usedFallback, allBranchCommitsIgnored: commitInfo.allBranchCommitsIgnored };
             if (validInputs.tagLastCommitter === true) {
               lastCommitLogin = commitInfo.committer;
             }

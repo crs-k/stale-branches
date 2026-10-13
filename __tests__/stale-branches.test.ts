@@ -1124,9 +1124,11 @@ describe('Stale Branches Main Function', () => {
 
   test('ignoreDefaultBranchCommits: ages each branch by its own commits against the default branch', async () => {
     mockValidateInputs.mockResolvedValueOnce(inputsIgnoringDefaultBranch('Autoupdate merged, Merge pull request'))
-    mockGetBranchCommitInfo.mockResolvedValue({committer: 'dev', age: 2, ignoredCount: 1, usedFallback: true})
+    mockGetBranchCommitInfo.mockResolvedValue({committer: 'dev', age: 2, ignoredCount: 1, usedFallback: false, allBranchCommitsIgnored: true})
 
     await run()
+
+    expect(core.info).toHaveBeenCalledWith(expect.stringContaining('No meaningful commit of its own'))
 
     expect(mockGetBranchCommitInfo).toHaveBeenCalledWith('sha1', 'main', ['Autoupdate merged', 'Merge pull request'], ['renovate'])
     expect(mockGetBranchCommitInfo).toHaveBeenCalledWith('sha2', 'main', ['Autoupdate merged', 'Merge pull request'], ['renovate'])

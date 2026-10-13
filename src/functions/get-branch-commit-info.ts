@@ -26,14 +26,14 @@ function ageOf(commit: any, now: number): number {
  * @param {string[]} ignoredMessages Commit messages or substrings to ignore
  * @param {string[]} [ignoredCommitters] Committer usernames/names to ignore
  *
- * @returns {{ committer: string, age: number, ignoredCount: number, usedFallback: boolean, sha?: string }}
+ * @returns {{ committer: string, age: number, ignoredCount: number, usedFallback: boolean, allBranchCommitsIgnored?: boolean, sha?: string }}
  */
 export async function getBranchCommitInfo(
   sha: string,
   defaultBranch: string,
   ignoredMessages: string[],
   ignoredCommitters: string[] = []
-): Promise<{committer: string; age: number; ignoredCount: number; usedFallback: boolean; sha?: string}> {
+): Promise<{committer: string; age: number; ignoredCount: number; usedFallback: boolean; allBranchCommitsIgnored?: boolean; sha?: string}> {
   const now = Date.now()
   const basehead = `${defaultBranch}...${sha}`
   type Comparison = Awaited<ReturnType<typeof github.rest.repos.compareCommitsWithBasehead>>['data']
@@ -63,5 +63,5 @@ export async function getBranchCommitInfo(
   }
 
   const oldest = firstPage.commits[0]
-  return {committer: committerOf(oldest), age: ageOf(oldest, now), ignoredCount, usedFallback: true, sha: oldest.sha}
+  return {committer: committerOf(oldest), age: ageOf(oldest, now), ignoredCount, usedFallback: false, allBranchCommitsIgnored: true, sha: oldest.sha}
 }

@@ -51,13 +51,13 @@ describe('getBranchCommitInfo', () => {
     // of an ancient default-branch commit and deleted.
     mockApi([commit('merge', 'Merge pull request #1 from org/feature', 2)])
     const info = await getBranchCommitInfo('tip', 'main', ['Merge pull request'], [])
-    expect(info).toMatchObject({age: 2, usedFallback: true, ignoredCount: 1})
+    expect(info).toMatchObject({age: 2, usedFallback: false, allBranchCommitsIgnored: true, ignoredCount: 1})
   })
 
   it('keeps an abandoned branch deletable when only filtered commits have touched it since', async () => {
     mockApi([commit('first', 'GitHub WoBo Action Autoupdate merged', 400), commit('latest', 'GitHub WoBo Action Autoupdate merged', 1)])
     const info = await getBranchCommitInfo('tip', 'main', ['Autoupdate merged'], [])
-    expect(info).toMatchObject({age: 400, usedFallback: true, ignoredCount: 2})
+    expect(info).toMatchObject({age: 400, usedFallback: false, allBranchCommitsIgnored: true, ignoredCount: 2})
   })
 
   it('uses the tip commit age for a branch with no commits of its own', async () => {
@@ -85,7 +85,7 @@ describe('getBranchCommitInfo', () => {
     const branchOnly = Array.from({length: 150}, (_, i) => commit(`c${i}`, 'Merge pull request', 300 - i))
     const api = mockApi(branchOnly)
     const info = await getBranchCommitInfo('tip', 'main', ['Merge pull request'], [])
-    expect(info).toMatchObject({sha: 'c0', age: 300, usedFallback: true, ignoredCount: 150})
+    expect(info).toMatchObject({sha: 'c0', age: 300, usedFallback: false, allBranchCommitsIgnored: true, ignoredCount: 150})
     expect(api.compareCommitsWithBasehead.mock.calls.map(([args]) => args.page)).toEqual([1, 2])
   })
 })
