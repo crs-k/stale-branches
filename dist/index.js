@@ -28213,7 +28213,15 @@ var require_stale_branches = __commonJS({
           let lastMeaningfulSha = void 0;
           const ignoredMessages = (validInputs.ignoreCommitMessages || "").split(",").map((s) => s.trim()).filter(Boolean);
           if (validInputs.ignoreDefaultBranchCommits) {
-            const commitInfo = await (0, get_branch_commit_info_1.getBranchCommitInfo)(branchToCheck.commmitSha, defaultBranch, ignoredMessages, validInputs.ignoreCommitters);
+            let commitInfo;
+            try {
+              commitInfo = await (0, get_branch_commit_info_1.getBranchCommitInfo)(branchToCheck.commmitSha, defaultBranch, ignoredMessages, validInputs.ignoreCommitters);
+            } catch (err) {
+              core.warning(`Skipping ${branchToCheck.branchName}: could not compare it with ${defaultBranch}: ${err instanceof Error ? err.message : String(err)}`);
+              const skippedIssueTitle = (0, create_issues_title_string_1.createIssueTitleString)(branchToCheck.branchName);
+              existingIssue = existingIssue.filter((branchIssue) => branchIssue.issueTitle !== skippedIssueTitle);
+              continue;
+            }
             commitAge = commitInfo.age;
             committer = commitInfo.committer;
             lastMeaningfulSha = commitInfo.sha;

@@ -21,6 +21,7 @@ jest.mock('../src/functions/get-branch-protection')
 const core = require('@actions/core')
 const github = require('@actions/github')
 import {run} from '../src/stale-branches'
+import {createIssueTitleString} from '../src/functions/utils/create-issues-title-string'
 import {validateInputs} from '../src/functions/get-context'
 import {getBranches} from '../src/functions/get-branches'
 import {filterBranches} from '../src/functions/utils/filter-branches'
@@ -67,6 +68,7 @@ describe('Stale Branches Main Function', () => {
     core.endGroup = jest.fn()
     core.info = jest.fn()
     core.setFailed = jest.fn()
+    core.warning = jest.fn()
     
     // Mock a basic valid input configuration
     mockValidateInputs.mockResolvedValue({
@@ -1145,5 +1147,23 @@ describe('Stale Branches Main Function', () => {
     expect(mockGetBranchCommitInfo).toHaveBeenCalledWith('sha1', 'main', [], ['renovate'])
     expect(mockGetRecentCommitInfo).not.toHaveBeenCalled()
     expect(mockDeleteBranch).toHaveBeenCalledWith('feature-1')
+  })
+
+  test('ignoreDefaultBranchCommits: skips a branch that cannot be compared and keeps assessing the rest', async () => {
+    mockValidateInputs.mockResolvedValueOnce(inputsIgnoringDefaultBranch(''))
+    mockGetIssues.mockResolvedValue([{issueTitle: createIssueTitleString('feature-1'), issueNumber: 7}])
+    mockGetBranchCommitInfo.mockImplementation(async sha => {
+      if (sha === 'sha1') throw new Error('No common ancestor between main and sha1.')
+      return {committer: 'dev', age: 400, ignoredCount: 0, usedFallback: false}
+    })
+
+    await run()
+
+    expect(core.setFailed).not.toHaveBeenCalled()
+    expect(core.warning).toHaveBeenCalledWith(expect.stringContaining('feature-1'))
+    expect(mockDeleteBranch).not.toHaveBeenCalledWith('feature-1')
+    expect(mockDeleteBranch).toHaveBeenCalledWith('feature-2')
+    // its stale issue is left alone, not closed as orphaned
+    expect(mockCloseIssue).not.toHaveBeenCalled()
   })
 })

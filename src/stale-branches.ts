@@ -79,7 +79,17 @@ export async function run(): Promise<void> {
         .map(s => s.trim())
         .filter(Boolean)
       if (validInputs.ignoreDefaultBranchCommits) {
-        const commitInfo = await getBranchCommitInfo(branchToCheck.commmitSha, defaultBranch, ignoredMessages, validInputs.ignoreCommitters)
+        let commitInfo: Awaited<ReturnType<typeof getBranchCommitInfo>>
+        try {
+          commitInfo = await getBranchCommitInfo(branchToCheck.commmitSha, defaultBranch, ignoredMessages, validInputs.ignoreCommitters)
+        } catch (err) {
+          // e.g. a branch with no history in common with the default branch. Its age is unknown, so
+          // leave it and its stale issue alone rather than failing the whole run.
+          core.warning(`Skipping ${branchToCheck.branchName}: could not compare it with ${defaultBranch}: ${err instanceof Error ? err.message : String(err)}`)
+          const skippedIssueTitle = createIssueTitleString(branchToCheck.branchName)
+          existingIssue = existingIssue.filter(branchIssue => branchIssue.issueTitle !== skippedIssueTitle)
+          continue
+        }
         commitAge = commitInfo.age
         committer = commitInfo.committer
         lastMeaningfulSha = commitInfo.sha
