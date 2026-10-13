@@ -11,6 +11,8 @@ import {getIssues} from './functions/get-issues'
 import {getRateLimit} from './functions/get-rate-limit'
 import {getRecentCommitAge} from './functions/get-commit-age'
 import {getRecentCommitInfo} from './functions/get-commit-info'
+import {getBranchCommitInfo} from './functions/get-branch-commit-info'
+import {getDefaultBranch} from './functions/get-default-branch'
 import {logActiveBranch} from './functions/logging/log-active-branch'
 import {logBranchGroupColor} from './functions/logging/log-branch-group-color'
 import {logLastCommitColor} from './functions/logging/log-last-commit-color'
@@ -57,39 +59,8 @@ export async function run(): Promise<void> {
     let issueBudgetRemaining = await getIssueBudget(validInputs.maxIssues, validInputs.staleBranchLabel)
     let lastCommitLogin = 'Unknown'
 
-    // Get default branch name and SHAs if needed
-    let defaultBranch = ''
-    let defaultBranchShas: Set<string> | undefined = undefined
-    if (validInputs.ignoreDefaultBranchCommits) {
-      // Use the repo API to get the default branch name
-      const repoMeta = await github.rest.repos.get({owner, repo})
-      defaultBranch = repoMeta.data.default_branch
-      // Fetch SHAs from the default branch (up to maxAgeDays)
-      let page = 1
-      let shas: string[] = []
-      let done = false
-      const maxAgeDays = validInputs.daysBeforeDelete
-      const now = Date.now()
-      while (!done) {
-        const resp = await github.rest.repos.listCommits({owner, repo, sha: defaultBranch, per_page: 100, page})
-        if (resp.data.length === 0) break
-        for (const commit of resp.data) {
-          const commitDateStr = commit.commit?.committer?.date
-          if (commitDateStr) {
-            const commitDateTime = new Date(commitDateStr).getTime()
-            const commitAge = Math.floor((now - commitDateTime) / (1000 * 60 * 60 * 24))
-            if (commitAge > maxAgeDays) {
-              done = true
-              break
-            }
-          }
-          shas.push(commit.sha)
-        }
-        if (resp.data.length < 100) done = true
-        page++
-      }
-      defaultBranchShas = new Set(shas)
-    }
+    // Branch-only commits are found by comparing against the default branch
+    const defaultBranch = validInputs.ignoreDefaultBranchCommits ? await getDefaultBranch() : ''
 
     // Assess Branches
     for (const branchToCheck of branches) {
@@ -103,19 +74,21 @@ export async function run(): Promise<void> {
       let ignoredCommitInfo: {ignoredCount: number; usedFallback: boolean} | undefined = undefined
       let committer: string | undefined = undefined
       let lastMeaningfulSha: string | undefined = undefined
-      if (validInputs.ignoreCommitMessages && validInputs.ignoreCommitMessages.trim() !== '') {
-        const ignoredMessages = validInputs.ignoreCommitMessages
-          .split(',')
-          .map(s => s.trim())
-          .filter(Boolean)
-        const commitInfo = await getRecentCommitInfo(
-          branchToCheck.commmitSha,
-          ignoredMessages,
-          validInputs.daysBeforeDelete,
-          validInputs.ignoreCommitters,
-          defaultBranchShas,
-          validInputs.ignoreDefaultBranchCommits
-        )
+      const ignoredMessages = (validInputs.ignoreCommitMessages || '')
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean)
+      if (validInputs.ignoreDefaultBranchCommits) {
+        const commitInfo = await getBranchCommitInfo(branchToCheck.commmitSha, defaultBranch, ignoredMessages, validInputs.ignoreCommitters)
+        commitAge = commitInfo.age
+        committer = commitInfo.committer
+        lastMeaningfulSha = commitInfo.sha
+        ignoredCommitInfo = {ignoredCount: commitInfo.ignoredCount, usedFallback: commitInfo.usedFallback}
+        if (validInputs.tagLastCommitter === true) {
+          lastCommitLogin = commitInfo.committer
+        }
+      } else if (ignoredMessages.length > 0) {
+        const commitInfo = await getRecentCommitInfo(branchToCheck.commmitSha, ignoredMessages, validInputs.daysBeforeDelete, validInputs.ignoreCommitters)
         commitAge = commitInfo.age
         committer = commitInfo.committer
         lastMeaningfulSha = commitInfo.sha
@@ -125,7 +98,7 @@ export async function run(): Promise<void> {
         }
       } else {
         // No ignored messages, but still use getRecentCommitInfo for consistency
-        const commitInfo = await getRecentCommitInfo(branchToCheck.commmitSha, [], undefined, validInputs.ignoreCommitters, defaultBranchShas, validInputs.ignoreDefaultBranchCommits)
+        const commitInfo = await getRecentCommitInfo(branchToCheck.commmitSha, [], undefined, validInputs.ignoreCommitters)
         commitAge = commitInfo.age
         committer = commitInfo.committer
         lastMeaningfulSha = commitInfo.sha

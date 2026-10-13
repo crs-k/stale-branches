@@ -8,6 +8,7 @@ jest.mock('../src/functions/get-stale-issue-budget')
 jest.mock('../src/functions/get-default-branch')
 jest.mock('../src/functions/get-commit-age')
 jest.mock('../src/functions/get-commit-info')
+jest.mock('../src/functions/get-branch-commit-info')
 jest.mock('../src/functions/compare-branches')
 jest.mock('../src/functions/create-issue')
 jest.mock('../src/functions/create-issue-comment')
@@ -28,6 +29,7 @@ import {getIssueBudget} from '../src/functions/get-stale-issue-budget'
 import {getDefaultBranch} from '../src/functions/get-default-branch'
 import {getRecentCommitAge} from '../src/functions/get-commit-age'
 import {getRecentCommitInfo} from '../src/functions/get-commit-info'
+import {getBranchCommitInfo} from '../src/functions/get-branch-commit-info'
 import {compareBranches} from '../src/functions/compare-branches'
 import {createIssue} from '../src/functions/create-issue'
 import {createIssueComment} from '../src/functions/create-issue-comment'
@@ -45,6 +47,7 @@ const mockGetIssueBudget = getIssueBudget as jest.MockedFunction<typeof getIssue
 const mockGetDefaultBranch = getDefaultBranch as jest.MockedFunction<typeof getDefaultBranch>
 const mockGetRecentCommitAge = getRecentCommitAge as jest.MockedFunction<typeof getRecentCommitAge>
 const mockGetRecentCommitInfo = getRecentCommitInfo as jest.MockedFunction<typeof getRecentCommitInfo>
+const mockGetBranchCommitInfo = getBranchCommitInfo as jest.MockedFunction<typeof getBranchCommitInfo>
 const mockCompareBranches = compareBranches as jest.MockedFunction<typeof compareBranches>
 const mockCreateIssue = createIssue as jest.MockedFunction<typeof createIssue>
 const mockCreateIssueComment = createIssueComment as jest.MockedFunction<typeof createIssueComment>
@@ -994,17 +997,13 @@ describe('Stale Branches Main Function', () => {
       'sha1',
       ['merge', 'release'], // Parsed commit messages to ignore
       90, // daysBeforeDelete
-      ['bot@example.com'],
-      undefined, // No default branch SHAs since ignoreDefaultBranchCommits is false
-      false
+      ['bot@example.com']
     )
     expect(mockGetRecentCommitInfo).toHaveBeenCalledWith(
       'sha2',
       ['merge', 'release'],
       90,
-      ['bot@example.com'],
-      undefined,
-      false
+      ['bot@example.com']
     )
   })
 
@@ -1103,69 +1102,46 @@ describe('Stale Branches Main Function', () => {
     expect(mockGetRateLimit).toHaveBeenCalledTimes(1)
   })
 
-  test('ignoreDefaultBranchCommits: collects recent default-branch SHAs within delete window', async () => {
-    mockValidateInputs.mockResolvedValueOnce({
-      daysBeforeStale: 30,
-      daysBeforeDelete: 90,
-      commentUpdates: true,
-      maxIssues: 5,
-      tagLastCommitter: true,
-      staleBranchLabel: 'stale',
-      compareBranches: 'off',
-      rateLimit: false,
-      prCheck: false,
-      dryRun: false,
-      ignoreIssueInteraction: false,
-      includeProtectedBranches: false,
-      includeRulesetBranches: false,
-      branchesFilterRegex: '',
-      ignoreDefaultBranchCommits: true
-    })
-
-    // A commit dated 5 days ago — within the 90-day delete window
-    const recentDate = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString()
-    const githubMocked = jest.requireMock('../src/functions/get-context').github
-    githubMocked.rest.repos.listCommits.mockResolvedValueOnce({
-      data: [{sha: 'recent-sha', commit: {committer: {date: recentDate}}}]
-    })
-
-    await run()
-
-    // Function should complete without error; listCommits was called to collect default-branch SHAs
-    expect(core.setFailed).not.toHaveBeenCalled()
-    expect(githubMocked.rest.repos.listCommits).toHaveBeenCalled()
+  const inputsIgnoringDefaultBranch = (ignoreCommitMessages: string) => ({
+    daysBeforeStale: 120,
+    daysBeforeDelete: 180,
+    commentUpdates: true,
+    maxIssues: 5,
+    tagLastCommitter: true,
+    staleBranchLabel: 'stale',
+    compareBranches: 'off',
+    rateLimit: false,
+    prCheck: false,
+    dryRun: false,
+    ignoreIssueInteraction: false,
+    includeProtectedBranches: false,
+    includeRulesetBranches: false,
+    branchesFilterRegex: '',
+    ignoreCommitMessages,
+    ignoreCommitters: ['renovate'],
+    ignoreDefaultBranchCommits: true
   })
 
-  test('ignoreDefaultBranchCommits: stops collecting when commit age exceeds daysBeforeDelete', async () => {
-    mockValidateInputs.mockResolvedValueOnce({
-      daysBeforeStale: 10,
-      daysBeforeDelete: 20,
-      commentUpdates: true,
-      maxIssues: 5,
-      tagLastCommitter: true,
-      staleBranchLabel: 'stale',
-      compareBranches: 'off',
-      rateLimit: false,
-      prCheck: false,
-      dryRun: false,
-      ignoreIssueInteraction: false,
-      includeProtectedBranches: false,
-      includeRulesetBranches: false,
-      branchesFilterRegex: '',
-      ignoreDefaultBranchCommits: true
-    })
-
-    // A commit dated 30 days ago — exceeds the 20-day daysBeforeDelete threshold
-    const oldDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
-    const githubMocked = jest.requireMock('../src/functions/get-context').github
-    githubMocked.rest.repos.listCommits.mockResolvedValueOnce({
-      data: [{sha: 'old-sha', commit: {committer: {date: oldDate}}}]
-    })
+  test('ignoreDefaultBranchCommits: ages each branch by its own commits against the default branch', async () => {
+    mockValidateInputs.mockResolvedValueOnce(inputsIgnoringDefaultBranch('Autoupdate merged, Merge pull request'))
+    mockGetBranchCommitInfo.mockResolvedValue({committer: 'dev', age: 2, ignoredCount: 1, usedFallback: true})
 
     await run()
 
-    // Function should complete; done=true is set when commitAge > maxAgeDays, ending collection
-    expect(core.setFailed).not.toHaveBeenCalled()
-    expect(githubMocked.rest.repos.listCommits).toHaveBeenCalled()
+    expect(mockGetBranchCommitInfo).toHaveBeenCalledWith('sha1', 'main', ['Autoupdate merged', 'Merge pull request'], ['renovate'])
+    expect(mockGetBranchCommitInfo).toHaveBeenCalledWith('sha2', 'main', ['Autoupdate merged', 'Merge pull request'], ['renovate'])
+    expect(mockGetRecentCommitInfo).not.toHaveBeenCalled()
+    expect(mockDeleteBranch).not.toHaveBeenCalled()
+  })
+
+  test('ignoreDefaultBranchCommits: compares against the default branch even without ignored messages', async () => {
+    mockValidateInputs.mockResolvedValueOnce(inputsIgnoringDefaultBranch(''))
+    mockGetBranchCommitInfo.mockResolvedValue({committer: 'dev', age: 400, ignoredCount: 0, usedFallback: false})
+
+    await run()
+
+    expect(mockGetBranchCommitInfo).toHaveBeenCalledWith('sha1', 'main', [], ['renovate'])
+    expect(mockGetRecentCommitInfo).not.toHaveBeenCalled()
+    expect(mockDeleteBranch).toHaveBeenCalledWith('feature-1')
   })
 })
